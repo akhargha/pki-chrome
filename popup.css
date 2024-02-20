@@ -1,0 +1,35 @@
+body {
+    min-height: 700px;
+    min-width:300px;
+    max-height: 700px;
+    max-width:300px;
+}
+
+#settings-btn{
+    margin: 1em;
+}
+
+#points-btn{
+    margin-top: 1em;
+    margin-left: 1em;
+}
+
+#favicon-img{
+    min-height: 200%;
+    min-width: 200%;
+    max-width: 75px;
+    max-height: 75px;
+    margin-left: 0.5em;
+    margin-top: 0.5em;
+}
+
+#favicon-container {
+    display: inline-block;
+    margin-left: 1em;
+}
+
+#url-container {
+    text-align: center;
+    margin-top: 0.5em;
+}
+  

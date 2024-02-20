@@ -1,0 +1,11 @@
+{
+    "manifest_version": 3,
+    "name": "Save Website",
+    "version": "1.0",
+    "description": "Saves website URLs to a sensitive list in localStorage.",
+    "permissions": ["activeTab", "storage"],
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  
