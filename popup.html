@@ -9,49 +9,35 @@
 <body>
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="https://trincoll.edu">
-                <img src="/icons/shield-halved-solid.svg" width="40" height="28">
-              </a>
+          <a class="navbar-item" href="https://trincoll.edu">
+            <img src="/icons/shield-halved-solid.svg" width="40" height="28">
+          </a>
+          <h2 style="margin-left: 3em; margin-top: 0.8em;">Points: </h2> <!--POINTS-->
           <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
           </a>
         </div>
-      
+
         <div id="navbarMenu" class="navbar-menu">
           <div class="navbar-end">
             <div class="navbar-item">
-              <div class="buttons">
-                <button class="button is-primary" id="button1">Button 1</button>
-                <button class="button is-info" id="button2">Button 2</button>
-                <button class="button is-danger" id="button3">Button 3</button>
+              <div class="buttons is-centered">
+                <button class="button is-primary" id="nav-sensitive">Edit sensitive site list</button>
+                <button class="button is-primary" id="nav-unsafe">Edit unsafe site list</button>
+                <button class="button is-primary" id="nav-testing">Disable random testing</button>
               </div>
             </div>
           </div>
         </div>
       </nav>
-      
     
     <!--Top Bar-->
     <div class="columns is-multiline is-mobile">
-        <!--Points Button-->
-        <div class="column is-one-quarter">
-            <div id="points-btn" class="button is-pulled-right">
-                <img src="/icons/gear-solid.svg" style="width: 5em; height: 5em; margin-left: 1em;">
-            </div>
-        </div>
-
         <!--Favicon-->
         <div class="column is-half">
             <div id="favicon-container"></div>
-        </div>
-
-        <!--Settings Button-->
-        <div class="column is-one-quarter">
-            <div id="settings-btn" class="button is-pulled-right">
-                <img src="/icons/gear-solid.svg" style="width: 5em; height: 5em; margin-right: 1em;">
-            </div>
         </div>
     </div>
 
@@ -69,6 +55,12 @@
     <h2 class="subtitle" id="choose-option" style="text-align: center;">Choose an option below:</h2>
 
     <h2 class="subtitle" id="not-marked-sensitive-proceed-caution" style="text-align: center; display: none;">This site has NOT been marked sensitive by you. Please proceed carefully and check your source</h2>
+
+    <!--Visiting website that is in sensitive list-->
+    <h2 class="subtitle" id="all-set" style="text-align: center; display: none;">You are safe!</h2>
+
+     <!--Visiting website that is in unsafe list-->
+     <h2 class="subtitle" id="site-blocked-text" style="text-align: center; display: none;">You had previously marked this website as unsafe. Please proceed carefully.</h2>
 
     <!--user adds untrusted site-->
     <h2 class="subtitle" id="added-to-untrust" style="text-align: center; display: none;">This site has been added to your untrusted list. We will warn you if you try to visit this website again.</h2>
@@ -88,19 +80,18 @@
 
     <!--Thought site is sensitive-->
     <div class="block">
-        <button class="button is-rounded is-info is-fullwidth" id="unsafe-save-btn" style="display: none;">I do not trust this website</button>
+        <button class="button is-rounded is-info is-fullwidth" id="unsafe-save-btn-1" style="display: none;">I do not trust this website</button>
     </div>
 
+    <!--Make sensitive after block-->
     <div class="block">
-        <button class="button is-rounded is-info is-fullwidth" id="sensitive-save-btn" style="display: none;">I trust this website. I want to proceed.</button>
+        <button class="button is-rounded is-info is-fullwidth" id="sensitive-save-btn-1" style="display: none;">I trust this website. I want to proceed.</button>
     </div>
-
-    <ul id="saved-websites-list"></ul>
-
 
     <script src="popup.js"></script>
 </body>
 </html>
 
 
-<!--TO DO: Make the save and unsafe buttons work for every case; red button fix; fix so that display is diff when going to sensitive site; add blocking feature-->
+<!--TO DO:
+  add blocking feature-->

@@ -15,17 +15,16 @@ body {
 }
 
 #favicon-img{
-    min-height: 200%;
-    min-width: 200%;
-    max-width: 75px;
-    max-height: 75px;
-    margin-left: 0.5em;
-    margin-top: 0.5em;
+    min-height: 50px;
+    min-width: 50px;
+    max-height: 100px;
+    max-width: 100px
 }
 
 #favicon-container {
     display: inline-block;
     margin-left: 1em;
+    margin-left: 6em;
 }
 
 #url-container {
