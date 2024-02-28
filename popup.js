@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("TEST1");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const url = tabs[0].url;
         const urlObj = new URL(url);
@@ -13,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const faviconImage = document.createElement("img");
         faviconImage.src = favicon;
         faviconImage.alt = "Favicon";
-
+    
         // Clear previous favicon image if any
         const previousFavicon = document.getElementById("favicon-img");
         if (previousFavicon) {
@@ -25,11 +26,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const faviconContainer = document.getElementById("favicon-container");
         faviconContainer.appendChild(faviconImage);
 
+        console.log("TEST2");
+        chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
+
         checkList(webDomain).then((result) => {
             if (result === 0) {
                 //Website is sensitive
                 removeView();
                 document.getElementById("all-set").style.display = "block";
+                chrome.scripting.executeScript({
+                    target: {tabId: tabs[0].id},
+                    files: ['contentScript.js']
+                })
+                console.log("TEST");
+                //chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
             } else if (result === 1) {
                 //Website is unsafe
                 removeView();
@@ -37,6 +47,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById(
                     "sensitive-save-btn-1"
                 ).style.display = "block";
+                chrome.scripting.executeScript({
+                    target: {tabId: tabs[0].id},
+                    files: ['contentScript.js']
+                })
             } else {
                 //Website not found
                 console.log("Website not found in the list");
@@ -63,6 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document
             .getElementById("sensitive-save-btn-1")
             .addEventListener("click", function () {
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    //chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
+                });
                 chrome.storage.local.get({ websiteList: {} }, function (items) {
                     const websiteList = items.websiteList;
                     // Storing the URL with values: true for sensitive and a string "test"
@@ -100,6 +117,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             });
     });
+
+
+
 });
 
 document.addEventListener("DOMContentLoaded", function () {
