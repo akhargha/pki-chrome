@@ -26,9 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const faviconContainer = document.getElementById("favicon-container");
         faviconContainer.appendChild(faviconImage);
 
-        console.log("TEST2");
-        chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
-
         checkList(webDomain).then((result) => {
             if (result === 0) {
                 //Website is sensitive
@@ -38,8 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     target: {tabId: tabs[0].id},
                     files: ['contentScript.js']
                 })
-                console.log("TEST");
-                //chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
+                chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
             } else if (result === 1) {
                 //Website is unsafe
                 removeView();
