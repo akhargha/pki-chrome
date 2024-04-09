@@ -31,7 +31,7 @@ def get_certificate_info():
 
     try:
         # Get the frequency parameter from the query string
-        frequency = int(request.args.get('frequency', 5))  # Default frequency is 5
+        frequency = int(request.args.get('frequency', 100000))  # Default frequency is 5
 
         # Call randomTesting function with the specified frequency
         if randomTesting(frequency):

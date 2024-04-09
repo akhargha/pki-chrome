@@ -1,4 +1,3 @@
-console.log("CScript");
 
 const url = new URL(window.location.href);
 const webDomain = url.hostname;

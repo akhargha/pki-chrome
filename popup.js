@@ -1,3 +1,13 @@
+/**
+ * 1. Store frequency of random testing as input.
+ * 1. Display cert info (call function with a 0 probability of fakecert) - save that in string
+ * 2. use saved string and save cert info for sensitive site when the site is added to list
+ * 3. use function call (using frequency stored) when opening popup and determining site list - if in sensitive and different from list-saved, then do not send 'removeblocker' and display message and give option to trust.
+ * 4. in this, if the cert info is fake (match strings), then if user clicks on "trust" - give feedback
+ */
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("TEST1");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {

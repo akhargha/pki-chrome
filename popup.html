@@ -1,115 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="popup.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+  </head>
+  <body>
     <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="https://trincoll.edu">
-            <img src="/icons/shield-halved-solid.svg" width="40" height="28">
-          </a>
-          <h2 style="margin-left: 3em; margin-top: 0.8em;">Points: </h2> <!--POINTS-->
-          <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-          </a>
-        </div>
+      <div class="navbar-brand">
+        <a class="navbar-item" href="https://trincoll.edu">
+          <img src="/icons/shield-halved-solid.svg" width="40" height="28" />
+        </a>
+        <h2 style="margin-left: 3em; margin-top: 0.8em">Points:</h2>
+        <!--POINTS-->
+        <a
+          role="button"
+          class="navbar-burger burger"
+          aria-label="menu"
+          aria-expanded="false"
+          data-target="navbarMenu"
+        >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
 
-        <div id="navbarMenu" class="navbar-menu">
-          <div class="navbar-end">
-            <div class="navbar-item">
-              <div class="buttons is-centered">
-                <button class="button is-primary" id="nav-sensitive">Edit sensitive site list</button>
-                <button class="button is-primary" id="nav-unsafe">Edit unsafe site list</button>
-                <button class="button is-primary" id="nav-testing">Disable random testing</button>
+      <div id="navbarMenu" class="navbar-menu">
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons is-centered">
+              <button class="button is-primary" id="nav-sensitive">
+                Edit sensitive site list
+              </button>
+              <button class="button is-primary" id="nav-unsafe">
+                Edit unsafe site list
+              </button>
+              <div style="border: 1px solid #ccc; border-radius: 10px; padding: 5px;">
+                <h5 style="display: inline;">Change how often you will be tested</h5><br>
+                <div class="input-group">
+                  <input class="slider is-fullwidth is-primary" step="1" min="0" max="100" value="50" type="range" style="margin-top: 15px; margin-right: 25px; margin-left: 10px;">
+                  <button class="button is-primary" id="save_slider" onclick="getCertificateInfo()">Save</button>
               </div>
+            </div>
+              
             </div>
           </div>
         </div>
-      </nav>
-    
+      </div>
+    </nav>
+
     <!--Top Bar-->
     <div class="columns is-multiline is-mobile">
-        <!--Favicon-->
-        <div class="column is-half">
-            <div id="favicon-container"></div>
-        </div>
+      <!--Favicon-->
+      <div class="column is-half">
+        <div id="favicon-container"></div>
+      </div>
     </div>
 
     <!--URL-->
     <p id="url-container"></p>
-    <br>
+    <br />
     <!--CA Info-->
-    <h2 class="title" style="text-align: center;"> Root CA </h2>
+    <h2 class="title" style="text-align: center">Root CA</h2>
 
     <!--Info Text-->
-    <p id="not-recognized-text" style="text-align: center;"> <img src="/icons/triangle-exclamation-solid.svg" style="max-width: 20px; max-height: 20px;"> We do <strong>not</strong> recognize this site. If you are visiting a sensitive site, please recheck your source and verify you are visiting the correct website.</p>
+    <p id="not-recognized-text" style="text-align: center">
+      <img
+        src="/icons/triangle-exclamation-solid.svg"
+        style="max-width: 20px; max-height: 20px"
+      />
+      We do <strong>not</strong> recognize this site. If you are visiting a
+      sensitive site, please recheck your source and verify you are visiting the
+      correct website.
+    </p>
 
-    <br>
+    <br />
 
-    <h2 class="subtitle" id="choose-option" style="text-align: center;">Choose an option below:</h2>
+    <h2 class="subtitle" id="choose-option" style="text-align: center">
+      Choose an option below:
+    </h2>
 
-    <h2 class="subtitle" id="not-marked-sensitive-proceed-caution" style="text-align: center; display: none;">This site has NOT been marked sensitive by you. Please proceed carefully and check your source</h2>
+    <h2
+      class="subtitle"
+      id="not-marked-sensitive-proceed-caution"
+      style="text-align: center; display: none"
+    >
+      This site has NOT been marked sensitive by you. Please proceed carefully
+      and check your source
+    </h2>
 
     <!--Visiting website that is in sensitive list-->
-    <h2 class="subtitle" id="all-set" style="text-align: center; display: none;">You are safe!</h2>
+    <h2 class="subtitle" id="all-set" style="text-align: center; display: none">
+      You are safe!
+    </h2>
 
-     <!--Visiting website that is in unsafe list-->
-     <h2 class="subtitle" id="site-blocked-text" style="text-align: center; display: none;">You had previously marked this website as unsafe. Please proceed carefully.</h2>
+    <!--Visiting website that is in unsafe list-->
+    <h2
+      class="subtitle"
+      id="site-blocked-text"
+      style="text-align: center; display: none"
+    >
+      You had previously marked this website as unsafe. Please proceed
+      carefully.
+    </h2>
 
     <!--user adds untrusted site-->
-    <h2 class="subtitle" id="added-to-untrust" style="text-align: center; display: none;">This site has been added to your untrusted list. We will warn you if you try to visit this website again.</h2>
+    <h2
+      class="subtitle"
+      id="added-to-untrust"
+      style="text-align: center; display: none"
+    >
+      This site has been added to your untrusted list. We will warn you if you
+      try to visit this website again.
+    </h2>
 
     <!--user adds trusted site-->
-    <h2 class="subtitle" id="added-to-trusted" style="text-align: center; display: none;">This site has been added to your trusted list. Please click on our extension every time you visit this website to protect yourself from attacks.</h2>
+    <h2
+      class="subtitle"
+      id="added-to-trusted"
+      style="text-align: center; display: none"
+    >
+      This site has been added to your trusted list. Please click on our
+      extension every time you visit this website to protect yourself from
+      attacks.
+    </h2>
 
     <!--Buttons-->
     <!--Initial-->
     <div class="block">
-        <button class="button is-rounded is-info is-fullwidth" id="sensitive-save-btn" style="min-height: 3em;">Save new sensitive site</button>
+      <button
+        class="button is-rounded is-info is-fullwidth"
+        id="sensitive-save-btn"
+        style="min-height: 3em"
+      >
+        Save new sensitive site
+      </button>
     </div>
 
     <div class="block">
-        <button class="button is-rounded is-danger is-clipped is-fullwidth" id="unsafe-save-btn" style="min-height: 3em;">I thought this was one of my saved <br> sensitive sites</button>
+      <button
+        class="button is-rounded is-danger is-clipped is-fullwidth"
+        id="unsafe-save-btn"
+        style="min-height: 3em"
+      >
+        I thought this was one of my saved <br />
+        sensitive sites
+      </button>
     </div>
 
     <!--Thought site is sensitive-->
     <div class="block">
-        <button class="button is-rounded is-info is-fullwidth" id="unsafe-save-btn-1" style="display: none;">I do not trust this website</button>
+      <button
+        class="button is-rounded is-info is-fullwidth"
+        id="unsafe-save-btn-1"
+        style="display: none"
+      >
+        I do not trust this website
+      </button>
     </div>
 
     <!--Make sensitive after block-->
     <div class="block">
-        <button class="button is-rounded is-info is-fullwidth" id="sensitive-save-btn-1" style="display: none;">I trust this website. I want to proceed.</button>
+      <button
+        class="button is-rounded is-info is-fullwidth"
+        id="sensitive-save-btn-1"
+        style="display: none"
+      >
+        I trust this website. I want to proceed.
+      </button>
     </div>
 
     <!-- Edit sensitive site list -->
-    <div id="sensitive-sites-list" style="display: none;"></div>
-    <div class="field has-addons" style="display: none;" id="sensitive-input">
-        <div class="control">
-            <input class="input" type="text" placeholder="Enter sensitive site URL">
-        </div>
-        <div class="control">
-            <button class="button is-info" id="sensitive-save">Save</button>
-        </div>
+    <div id="sensitive-sites-list" style="display: none"></div>
+    <div class="field has-addons" style="display: none" id="sensitive-input">
+      <div class="control">
+        <input
+          class="input"
+          type="text"
+          placeholder="Enter sensitive site URL"
+        />
+      </div>
+      <div class="control">
+        <button class="button is-info" id="sensitive-save">Save</button>
+      </div>
     </div>
 
     <!-- Edit unsafe site list -->
-    <div id="unsafe-sites-list" style="display: none;"></div>
-    <div class="field has-addons" style="display: none;" id="unsafe-input">
-        <div class="control">
-            <input class="input" type="text" placeholder="Enter unsafe site URL">
-        </div>
-        <div class="control">
-            <button class="button is-info" id="unsafe-save">Save</button>
-        </div>
+    <div id="unsafe-sites-list" style="display: none"></div>
+    <div class="field has-addons" style="display: none" id="unsafe-input">
+      <div class="control">
+        <input class="input" type="text" placeholder="Enter unsafe site URL" />
+      </div>
+      <div class="control">
+        <button class="button is-info" id="unsafe-save">Save</button>
+      </div>
     </div>
 
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>
