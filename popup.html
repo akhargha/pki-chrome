@@ -88,10 +88,28 @@
         <button class="button is-rounded is-info is-fullwidth" id="sensitive-save-btn-1" style="display: none;">I trust this website. I want to proceed.</button>
     </div>
 
+    <!-- Edit sensitive site list -->
+    <div id="sensitive-sites-list" style="display: none;"></div>
+    <div class="field has-addons" style="display: none;" id="sensitive-input">
+        <div class="control">
+            <input class="input" type="text" placeholder="Enter sensitive site URL">
+        </div>
+        <div class="control">
+            <button class="button is-info" id="sensitive-save">Save</button>
+        </div>
+    </div>
+
+    <!-- Edit unsafe site list -->
+    <div id="unsafe-sites-list" style="display: none;"></div>
+    <div class="field has-addons" style="display: none;" id="unsafe-input">
+        <div class="control">
+            <input class="input" type="text" placeholder="Enter unsafe site URL">
+        </div>
+        <div class="control">
+            <button class="button is-info" id="unsafe-save">Save</button>
+        </div>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 </html>
-
-
-<!--TO DO:
-  add blocking feature-->

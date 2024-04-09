@@ -22,12 +22,8 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
             }
         } else {
             console.log("unsafe site");
-            // Check if the site is in session list
-            if (!items.sessionList[webDomain]) {
-                console.log("not in session list");
-                // If not in session list, add blocker
+                //add blocker
                 addBlocker();
-            }
         }
     }
 });

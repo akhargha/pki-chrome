@@ -158,3 +158,123 @@ function checkList(webDomain) {
         });
     });
 }
+
+// Edit sensitive site list
+document.getElementById("nav-sensitive").addEventListener("click", function () {
+    removeView();
+    document.getElementById("sensitive-sites-list").style.display = "block";
+    document.getElementById("sensitive-input").style.display = "block";
+    document.getElementById("sensitive-save").style.display = "block";
+    displaySensitiveSites();
+});
+
+// Edit unsafe site list
+document.getElementById("nav-unsafe").addEventListener("click", function () {
+    removeView();
+    document.getElementById("unsafe-sites-list").style.display = "block";
+    document.getElementById("unsafe-input").style.display = "block";
+    document.getElementById("unsafe-save").style.display = "block";
+    displayUnsafeSites();
+});
+
+// Display sensitive sites
+function displaySensitiveSites() {
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+        const websiteList = items.websiteList;
+        const sensitiveSitesList = document.getElementById("sensitive-sites-list");
+        sensitiveSitesList.innerHTML = "";
+
+        for (const website in websiteList) {
+            if (websiteList[website].isSensitive) {
+                const siteButton = document.createElement("button");
+                siteButton.textContent = website;
+                siteButton.classList.add("button", "is-primary", "is-small", "is-rounded", "sensitive-site");
+                siteButton.addEventListener("click", function () {
+                    removeSensitiveSite(website);
+                });
+                sensitiveSitesList.appendChild(siteButton);
+            }
+        }
+    });
+}
+
+// Display unsafe sites
+function displayUnsafeSites() {
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+        const websiteList = items.websiteList;
+        const unsafeSitesList = document.getElementById("unsafe-sites-list");
+        unsafeSitesList.innerHTML = "";
+
+        for (const website in websiteList) {
+            if (!websiteList[website].isSensitive) {
+                const siteButton = document.createElement("button");
+                siteButton.textContent = website;
+                siteButton.classList.add("button", "is-danger", "is-small", "is-rounded", "unsafe-site");
+                siteButton.addEventListener("click", function () {
+                    removeUnsafeSite(website);
+                });
+                unsafeSitesList.appendChild(siteButton);
+            }
+        }
+    });
+}
+
+// Save sensitive site
+document.getElementById("sensitive-save").addEventListener("click", function () {
+    const sensitiveInput = document.querySelector("#sensitive-input input");
+    const website = sensitiveInput.value.trim();
+
+    if (website !== "") {
+        chrome.storage.local.get({ websiteList: {} }, function (items) {
+            const websiteList = items.websiteList;
+            websiteList[website] = { isSensitive: true, label: "test" };
+            chrome.storage.local.set({ websiteList: websiteList }, function () {
+                console.log("Website saved as sensitive:", website);
+                sensitiveInput.value = "";
+                displaySensitiveSites();
+            });
+        });
+    }
+});
+
+// Save unsafe site
+document.getElementById("unsafe-save").addEventListener("click", function () {
+    const unsafeInput = document.querySelector("#unsafe-input input");
+    const website = unsafeInput.value.trim();
+
+    if (website !== "") {
+        chrome.storage.local.get({ websiteList: {} }, function (items) {
+            const websiteList = items.websiteList;
+            websiteList[website] = { isSensitive: false, label: "test" };
+            chrome.storage.local.set({ websiteList: websiteList }, function () {
+                console.log("Website saved as unsafe:", website);
+                unsafeInput.value = "";
+                displayUnsafeSites();
+            });
+        });
+    }
+});
+
+// Remove sensitive site
+function removeSensitiveSite(website) {
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+        const websiteList = items.websiteList;
+        delete websiteList[website];
+        chrome.storage.local.set({ websiteList: websiteList }, function () {
+            console.log("Sensitive site removed:", website);
+            displaySensitiveSites();
+        });
+    });
+}
+
+// Remove unsafe site
+function removeUnsafeSite(website) {
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+        const websiteList = items.websiteList;
+        delete websiteList[website];
+        chrome.storage.local.set({ websiteList: websiteList }, function () {
+            console.log("Unsafe site removed:", website);
+            displayUnsafeSites();
+        });
+    });
+}
