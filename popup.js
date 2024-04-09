@@ -31,22 +31,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 //Website is sensitive
                 removeView();
                 document.getElementById("all-set").style.display = "block";
-                chrome.scripting.executeScript({
-                    target: {tabId: tabs[0].id},
-                    files: ['contentScript.js']
-                })
+                chrome.storage.local.get({ sessionList: {} }, function (items) {
+                    const sessionList = items.sessionList;
+                    sessionList[webDomain] = true;
+                    chrome.storage.local.set({ sessionList: sessionList }, function () {
+                        console.log("Website added to session list", webDomain);
+                    });
+                });
                 chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
             } else if (result === 1) {
                 //Website is unsafe
                 removeView();
                 document.getElementById("site-blocked-text").style.display = "block";
-                document.getElementById(
-                    "sensitive-save-btn-1"
-                ).style.display = "block";
-                chrome.scripting.executeScript({
-                    target: {tabId: tabs[0].id},
-                    files: ['contentScript.js']
-                })
+                document.getElementById("sensitive-save-btn-1").style.display = "block";
             } else {
                 //Website not found
                 console.log("Website not found in the list");
@@ -57,12 +54,15 @@ document.addEventListener("DOMContentLoaded", function () {
         document
             .getElementById("sensitive-save-btn")
             .addEventListener("click", function () {
-                chrome.storage.local.get({ websiteList: {} }, function (items) {
+                chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
                     const websiteList = items.websiteList;
+                    const sessionList = items.sessionList;
                     // Storing the URL with values: true for sensitive and a string "test"
                     websiteList[webDomain] = { isSensitive: true, label: "test" };
-                    chrome.storage.local.set({ websiteList: websiteList }, function () {
+                    sessionList[webDomain] = true;
+                    chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                         console.log("Website Saved as Sensitive", webDomain);
+                        console.log("Website added to session list", webDomain);
                     });
                     removeView();
                     document.getElementById("added-to-trusted").style.display = "block";
@@ -73,15 +73,15 @@ document.addEventListener("DOMContentLoaded", function () {
         document
             .getElementById("sensitive-save-btn-1")
             .addEventListener("click", function () {
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                    //chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
-                });
-                chrome.storage.local.get({ websiteList: {} }, function (items) {
+                chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
                     const websiteList = items.websiteList;
+                    const sessionList = items.sessionList;
                     // Storing the URL with values: true for sensitive and a string "test"
                     websiteList[webDomain] = { isSensitive: true, label: "test" };
-                    chrome.storage.local.set({ websiteList: websiteList }, function () {
+                    sessionList[webDomain] = true;
+                    chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                         console.log("Website Saved as Sensitive", webDomain);
+                        console.log("Website added to session list", webDomain);
                     });
                     removeView();
                     document.getElementById("added-to-trusted").style.display = "block";
@@ -113,9 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             });
     });
-
-
-
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -142,7 +139,6 @@ function removeView() {
     document.getElementById("site-blocked-text").style.display = "none";
     document.getElementById("sensitive-save-btn-1").style.display = "none";
     document.getElementById("unsafe-save-btn-1").style.display = "none";
-
 }
 
 //Returns 0 for sensitive, 1 for unsafe, and -1 for not-found
@@ -162,37 +158,3 @@ function checkList(webDomain) {
         });
     });
 }
-
-/**
-// Function to display sensitive websites
-function displaySensitiveWebsites() {
-    chrome.storage.local.get({sensitiveWebsites: {}}, function(items) {
-        const listContainer = document.getElementById('saved-websites-list');
-        listContainer.innerHTML = ''; // Clear current list
-        
-        const sensitiveWebsites = items.sensitiveWebsites;
-        for (const domain in sensitiveWebsites) {
-            const li = document.createElement('li');
-            li.textContent = domain;
-            listContainer.appendChild(li);
-        }
-    });
-}
-*/
-
-/**
-// Function to display unsafe websites
-function displayUnsafeWebsites() {
-    chrome.storage.local.get({unsafeWebsites: {}}, function(items) {
-        const listContainer = document.getElementById('saved-websites-list');
-        listContainer.innerHTML = ''; // Clear current list
-        
-        const unsafeWebsites = items.unsafeWebsites;
-        for (const domain in unsafeWebsites) {
-            const li = document.createElement('li');
-            li.textContent = domain;
-            listContainer.appendChild(li);
-        }
-    });
-}
-*/
