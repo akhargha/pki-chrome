@@ -4,10 +4,17 @@
  * 3. use saved string and save cert info for sensitive site when the site is added to list - done
  * 4. use function call (using frequency stored) when opening popup and determining site list - if in sensitive and different from list-saved, then do not send 'removeblocker' and display message and give option to trust. - done
  * 5. in this, if the cert info is fake (match strings), then if user clicks on "trust" - give feedback - done
- * 6. Create actual string for feedback
- * 7. Cert info currently not updating to fake
- * 8. check validation (OV, DV, EV)
+ * 6. !Create actual string for feedback
+ * 7. !Cert info currently not updating to fake
+ * 8. !check validation (OV, DV, EV)
  */
+
+//same codebase
+//same functionality - for no noise
+// have a list of CA names (real) and make sure the same CA is NOT Displayed
+// bad indicator - click box without clicking extension - also give feedback to user if user clicks on website
+// option1: i want to continue || option2: no there's something wrong (random testing or attack)
+
 
 
 
