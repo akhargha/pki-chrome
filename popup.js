@@ -1,10 +1,12 @@
 /**
  * 1. Store frequency of random testing as input. - done
- * 1. Display cert info (call function with a 0 probability of fakecert) - save that in string - done
- * 2. use saved string and save cert info for sensitive site when the site is added to list - done
- * 3. use function call (using frequency stored) when opening popup and determining site list - if in sensitive and different from list-saved, then do not send 'removeblocker' and display message and give option to trust.
- * 4. in this, if the cert info is fake (match strings), then if user clicks on "trust" - give feedback
- * 5. check validation (OV, DV, EV)
+ * 2. Display cert info (call function with a 0 probability of fakecert) - save that in string - done
+ * 3. use saved string and save cert info for sensitive site when the site is added to list - done
+ * 4. use function call (using frequency stored) when opening popup and determining site list - if in sensitive and different from list-saved, then do not send 'removeblocker' and display message and give option to trust. - done
+ * 5. in this, if the cert info is fake (match strings), then if user clicks on "trust" - give feedback - done
+ * 6. Create actual string for feedback
+ * 7. Cert info currently not updating to fake
+ * 8. check validation (OV, DV, EV)
  */
 
 
@@ -28,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("TEST1");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         let curr_issuerCommonName;
+        let test_issuerCommonName;
         const url = tabs[0].url;
         const urlObj = new URL(url);
         const webDomain = urlObj.hostname;
@@ -73,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error('Error:', error);
                 alert('An error occurred while retrieving the certificate information.');
             });
-        
+
         checkList(webDomain).then((result) => {
             if (result === 0) {
                 //Website is sensitive
@@ -86,7 +89,74 @@ document.addEventListener("DOMContentLoaded", function () {
                         console.log("Website added to session list", webDomain);
                     });
                 });
-                chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" });
+
+                // Get the testing frequency from local storage
+                chrome.storage.local.get('testingFrequency', function (result) {
+                    let frequency = 101 - result.testingFrequency;
+                    if (frequency === undefined) {
+                        frequency = 100; // Default frequency if not set
+                    }
+
+                    // Call backend to display certificate information
+                    let apiUrl = `http://127.0.0.1:5000/certificate?url=${encodeURIComponent(url)}`;
+                    apiUrl += `&frequency=${frequency}`;
+                    fetch(apiUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            const issuerCommonName = data.issuer.commonName;
+                            console.log(issuerCommonName);
+                            test_issuerCommonName = issuerCommonName;
+                            const issuerOrganizationName = data.issuer.organizationName;
+
+                            const commonNameElement = document.getElementById('commonname');
+                            commonNameElement.textContent = `Common Name: ${issuerCommonName}`;
+
+                            const organizationNameElement = document.getElementById('organizationname');
+                            organizationNameElement.textContent = `Organization Name: ${issuerOrganizationName}`;
+
+                            // Check if the current issuer common name matches the stored label for the web domain
+                            chrome.storage.local.get({ websiteList: {} }, function (items) {
+                                const websiteList = items.websiteList;
+                                if (websiteList.hasOwnProperty(webDomain) && websiteList[webDomain].label === test_issuerCommonName) {
+                                    // Send the removeBlocker message
+                                    chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" });
+                                } else {
+                                    // Change display mode to block for element with id "cert-info-change"
+                                    document.getElementById("cert-info-change").style.display = "block";
+
+                                    console.log("TEST" + test_issuerCommonName);
+                                    // Add event listener for the "trust-on-change" button
+                                    document.getElementById("trust-on-change").addEventListener("click", function () {
+                                        console.log("TEST" + test_issuerCommonName);
+                                        if (test_issuerCommonName === "fakeissuer.com") {
+                                            // Change display to block for element "feedback"
+                                            console.log("Displayed feedbakc")
+                                            document.getElementById("feedback").style.display = "block";
+                                        } else {
+                                            // Save the web domain with the current issuer common name as the label
+                                            chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
+                                                const websiteList = items.websiteList;
+                                                const sessionList = items.sessionList;
+                                                websiteList[webDomain] = { isSensitive: true, label: test_issuerCommonName };
+                                                sessionList[webDomain] = true;
+                                                chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
+                                                    console.log("Website Saved as Sensitive", webDomain);
+                                                    console.log("Website added to session list", webDomain);
+                                                });
+                                                removeView();
+                                                document.getElementById("added-to-trusted").style.display = "block";
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while retrieving the certificate information.');
+                        });
+                });
+
             } else if (result === 1) {
                 //Website is unsafe
                 removeView();
