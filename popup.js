@@ -9,6 +9,21 @@
 
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    /** 
+     * To access frequency
+    chrome.storage.local.get('testingFrequency', function(result) {
+        // 'result' is an object with keys and values stored in local storage.
+        // The frequency we saved earlier is accessed by using the same key we used to save it.
+        if (result.testingFrequency !== undefined) {
+            console.log("Testing frequency is: ", result.testingFrequency);
+            // You can now use 'result.testingFrequency' as needed in your script.
+        } else {
+            console.log("Testing frequency not found.");
+            // Handle the case where 'testingFrequency' might not be set yet.
+        }
+    }); 
+    */
     console.log("TEST1");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const url = tabs[0].url;
@@ -24,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const faviconImage = document.createElement("img");
         faviconImage.src = favicon;
         faviconImage.alt = "Favicon";
-    
+
         // Clear previous favicon image if any
         const previousFavicon = document.getElementById("favicon-img");
         if (previousFavicon) {
@@ -48,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         console.log("Website added to session list", webDomain);
                     });
                 });
-                chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
+                chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" });
             } else if (result === 1) {
                 //Website is unsafe
                 removeView();
@@ -122,6 +137,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("added-to-untrust").style.display = "block";
                 });
             });
+
+        document.getElementById('save_frequency').addEventListener('click', function () {
+            const sliderValue = document.getElementById('test_frequency_slider').value;
+            const frequency = parseInt(sliderValue, 10); // 10 for decimal
+
+            // Save the frequency to local storage
+            chrome.storage.local.set({ 'testingFrequency': frequency }, function () {
+                console.log("Testing frequency saved:", frequency);
+            });
+        });
     });
 });
 

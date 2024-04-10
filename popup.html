@@ -40,14 +40,38 @@
               <button class="button is-primary" id="nav-unsafe">
                 Edit unsafe site list
               </button>
-              <div style="border: 1px solid #ccc; border-radius: 10px; padding: 5px;">
-                <h5 style="display: inline;">Change how often you will be tested</h5><br>
-                <div class="input-group">
-                  <input class="slider is-fullwidth is-primary" step="1" min="0" max="100" value="50" type="range" style="margin-top: 15px; margin-right: 25px; margin-left: 10px;">
-                  <button class="button is-primary" id="save_slider" onclick="getCertificateInfo()">Save</button>
+              <div
+                style="
+                  border: 1px solid #ccc;
+                  border-radius: 10px;
+                  padding: 5px;
+                "
+              >
+                <h5 style="display: inline">
+                  Change how often you will be tested
+                </h5>
+                <br />
+                  <input
+                    class="slider is-fullwidth is-primary"
+                    id="test_frequency_slider"
+                    step="1"
+                    min="0"
+                    max="100"
+                    value="50"
+                    type="range"
+                    style="
+                      margin-top: 15px;
+                      margin-right: 25px;
+                      margin-left: 10px;
+                    "
+                  />
+                  <button
+                    class="button is-primary"
+                    id="save_frequency"
+                  >
+                    Save
+                  </button>
               </div>
-            </div>
-              
             </div>
           </div>
         </div>
