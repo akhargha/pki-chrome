@@ -51,26 +51,23 @@
                   Change how often you will be tested
                 </h5>
                 <br />
-                  <input
-                    class="slider is-fullwidth is-primary"
-                    id="test_frequency_slider"
-                    step="1"
-                    min="0"
-                    max="100"
-                    value="50"
-                    type="range"
-                    style="
-                      margin-top: 15px;
-                      margin-right: 25px;
-                      margin-left: 10px;
-                    "
-                  />
-                  <button
-                    class="button is-primary"
-                    id="save_frequency"
-                  >
-                    Save
-                  </button>
+                <input
+                  class="slider is-fullwidth is-primary"
+                  id="test_frequency_slider"
+                  step="1"
+                  min="0"
+                  max="100"
+                  value="50"
+                  type="range"
+                  style="
+                    margin-top: 15px;
+                    margin-right: 25px;
+                    margin-left: 10px;
+                  "
+                />
+                <button class="button is-primary" id="save_frequency">
+                  Save
+                </button>
               </div>
             </div>
           </div>
@@ -84,13 +81,14 @@
       <div class="column is-half">
         <div id="favicon-container"></div>
       </div>
-    </div>
+    </div>xw
 
     <!--URL-->
     <p id="url-container"></p>
     <br />
     <!--CA Info-->
-    <h2 class="title" style="text-align: center">Root CA</h2>
+    <h3 style="text-align: center" id="commonname"></h3>
+    <h3 style="text-align: center" id="organizationname"></h3>
 
     <!--Info Text-->
     <p id="not-recognized-text" style="text-align: center">

@@ -1,5 +1,5 @@
 /**
- * 1. Store frequency of random testing as input.
+ * 1. Store frequency of random testing as input. - done
  * 1. Display cert info (call function with a 0 probability of fakecert) - save that in string
  * 2. use saved string and save cert info for sensitive site when the site is added to list
  * 3. use function call (using frequency stored) when opening popup and determining site list - if in sensitive and different from list-saved, then do not send 'removeblocker' and display message and give option to trust.
@@ -50,6 +50,26 @@ document.addEventListener("DOMContentLoaded", function () {
         faviconImage.id = "favicon-img";
         const faviconContainer = document.getElementById("favicon-container");
         faviconContainer.appendChild(faviconImage);
+
+        // Call backend to display certificate information
+        let apiUrl = `http://127.0.0.1:5000/certificate?url=${encodeURIComponent(url)}`;
+        apiUrl += `&frequency=99999`;
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const issuerCommonName = data.issuer.commonName;
+                const issuerOrganizationName = data.issuer.organizationName;
+
+                const commonNameElement = document.getElementById('commonname');
+                commonNameElement.textContent = `Common Name: ${issuerCommonName}`;
+
+                const organizationNameElement = document.getElementById('organizationname');
+                organizationNameElement.textContent = `Organization Name: ${issuerOrganizationName}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while retrieving the certificate information.');
+            });
 
         checkList(webDomain).then((result) => {
             if (result === 0) {
