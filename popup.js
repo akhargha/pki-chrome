@@ -1,9 +1,10 @@
 /**
  * 1. Store frequency of random testing as input. - done
- * 1. Display cert info (call function with a 0 probability of fakecert) - save that in string
- * 2. use saved string and save cert info for sensitive site when the site is added to list
+ * 1. Display cert info (call function with a 0 probability of fakecert) - save that in string - done
+ * 2. use saved string and save cert info for sensitive site when the site is added to list - done
  * 3. use function call (using frequency stored) when opening popup and determining site list - if in sensitive and different from list-saved, then do not send 'removeblocker' and display message and give option to trust.
  * 4. in this, if the cert info is fake (match strings), then if user clicks on "trust" - give feedback
+ * 5. check validation (OV, DV, EV)
  */
 
 
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     */
     console.log("TEST1");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        let curr_issuerCommonName;
         const url = tabs[0].url;
         const urlObj = new URL(url);
         const webDomain = urlObj.hostname;
@@ -53,11 +55,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Call backend to display certificate information
         let apiUrl = `http://127.0.0.1:5000/certificate?url=${encodeURIComponent(url)}`;
-        apiUrl += `&frequency=99999`;
+        apiUrl += `&frequency=99999999`;
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const issuerCommonName = data.issuer.commonName;
+                curr_issuerCommonName = issuerCommonName;
                 const issuerOrganizationName = data.issuer.organizationName;
 
                 const commonNameElement = document.getElementById('commonname');
@@ -70,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error('Error:', error);
                 alert('An error occurred while retrieving the certificate information.');
             });
-
+        
         checkList(webDomain).then((result) => {
             if (result === 0) {
                 //Website is sensitive
@@ -103,14 +106,34 @@ document.addEventListener("DOMContentLoaded", function () {
                     const websiteList = items.websiteList;
                     const sessionList = items.sessionList;
                     // Storing the URL with values: true for sensitive and a string "test"
-                    websiteList[webDomain] = { isSensitive: true, label: "test" };
+                    websiteList[webDomain] = { isSensitive: true, label: curr_issuerCommonName };
                     sessionList[webDomain] = true;
                     chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                         console.log("Website Saved as Sensitive", webDomain);
                         console.log("Website added to session list", webDomain);
+                        console.log("Website Saved as Sensitive", webDomain);
                     });
                     removeView();
                     document.getElementById("added-to-trusted").style.display = "block";
+
+
+                    /**
+                     * access saved cert info
+                    chrome.storage.local.get({ websiteList: {} }, function (items) {
+                        const websiteList = items.websiteList;
+                    
+                        // Check if the websiteList contains the webDomain
+                        if (websiteList.hasOwnProperty(webDomain)) {
+                            // Access the label for the specified webDomain
+                            const label = websiteList[webDomain].label;
+                            console.log("Label for google.com:", label);
+                        } else {
+                            console.log("WebDomain not found in the websiteList.");
+                        }
+                    });
+                     */
+
+
                 });
             });
 
@@ -122,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const websiteList = items.websiteList;
                     const sessionList = items.sessionList;
                     // Storing the URL with values: true for sensitive and a string "test"
-                    websiteList[webDomain] = { isSensitive: true, label: "test" };
+                    websiteList[webDomain] = { isSensitive: true, label: curr_issuerCommonName };
                     sessionList[webDomain] = true;
                     chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                         console.log("Website Saved as Sensitive", webDomain);
