@@ -99,19 +99,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Get the testing frequency from local storage
                 chrome.storage.local.get('testingFrequency', function (result) {
-                    let frequency = 101 - result.testingFrequency;
-                    if (frequency === undefined) {
-                        frequency = 100; // Default frequency if not set
-                    }
+                    let frequency = result.testingFrequency === undefined ? 100 : 101 - result.testingFrequency;
 
                     // Call backend to display certificate information
                     let apiUrl = `http://127.0.0.1:5000/certificate?url=${encodeURIComponent(url)}`;
                     apiUrl += `&frequency=${frequency}`;
+
                     fetch(apiUrl)
                         .then(response => response.json())
                         .then(data => {
                             const issuerCommonName = data.issuer.commonName;
-                            console.log(issuerCommonName);
                             test_issuerCommonName = issuerCommonName;
                             const issuerOrganizationName = data.issuer.organizationName;
 
@@ -131,13 +128,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                     // Change display mode to block for element with id "cert-info-change"
                                     document.getElementById("cert-info-change").style.display = "block";
 
-                                    console.log("TEST" + test_issuerCommonName);
                                     // Add event listener for the "trust-on-change" button
                                     document.getElementById("trust-on-change").addEventListener("click", function () {
-                                        console.log("TEST" + test_issuerCommonName);
                                         if (test_issuerCommonName === "fakeissuer.com") {
                                             // Change display to block for element "feedback"
-                                            console.log("Displayed feedbakc")
+                                            console.log("Displayed feedback");
                                             document.getElementById("feedback").style.display = "block";
                                         } else {
                                             // Save the web domain with the current issuer common name as the label
