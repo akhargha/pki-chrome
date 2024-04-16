@@ -1,4 +1,3 @@
-
 const url = new URL(window.location.href);
 const webDomain = url.hostname;
 
@@ -21,8 +20,8 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
             }
         } else {
             console.log("unsafe site");
-                //add blocker
-                addBlocker();
+            // Add blocker
+            addBlocker();
         }
     }
 });
@@ -37,16 +36,22 @@ function addBlocker() {
         blockerDiv.style.width = '100%';
         blockerDiv.style.height = '100%';
         blockerDiv.style.zIndex = '10000';
-        blockerDiv.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        blockerDiv.style.backgroundColor = 'rgba(0,0,0,0.2)';
+        document.body.appendChild(blockerDiv);
 
         var blockerMessage = document.createElement('h1');
         blockerMessage.style.color = 'white';
         blockerMessage.style.textAlign = 'center';
         blockerMessage.style.marginTop = '20%';
         blockerMessage.innerHTML = 'This site is blocked by the extension. Click on the extension to continue.';
+        blockerMessage.style.display = 'none'; // Initially hide the message
 
         blockerDiv.appendChild(blockerMessage);
-        document.body.appendChild(blockerDiv);
+
+        // Add click event listener to show the message
+        blockerDiv.addEventListener('click', function() {
+            blockerMessage.style.display = 'block'; // Show the message on click
+        });
     }
 }
 
