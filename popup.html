@@ -164,9 +164,28 @@
       </button>
     </div>
 
-    <h2 id="cert-info-change" style="display: none;">Certificate info changed!</h2>
-    <button id="trust-on-change">Trust me</button>
-    <h2 id="feedback" style="display: none;">Feedback</h2>
+    <h2
+      class="subtitle"
+      style="text-align: center; display: none; color: red"
+      id="cert-info-change"
+    >
+      Some security information about this site has been changed! This is
+      usually an indicator of an attack. Please proceed carefully.
+    </h2>
+    <button
+      class="button is-rounded is-info is-fullwidth"
+      id="trust-on-change"
+      style="display: none"
+    >
+      I still trust this website
+    </button>
+    <h2
+      id="feedback"
+      style="text-align: center; display: none"
+      class="subtitle"
+    >
+      Feedback: This was just a test!
+    </h2>
 
     <div class="block">
       <button

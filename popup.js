@@ -126,7 +126,9 @@ document.addEventListener("DOMContentLoaded", function () {
                                     chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" });
                                 } else {
                                     // Change display mode to block for element with id "cert-info-change"
+                                    removeView();
                                     document.getElementById("cert-info-change").style.display = "block";
+                                    document.getElementById("trust-on-change").style.display = "block";
 
                                     // Add event listener for the "trust-on-change" button
                                     document.getElementById("trust-on-change").addEventListener("click", function () {
