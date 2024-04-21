@@ -34,10 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }); 
     */
-    console.log("TEST1");
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        let curr_issuerCommonName;
-        let test_issuerCommonName;
         const url = tabs[0].url;
         const urlObj = new URL(url);
         const webDomain = urlObj.hostname;
@@ -63,27 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const faviconContainer = document.getElementById("favicon-container");
         faviconContainer.appendChild(faviconImage);
 
-        // Call backend to display certificate information
-        let apiUrl = `http://127.0.0.1:5000/certificate?url=${encodeURIComponent(url)}`;
-        apiUrl += `&frequency=99999999`;
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const issuerCommonName = data.issuer.commonName;
-                curr_issuerCommonName = issuerCommonName;
-                const issuerOrganizationName = data.issuer.organizationName;
-
-                const commonNameElement = document.getElementById('commonname');
-                commonNameElement.textContent = `Common Name: ${issuerCommonName}`;
-
-                const organizationNameElement = document.getElementById('organizationname');
-                organizationNameElement.textContent = `Organization Name: ${issuerOrganizationName}`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while retrieving the certificate information.');
-            });
-
         checkList(webDomain).then((result) => {
             if (result === 0) {
                 //Website is sensitive
@@ -96,71 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         console.log("Website added to session list", webDomain);
                     });
                 });
-
-                // Get the testing frequency from local storage
-                chrome.storage.local.get('testingFrequency', function (result) {
-                    let frequency = result.testingFrequency === undefined ? 100 : 101 - result.testingFrequency;
-
-                    // Call backend to display certificate information
-                    let apiUrl = `http://127.0.0.1:5000/certificate?url=${encodeURIComponent(url)}`;
-                    apiUrl += `&frequency=${frequency}`;
-
-                    fetch(apiUrl)
-                        .then(response => response.json())
-                        .then(data => {
-                            const issuerCommonName = data.issuer.commonName;
-                            test_issuerCommonName = issuerCommonName;
-                            const issuerOrganizationName = data.issuer.organizationName;
-
-                            const commonNameElement = document.getElementById('commonname');
-                            commonNameElement.textContent = `Common Name: ${issuerCommonName}`;
-
-                            const organizationNameElement = document.getElementById('organizationname');
-                            organizationNameElement.textContent = `Organization Name: ${issuerOrganizationName}`;
-
-                            // Check if the current issuer common name matches the stored label for the web domain
-                            chrome.storage.local.get({ websiteList: {} }, function (items) {
-                                const websiteList = items.websiteList;
-                                if (websiteList.hasOwnProperty(webDomain) && websiteList[webDomain].label === test_issuerCommonName) {
-                                    // Send the removeBlocker message
-                                    chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" });
-                                } else {
-                                    // Change display mode to block for element with id "cert-info-change"
-                                    removeView();
-                                    document.getElementById("cert-info-change").style.display = "block";
-                                    document.getElementById("trust-on-change").style.display = "block";
-
-                                    // Add event listener for the "trust-on-change" button
-                                    document.getElementById("trust-on-change").addEventListener("click", function () {
-                                        if (test_issuerCommonName === "fakeissuer.com") {
-                                            // Change display to block for element "feedback"
-                                            console.log("Displayed feedback");
-                                            document.getElementById("feedback").style.display = "block";
-                                        } else {
-                                            // Save the web domain with the current issuer common name as the label
-                                            chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
-                                                const websiteList = items.websiteList;
-                                                const sessionList = items.sessionList;
-                                                websiteList[webDomain] = { isSensitive: true, label: test_issuerCommonName };
-                                                sessionList[webDomain] = true;
-                                                chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
-                                                    console.log("Website Saved as Sensitive", webDomain);
-                                                    console.log("Website added to session list", webDomain);
-                                                });
-                                                removeView();
-                                                document.getElementById("added-to-trusted").style.display = "block";
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred while retrieving the certificate information.');
-                        });
-                });
-
             } else if (result === 1) {
                 //Website is unsafe
                 removeView();
@@ -179,17 +90,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
                     const websiteList = items.websiteList;
                     const sessionList = items.sessionList;
-                    // Storing the URL with values: true for sensitive and a string "test"
-                    websiteList[webDomain] = { isSensitive: true, label: curr_issuerCommonName };
+                    // Storing the URL with values: true for sensitive
+                    websiteList[webDomain] = { isSensitive: true };
                     sessionList[webDomain] = true;
                     chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                         console.log("Website Saved as Sensitive", webDomain);
                         console.log("Website added to session list", webDomain);
-                        console.log("Website Saved as Sensitive", webDomain);
                     });
                     removeView();
                     document.getElementById("added-to-trusted").style.display = "block";
-
 
                     /**
                      * access saved cert info
@@ -219,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const websiteList = items.websiteList;
                     const sessionList = items.sessionList;
                     // Storing the URL with values: true for sensitive and a string "test"
-                    websiteList[webDomain] = { isSensitive: true, label: curr_issuerCommonName };
+                    websiteList[webDomain] = { isSensitive: true};
                     sessionList[webDomain] = true;
                     chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                         console.log("Website Saved as Sensitive", webDomain);
@@ -246,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 chrome.storage.local.get({ websiteList: {} }, function (items) {
                     const websiteList = items.websiteList;
                     // Storing the URL with values: false for unsafe and a string "test"
-                    websiteList[webDomain] = { isSensitive: false, label: "test" };
+                    websiteList[webDomain] = { isSensitive: false};
                     chrome.storage.local.set({ websiteList: websiteList }, function () {
                         console.log("Website Saved as Unsafe", webDomain);
                     });
@@ -254,16 +163,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("added-to-untrust").style.display = "block";
                 });
             });
-
-        document.getElementById('save_frequency').addEventListener('click', function () {
-            const sliderValue = document.getElementById('test_frequency_slider').value;
-            const frequency = parseInt(sliderValue, 10); // 10 for decimal
-
-            // Save the frequency to local storage
-            chrome.storage.local.set({ 'testingFrequency': frequency }, function () {
-                console.log("Testing frequency saved:", frequency);
-            });
-        });
     });
 });
 
@@ -379,7 +278,7 @@ document.getElementById("sensitive-save").addEventListener("click", function () 
     if (website !== "") {
         chrome.storage.local.get({ websiteList: {} }, function (items) {
             const websiteList = items.websiteList;
-            websiteList[website] = { isSensitive: true, label: "test" };
+            websiteList[website] = { isSensitive: true };
             chrome.storage.local.set({ websiteList: websiteList }, function () {
                 console.log("Website saved as sensitive:", website);
                 sensitiveInput.value = "";
@@ -397,7 +296,7 @@ document.getElementById("unsafe-save").addEventListener("click", function () {
     if (website !== "") {
         chrome.storage.local.get({ websiteList: {} }, function (items) {
             const websiteList = items.websiteList;
-            websiteList[website] = { isSensitive: false, label: "test" };
+            websiteList[website] = { isSensitive: false };
             chrome.storage.local.set({ websiteList: websiteList }, function () {
                 console.log("Website saved as unsafe:", website);
                 unsafeInput.value = "";
