@@ -9,8 +9,8 @@
  * 8. !check validation (OV, DV, EV)
  */
 
-//same codebase
-//same functionality - for no noise
+// same codebase
+// same functionality - for no noise
 // have a list of CA names (real) and make sure the same CA is NOT Displayed
 // bad indicator - click box without clicking extension - also give feedback to user if user clicks on website
 // option1: i want to continue || option2: no there's something wrong (random testing or attack)
@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     chrome.storage.local.set({ sessionList: sessionList }, function () {
                         console.log("Website added to session list", webDomain);
                     });
+                    // TODO : Call backend so that we know if we need to test. 
                 });
             } else if (result === 1) {
                 //Website is unsafe
@@ -163,6 +164,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("added-to-untrust").style.display = "block";
                 });
             });
+    });
+
+    const autoSearchCheckbox = document.getElementById('auto-search-checkbox');
+    chrome.storage.local.get({autoSearchEnabled: true}, function(data) {
+        autoSearchCheckbox.checked = data.autoSearchEnabled;
+    });
+
+    // Update the setting when the checkbox state changes
+    autoSearchCheckbox.addEventListener('change', function () {
+        chrome.storage.local.set({autoSearchEnabled: this.checked});
     });
 });
 

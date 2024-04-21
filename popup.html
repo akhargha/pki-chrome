@@ -40,36 +40,13 @@
               <button class="button is-primary" id="nav-unsafe">
                 Edit unsafe site list
               </button>
-              <div
-                style="
-                  border: 1px solid #ccc;
-                  border-radius: 10px;
-                  padding: 5px;
-                "
-              >
-                <h5 style="display: inline">
-                  Change how often you will be tested
-                </h5>
-                <br />
-                <input
-                  class="slider is-fullwidth is-primary"
-                  id="test_frequency_slider"
-                  step="1"
-                  min="0"
-                  max="100"
-                  value="50"
-                  type="range"
-                  style="
-                    margin-top: 15px;
-                    margin-right: 25px;
-                    margin-left: 10px;
-                  "
-                />
-                <button class="button is-primary" id="save_frequency">
-                  Save
-                </button>
-              </div>
             </div>
+            <div style="text-align: center;">
+            <label class="checkbox">
+              <input type="checkbox" checked id="auto-search-checkbox" />
+              Search for sensitive sites automatically
+            </label>
+          </div>
           </div>
         </div>
       </div>
@@ -86,7 +63,7 @@
     <!--URL-->
     <p id="url-container"></p>
     <br />
-    
+
     <!--Info Text-->
     <p id="not-recognized-text" style="text-align: center">
       <img

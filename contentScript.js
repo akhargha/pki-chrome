@@ -3,6 +3,15 @@ const webDomain = url.hostname;
 
 console.log(webDomain);
 
+chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
+    if (settings.autoSearchEnabled) {
+        const passwordFields = document.querySelectorAll('input[type="password"]');
+        if (passwordFields.length > 0) {
+            alert('THIS HAS A PASSWORD FIELD');
+        }
+    }
+});
+
 // Check if the site is sensitive or unsafe
 chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
     if (items.websiteList[webDomain]) {
@@ -49,7 +58,7 @@ function addBlocker() {
         blockerDiv.appendChild(blockerMessage);
 
         // Add click event listener to show the message
-        blockerDiv.addEventListener('click', function() {
+        blockerDiv.addEventListener('click', function () {
             blockerMessage.style.display = 'block'; // Show the message on click
         });
     }
@@ -63,7 +72,7 @@ function removeBlocker() {
 }
 
 // Listener for messages
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action === "removeBlocker") {
         removeBlocker();
     }
