@@ -3,6 +3,9 @@
   "name": "Save Website",
   "version": "1.0",
   "description": "Saves website URLs to a sensitive list in localStorage.",
+  "icons": {
+    "128": "lock.png"
+  },
   "permissions": ["activeTab", "storage", "scripting", "tabs"],
   "action": {
     "default_popup": "popup.html"

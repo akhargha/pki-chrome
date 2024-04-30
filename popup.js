@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     removeView();
+    document.getElementById('points').style.display = 'none';
     checkUserKey().then((hasUserKey) => {
       if (hasUserKey) {
         initializeExtension();
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('sensitive-save-btn').style.display = 'block'; //
     document.getElementById('unsafe-save-btn').style.display = 'block'; //
     document.getElementById('not-recognized-text').style.display = 'block'; //
+    document.getElementById('points').style.display = 'block';
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const url = tabs[0].url;
