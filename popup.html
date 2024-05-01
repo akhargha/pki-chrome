@@ -13,7 +13,7 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="https://trincoll.edu">
-          <span style="font-size: 1.5em;">🔒</span>
+          <span style="font-size: 1.5em">🔒</span>
           <!-- <img src="/icons/shield-halved-solid.svg" width="40" height="28" /> -->
         </a>
         <h2 style="margin-left: 3em; margin-top: 0.8em" id="points">Points:</h2>
@@ -42,37 +42,66 @@
                 Edit unsafe site list
               </button>
             </div>
-            <div style="text-align: center;">
-            <label class="checkbox">
-              <input type="checkbox" checked id="auto-search-checkbox" />
-              Search for sensitive sites automatically
-            </label>
-          </div>
+            <div style="text-align: center">
+              <label class="checkbox">
+                <input type="checkbox" checked id="auto-search-checkbox" />
+                Search for sensitive sites automatically
+              </label>
+            </div>
           </div>
         </div>
       </div>
     </nav>
 
-
-    <div id="user-key-input" style="display: none; padding-top: 50px;">
-      <h2 class="subtitle" style="text-align: center">
-        We are not able to identify you in this browser. Please enter your user key to use the extension.
+    <div id="user-key-input" style="display: none; padding-top: 50px">
+      <h2 class="subtitle" style="text-align: center" id="recovery-prompt">
+        We are not able to identify you in this browser. Please enter your user
+        key to use the extension.
       </h2>
       <div class="field">
         <div class="control">
-          <input class="input" type="text" placeholder="Enter your user key" id="user-key-field">
+          <input
+            class="input"
+            type="text"
+            placeholder="Enter your user key"
+            id="user-key-field"
+          />
         </div>
       </div>
-      <div class="field" style="text-align: center;">
+      <div class="field" style="text-align: center">
         <div class="control">
           <button class="button is-primary" id="user-key-submit">Submit</button>
         </div>
       </div>
+      <!-- Forgot Password Button -->
+      <div class="field" style="text-align: center">
+        <button class="button is-link" id="forgot-password">
+          Forgot Password?
+        </button>
+      </div>
+      <!-- Name and Date of Birth Form -->
+      <div id="forgot-password-form" style="display: none">
+        <input
+          class="input"
+          type="text"
+          placeholder="Enter your name"
+          id="name-field"
+        />
+        <input class="input" type="date" id="dob-field" />
+        <button class="button is-primary" id="recover-password-submit">
+          Recover Password
+        </button>
+      </div>
+      <!-- Response from server -->
+      <div
+        id="password-recovery-response"
+        style="text-align: center; display: none"
+      ></div>
     </div>
 
     <!--Top Bar-->
-      <!--Favicon-->
-        <div id="favicon-container"></div>
+    <!--Favicon-->
+    <div id="favicon-container"></div>
 
     <!--URL-->
     <p id="url-container"></p>

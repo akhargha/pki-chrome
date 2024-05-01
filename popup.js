@@ -37,6 +37,36 @@ document.addEventListener('DOMContentLoaded', function () {
           });
       }
     });
+
+
+    document.getElementById('forgot-password').addEventListener('click', function () {
+      document.getElementById('forgot-password-form').style.display = 'block';
+      document.getElementById('recovery-prompt').style.display = 'none';
+      document.getElementById('user-key-field').style.display = 'none';
+      document.getElementById('user-key-submit').style.display = 'none';
+  });
+
+  document.getElementById('recover-password-submit').addEventListener('click', function () {
+      const name = document.getElementById('name-field').value.trim();
+      const dob = document.getElementById('dob-field').value;
+      if (name !== '' && dob !== '') {
+          fetch('http://localhost:8080/validate?name=' + encodeURIComponent(name) + '&dob=' + dob)
+              .then(response => response.text())
+              .then(data => {
+                  document.getElementById('password-recovery-response').style.display = 'block';
+                  if (data === 'not found') {
+                      document.getElementById('password-recovery-response').textContent = 'User not found. Please create a new account.';
+                  } else {
+                      document.getElementById('password-recovery-response').textContent = 'Your user key: ' + data;
+                  }
+              })
+              .catch(error => {
+                  document.getElementById('password-recovery-response').style.display = 'block';
+                  console.error('Error during password recovery');
+                  document.getElementById('password-recovery-response').textContent = 'An error occurred during password recovery. Please try again later.';
+              });
+      }
+  });
   });
   
   function initializeExtension() {
