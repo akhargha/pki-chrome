@@ -7,7 +7,7 @@ chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
     if (settings.autoSearchEnabled) {
         const passwordFields = document.querySelectorAll('input[type="password"]');
         if (passwordFields.length > 0) {
-            alert('Extension: We have automatically detected this site to be sensitive. Please click on the extension to be safe. \n \n If you would not like to see future alerts, go to settings and uncheck "automatic detection"');
+            alert('🔒 Extension Alert: This site may contain sensitive information with password fields. Click the 🔒 extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in extension settings 🔒.');
         }
     }
 });
