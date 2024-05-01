@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           })
           .catch(error => {
-            console.error('Error validating user key:', error);
+            console.error('Error validating user key');
             alert('An error occurred while validating the user key. Please try again later.');
           });
       }
