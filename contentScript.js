@@ -29,11 +29,10 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
               const savedCertificateChain = items.websiteList[webDomain].certificateChain;
               if (compareCertificateChains(response.certificateChain, savedCertificateChain)) {
                 console.log("Certificate chain matches");
-                // If certificate chain matches, remove blocker if it exists
-                removeBlocker();
+                addBlocker();
               } else {
                 console.log("Certificate chain does not match");
-                // If certificate chain does not match, add blocker
+                //DO OTHER STUFF HERE
                 addBlocker();
               }
             } else if (response.error) {
