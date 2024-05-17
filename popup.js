@@ -122,14 +122,31 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
           const websiteList = items.websiteList;
           const sessionList = items.sessionList;
-          websiteList[webDomain] = { isSensitive: true };
-          sessionList[webDomain] = true;
-          chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
-            console.log('Website Saved as Sensitive', webDomain);
-            console.log('Website added to session list', webDomain);
-          });
-          removeView();
-          document.getElementById('added-to-trusted').style.display = 'block';
+          
+          fetchCertificateChain(webDomain)
+            .then(certificateChain => {
+              websiteList[webDomain] = {
+                isSensitive: true,
+                certificateChain: certificateChain
+              };
+              sessionList[webDomain] = true;
+              chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
+                console.log('Website Saved as Sensitive', webDomain);
+                console.log('Website added to session list', webDomain);
+              });
+
+              chrome.storage.local.get({ websiteList: {} }, function (items) {
+                const websiteList = items.websiteList;
+                console.log('Website List:', websiteList);
+              });
+              
+              removeView();
+              document.getElementById('added-to-trusted').style.display = 'block';
+            })
+            .catch(error => {
+              console.error('Error fetching certificate chain:', error);
+              // Handle the error, e.g., display an error message to the user
+            });
         });
       });
   
@@ -137,14 +154,25 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
           const websiteList = items.websiteList;
           const sessionList = items.sessionList;
-          websiteList[webDomain] = { isSensitive: true };
-          sessionList[webDomain] = true;
-          chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
-            console.log('Website Saved as Sensitive', webDomain);
-            console.log('Website added to session list', webDomain);
-          });
-          removeView();
-          document.getElementById('added-to-trusted').style.display = 'block';
+          
+          fetchCertificateChain(webDomain)
+            .then(certificateChain => {
+              websiteList[webDomain] = {
+                isSensitive: true,
+                certificateChain: certificateChain
+              };
+              sessionList[webDomain] = true;
+              chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
+                console.log('Website Saved as Sensitive', webDomain);
+                console.log('Website added to session list', webDomain);
+              });
+              removeView();
+              document.getElementById('added-to-trusted').style.display = 'block';
+            })
+            .catch(error => {
+              console.error('Error fetching certificate chain:', error);
+              // Handle the error, e.g., display an error message to the user
+            });
         });
       });
   
@@ -269,15 +297,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const website = sensitiveInput.value.trim();
   
     if (website !== '') {
-      chrome.storage.local.get({ websiteList: {} }, function (items) {
-        const websiteList = items.websiteList;
-        websiteList[website] = { isSensitive: true };
-        chrome.storage.local.set({ websiteList: websiteList }, function () {
-          console.log('Website saved as sensitive:', website);
-          sensitiveInput.value = '';
-          displaySensitiveSites();
+      fetchCertificateChain(website)
+        .then(certificateChain => {
+          chrome.storage.local.get({ websiteList: {} }, function (items) {
+            const websiteList = items.websiteList;
+            websiteList[website] = {
+              isSensitive: true,
+              certificateChain: certificateChain
+            };
+            chrome.storage.local.set({ websiteList: websiteList }, function () {
+              console.log('Website saved as sensitive:', website);
+              sensitiveInput.value = '';
+              displaySensitiveSites();
+            });
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching certificate chain:', error);
+          // Handle the error, e.g., display an error message to the user
         });
-      });
     }
   });
   
@@ -331,4 +369,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     });
+  }
+
+  function fetchCertificateChain(webDomain) {
+    return fetch(`http://pkie.engr.uconn.edu/certificate_chain/${webDomain}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status) {
+          return data.output;
+        } else {
+          throw new Error('Failed to fetch certificate chain');
+        }
+      });
   }
