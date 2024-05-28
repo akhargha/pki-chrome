@@ -1,4 +1,4 @@
-// 1. Make website get unblocked when extension is opened (unblock by sending message on session open) - partially done
+// 1. Make website get unblocked when extension is opened (unblock by sending message on session open) - done
 // 2. Get cookies from a website for the user ID instead of extension login page
 // 3. Check cert everytime for our own experiemnts and only per browser session for usual websites
 // 4. Send data (timestamp, action, unique user id)
@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
               chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                 console.log('Website Saved as Sensitive', webDomain);
                 console.log('Website added to session list', webDomain);
+                chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" }); //send message to unblock
               });
 
               chrome.storage.local.get({ websiteList: {} }, function (items) {
@@ -171,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
               chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
                 console.log('Website Saved as Sensitive', webDomain);
                 console.log('Website added to session list', webDomain);
+                chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" }); //send message to unblock
               });
               removeView();
               document.getElementById('added-to-trusted').style.display = 'block';
