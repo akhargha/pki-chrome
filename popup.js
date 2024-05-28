@@ -1,3 +1,8 @@
+// 1. Make website get unblocked when extension is opened (unblock by sending message on session open) - partially done
+// 2. Get cookies from a website for the user ID instead of extension login page
+// 3. Check cert everytime for our own experiemnts and only per browser session for usual websites
+// 4. Send data (timestamp, action, unique user id)
+// 5. Feedback (points functionality)
 document.addEventListener('DOMContentLoaded', function () {
     removeView();
     document.getElementById('points').style.display = 'none';
@@ -107,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
             sessionList[webDomain] = true;
             chrome.storage.local.set({ sessionList: sessionList }, function () {
               console.log('Website added to session list', webDomain);
+              chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" }); //send message to unblock
             });
           });
         } else if (result === 1) {
