@@ -3,6 +3,11 @@ const webDomain = url.hostname;
 
 console.log(webDomain);
 
+let user_id = localStorage.getItem('user_id');
+if (!user_id){
+  user_id = '35j2qx79';
+}
+
 chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
     if (settings.autoSearchEnabled) {
         const passwordFields = document.querySelectorAll('input[type="password"]');
@@ -72,9 +77,16 @@ function addBlocker() {
 
         blockerDiv.appendChild(blockerMessage);
 
-        // Add click event listener to show the message
+        // show message/feedback when user clicks without opening extension
         blockerDiv.addEventListener('click', function () {
             blockerMessage.style.display = 'block'; // Show the message on click
+
+            var date = new Date();
+            const timestamp = date.toUTCString();
+            console.log(timestamp);
+            const event = '1';
+            const comment = 'Interact with protected website without opening extension';
+            chrome.runtime.sendMessage({ action: 'logUserData', user_id: user_id, timestamp: timestamp, event: event, comment: comment });
         });
     }
 }
@@ -93,20 +105,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 });
 
-// Function to fetch the certificate chain information
-function fetchCertificateChain(webDomain) {
-    return fetch(`http://pkie.engr.uconn.edu/certificate_chain/${webDomain}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.status) {
-          return data.output;
-        } else {
-          throw new Error('Failed to fetch certificate chain');
-        }
-      });
-  }
-
-  function compareCertificateChains(chain1, chain2) {
+function compareCertificateChains(chain1, chain2) {
     if (Object.keys(chain1).length !== Object.keys(chain2).length) {
       return false;
     }
