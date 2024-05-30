@@ -19,13 +19,41 @@ chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
 
 chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
     if (items.websiteList[webDomain]) {
-      if (items.websiteList[webDomain].isSensitive) { // Check if the site is in sensitive list
+      if (items.websiteList[webDomain].isSensitive) { // Check if the site is in protected list
         console.log("sensitive site");
         // Check if the site is in session list
         if (items.sessionList[webDomain]) {
           console.log("in session list");
           // If in session list, remove blocker if it exists
           removeBlocker();
+
+          // Check if site is test site
+          chrome.runtime.sendMessage({ action: 'fetchTestWebsites'}, function(response){
+            console.log("checking");
+            if (response && response.websites){
+              const testWebsites = response.websites;
+              if (testWebsites.includes(webDomain)) {
+                //if site is test site then check cert
+                const shortenedDomain = webDomain.replace(/^www\./,'');
+                chrome.runtime.sendMessage({ action: 'fetchCertificateChain', webDomain: shortenedDomain }, function(response) {
+                  if (response.certificateChain) {
+                    const savedCertificateChain = items.websiteList[webDomain].certificateChain;
+                    if (compareCertificateChains(response.certificateChain, savedCertificateChain)) {
+                      console.log("Certificate chain matches");
+                    } else {
+                      console.log("Certificate chain does not match");
+                      //DO OTHER STUFF HERE
+                      addBlocker();
+                    }
+                  } else if (response.error) {
+                    console.error('Error fetching certificate chain:', response.error);
+                    // If there's an error fetching the certificate chain, add blocker
+                    addBlocker();
+                  }
+                });
+              }
+            }
+          });
         } else {
           console.log("not in session list");
           // If not in session list, send a message to the background script to fetch the certificate chain

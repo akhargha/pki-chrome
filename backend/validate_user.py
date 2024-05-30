@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import random
 import string
 
@@ -25,6 +25,11 @@ def validate_user_key():
             random_key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
             return random_key
     return "Invalid request"
+
+@app.route('/websites', methods=['GET'])
+def get_websites():
+    websites = ["www.google.com", "www.trincoll.edu"]
+    return jsonify(websites)
 
 if __name__ == '__main__':
     app.run(host='localhost', port=8080)

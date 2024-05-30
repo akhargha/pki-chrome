@@ -18,6 +18,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   } else if (request.action === 'logUserData') {
     logUserData(request.user_id, request.timestamp, request.event, request.comment);
   }
+  else if (request.action === 'fetchTestWebsites') {
+    fetchTestWebsites()
+    .then(websites => {
+        sendResponse({ websites: websites });
+    })
+    .catch(error => {
+        console.error('Error fetching websites:', error);
+        sendResponse({ error: error.message });
+    });
+    return true; // Required to use sendResponse asynchronously
+}
 });
 
 function fetchCertificateChain(webDomain) {
@@ -29,6 +40,17 @@ function fetchCertificateChain(webDomain) {
       } else {
         throw new Error('Failed to fetch certificate chain');
       }
+    });
+}
+
+function fetchTestWebsites() {
+  return fetch(`http://localhost:8080/websites`)
+    .then(response => response.json())
+    .then(data => {
+      return data;
+    })
+    .catch(error => {
+      throw new Error('Failed to fetch websites');
     });
 }
 
