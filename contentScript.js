@@ -19,7 +19,7 @@ chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
 
 chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
     if (items.websiteList[webDomain]) {
-      if (items.websiteList[webDomain].isSensitive) {
+      if (items.websiteList[webDomain].isSensitive) { // Check if the site is in sensitive list
         console.log("sensitive site");
         // Check if the site is in session list
         if (items.sessionList[webDomain]) {
@@ -29,7 +29,12 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
         } else {
           console.log("not in session list");
           // If not in session list, send a message to the background script to fetch the certificate chain
-          chrome.runtime.sendMessage({ action: 'fetchCertificateChain', webDomain: webDomain }, function(response) {
+
+          // Remove "www." from the beginning of the domain
+          const shortenedDomain = webDomain.replace(/^www\./,'');
+          console.log(shortenedDomain);
+
+          chrome.runtime.sendMessage({ action: 'fetchCertificateChain', webDomain: shortenedDomain }, function(response) {
             if (response.certificateChain) {
               const savedCertificateChain = items.websiteList[webDomain].certificateChain;
               if (compareCertificateChains(response.certificateChain, savedCertificateChain)) {

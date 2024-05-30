@@ -380,7 +380,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function fetchCertificateChain(webDomain) {
-    return fetch(`http://pkie.engr.uconn.edu/certificate_chain/${webDomain}`)
+    // Remove "www." from the beginning of the domain
+    const shortenedDomain = webDomain.replace(/^www\./,'');
+    return fetch(`http://pkie.engr.uconn.edu/certificate_chain/${shortenedDomain}`)
       .then(response => response.json())
       .then(data => {
         if (data.status) {
