@@ -3,10 +3,13 @@ const webDomain = url.hostname;
 
 console.log(webDomain);
 
-let user_id = localStorage.getItem('user_id');
-if (!user_id){
-  user_id = '35j2qx61';
-}
+chrome.storage.local.get('userId', function(data) {
+  if (data.userId) {
+    user_id = data.userId;
+  } else {
+    user_id = 'abcde';
+  }
+});
 
 chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
     if (settings.autoSearchEnabled) {

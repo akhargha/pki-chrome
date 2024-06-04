@@ -4,6 +4,17 @@ chrome.runtime.onStartup.addListener(function() {
   });
 });
 
+// background.js
+chrome.runtime.onMessageExternal.addListener(
+  function(request, sender, sendResponse) {
+    if (request.type === 'storeUserId') {
+      chrome.storage.local.set({userId: request.userId}, function() {
+      });
+      sendResponse({status: 'User ID stored'});
+    }
+    return true;
+  }
+);
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === 'fetchCertificateChain') {
     fetchCertificateChain(request.webDomain)

@@ -1,19 +1,24 @@
 // 1. Make website get unblocked when extension is opened (unblock by sending message on session open) - done
-// 2. Get cookies from a website for the user ID instead of extension login page
+// 2. Get cookies from a website for the user ID instead of extension login page - done
 // 3. Check cert everytime for our own experiemnts and only per browser session for usual websites - done
-// 4. Send data (timestamp, action, unique user id) - done for one action
+// 4. Send data (timestamp, action, unique user id) - done
 // 5. Feedback (points functionality)
-// 6. change time format - prithvi comment
+// 6. change time format - prithvi comment - done
 // 7. List of changes (last meeting)
 // 8. block website when user do not trust it without reload
 // 9. do not notify user of pass field when site is protected
 // 10. change background of blocker text to highlight
-let user_id = localStorage.getItem('user_id');
-if (!user_id) {
-  user_id = '35j2qx61';
-}
 
 document.addEventListener('DOMContentLoaded', function () {
+  // retrieve user id
+  chrome.storage.local.get('userId', function(data) {
+    if (data.userId) {
+      user_id = data.userId;
+    } else {
+      user_id = 'abcde';
+    }
+  });
+
   removeView();
   document.getElementById('points').style.display = 'none';
   checkUserKey().then((hasUserKey) => {
