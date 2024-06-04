@@ -5,7 +5,7 @@ console.log(webDomain);
 
 let user_id = localStorage.getItem('user_id');
 if (!user_id){
-  user_id = '35j2qx79';
+  user_id = '35j2qx61';
 }
 
 chrome.storage.local.get({ autoSearchEnabled: true }, function(settings) {
@@ -114,8 +114,9 @@ function addBlocker() {
         blockerDiv.addEventListener('click', function () {
             blockerMessage.style.display = 'block'; // Show the message on click
 
-            var date = new Date();
-            const timestamp = date.toUTCString();
+            chrome.runtime.sendMessage({ action: "blockerDivClicked" }); // send msg to popup.js to show feedback
+            
+            const timestamp = Date.now();
             console.log(timestamp);
             const event = '1';
             const comment = 'Interact with protected website without opening extension';
