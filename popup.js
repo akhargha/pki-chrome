@@ -11,7 +11,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   // retrieve user id
-  chrome.storage.local.get('userId', function(data) {
+  chrome.storage.local.get('userId', function (data) {
     if (data.userId) {
       user_id = data.userId;
     } else {
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function initializeExtension() {
 
-  logUserData(user_id,3);
+  logUserData(user_id, 3);
 
   document.getElementById('choose-option').style.display = 'block'; //
   document.getElementById('sensitive-save-btn').style.display = 'block'; //
@@ -126,7 +126,7 @@ function initializeExtension() {
         removeView();
         document.getElementById('all-set').style.display = 'block';
 
-        logUserData(user_id,2);
+        logUserData(user_id, 2);
 
         chrome.storage.local.get({ sessionList: {} }, function (items) {
           const sessionList = items.sessionList;
@@ -171,8 +171,8 @@ function initializeExtension() {
             removeView();
             document.getElementById('added-to-trusted').style.display = 'block';
 
-            logUserData(user_id,4);
-            logUserData(user_id,7);
+            logUserData(user_id, 4);
+            logUserData(user_id, 7);
           })
           .catch(error => {
             console.error('Error fetching certificate chain:', error);
@@ -201,8 +201,8 @@ function initializeExtension() {
             removeView();
             document.getElementById('added-to-trusted').style.display = 'block';
 
-            logUserData(user_id,5);
-            logUserData(user_id,7);
+            logUserData(user_id, 5);
+            logUserData(user_id, 7);
           })
           .catch(error => {
             console.error('Error fetching certificate chain:', error);
@@ -227,9 +227,10 @@ function initializeExtension() {
         });
         removeView();
         document.getElementById('added-to-untrust').style.display = 'block';
+        chrome.tabs.sendMessage(tabs[0].id, { action: "addBlocker" }); //send message to block
 
-        logUserData(user_id,6);
-        logUserData(user_id,7);
+        logUserData(user_id, 6);
+        logUserData(user_id, 7);
       });
     });
   });
@@ -350,8 +351,8 @@ document.getElementById('sensitive-save').addEventListener('click', function () 
           });
         });
 
-        logUserData(user_id,4);
-        logUserData(user_id,7);
+        logUserData(user_id, 4);
+        logUserData(user_id, 7);
       })
       .catch(error => {
         console.error('Error fetching certificate chain:', error);
@@ -375,7 +376,7 @@ document.getElementById('unsafe-save').addEventListener('click', function () {
       });
     });
 
-    logUserData(user_id,6);
+    logUserData(user_id, 6);
     logUserData(user_id, 7);
   }
 });
@@ -387,8 +388,8 @@ function removeSensitiveSite(website) {
     chrome.storage.local.set({ websiteList: websiteList }, function () {
       console.log('Sensitive site removed:', website);
       displaySensitiveSites();
-      logUserData(user_id,8);
-      logUserData(user_id,7)
+      logUserData(user_id, 8);
+      logUserData(user_id, 7)
     });
   });
 }
@@ -400,8 +401,8 @@ function removeUnsafeSite(website) {
     chrome.storage.local.set({ websiteList: websiteList }, function () {
       console.log('Unsafe site removed:', website);
       displayUnsafeSites();
-      logUserData(user_id,9);
-      logUserData(user_id,7)
+      logUserData(user_id, 9);
+      logUserData(user_id, 7)
     });
   });
 }
