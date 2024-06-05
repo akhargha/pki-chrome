@@ -4,7 +4,7 @@
 // 4. Send data (timestamp, action, unique user id) - done
 // 5. Feedback (points functionality)
 // 6. change time format - prithvi comment - done
-// 7. List of changes (last meeting)
+// 7. List of changes (last meeting) - done
 // 8. block website when user do not trust it without reload - done
 // 9. do not notify user of pass field when site is protected
 // 10. change background of blocker text to highlight
@@ -145,6 +145,8 @@ function initializeExtension() {
       } else if (result === 1) {
         removeView();
         document.getElementById('site-blocked-text').style.display = 'block';
+        document.getElementById('unblock-once').style.display = 'block';
+
       } else {
         console.log('Website not found in the list');
       }
@@ -206,6 +208,7 @@ function initializeExtension() {
     
           removeView();
           document.getElementById('added-to-untrust').style.display = 'block';
+          document.getElementById('unblock-once').style.display = 'block';
           chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             chrome.tabs.sendMessage(tabs[0].id, { action: "addBlocker" }); // Optionally, send a message to block the site
           });
@@ -237,6 +240,7 @@ function removeView() {
   document.getElementById('site-blocked-text').style.display = 'none';
   document.getElementById('sensitive-sites-dropdown').style.display = 'none';
   document.getElementById('report-phish-prompt-text').style.display = 'none';
+  document.getElementById('unblock-once').style.display = 'none';
   
 }
 
@@ -271,6 +275,22 @@ document.getElementById('nav-unsafe').addEventListener('click', function () {
   document.getElementById('unsafe-input').style.display = 'block';
   document.getElementById('unsafe-save').style.display = 'block';
   displayUnsafeSites();
+});
+
+//temp unblocking site
+document.getElementById('unblock-once').addEventListener('click', function () {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const url = new URL(tabs[0].url);
+    const domain = url.hostname;
+
+    // Send message to content script to remove the blocker
+    chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
+
+    // Display the temporary unblock text
+    document.getElementById('temp-unblock-text').style.display = 'block';
+    document.getElementById('site-blocked-text').style.display = 'none';
+    document.getElementById('unblock-once').style.display = 'none';
+  });
 });
 
 function displaySensitiveSites() {
