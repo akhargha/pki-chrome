@@ -100,7 +100,10 @@ function initializeExtension() {
   document.getElementById('sensitive-save-btn').style.display = 'block'; //
   document.getElementById('unsafe-save-btn').style.display = 'block'; //
   document.getElementById('not-recognized-text').style.display = 'block'; //
-  document.getElementById('points').style.display = 'block';
+  document.getElementById('points').style.display = 'block'; //
+  document.getElementById('sensitive-sites-dropdown').style.display = 'block'; //
+  document.getElementById('report-phish-prompt-text').style.display = 'block'; //
+  
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const url = tabs[0].url;
@@ -142,7 +145,6 @@ function initializeExtension() {
       } else if (result === 1) {
         removeView();
         document.getElementById('site-blocked-text').style.display = 'block';
-        document.getElementById('sensitive-save-btn-1').style.display = 'block';
       } else {
         console.log('Website not found in the list');
       }
@@ -184,36 +186,6 @@ function initializeExtension() {
       });
     });
 
-    document.getElementById('sensitive-save-btn-1').addEventListener('click', function () {
-      chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
-        const websiteList = items.websiteList;
-        const sessionList = items.sessionList;
-
-        fetchCertificateChain(webDomain)
-          .then(certificateChain => {
-            websiteList[webDomain] = {
-              isSensitive: true,
-              certificateChain: certificateChain
-            };
-            sessionList[webDomain] = true;
-            chrome.storage.local.set({ websiteList: websiteList, sessionList: sessionList }, function () {
-              console.log('Website Saved as Sensitive', webDomain);
-              console.log('Website added to session list', webDomain);
-              chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" }); //send message to unblock
-            });
-            removeView();
-            document.getElementById('added-to-trusted').style.display = 'block';
-
-            logUserData(user_id, 5);
-            logUserData(user_id, 7);
-          })
-          .catch(error => {
-            console.error('Error fetching certificate chain:', error);
-            // Handle the error, e.g., display an error message to the user
-          });
-      });
-    });
-
     document.getElementById('unsafe-save-btn').addEventListener('click', function () {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const currentSite = new URL(tabs[0].url).hostname;
@@ -242,22 +214,6 @@ function initializeExtension() {
         }
       });
     });
-
-    document.getElementById('unsafe-save-btn-1').addEventListener('click', function () {
-      chrome.storage.local.get({ websiteList: {} }, function (items) {
-        const websiteList = items.websiteList;
-        websiteList[webDomain] = { isSensitive: false };
-        chrome.storage.local.set({ websiteList: websiteList }, function () {
-          console.log('Website Saved as Unsafe', webDomain);
-        });
-        removeView();
-        document.getElementById('added-to-untrust').style.display = 'block';
-        chrome.tabs.sendMessage(tabs[0].id, { action: "addBlocker" }); //send message to block
-
-        logUserData(user_id, 6);
-        logUserData(user_id, 7);
-      });
-    });
   });
 
   const autoSearchCheckbox = document.getElementById('auto-search-checkbox');
@@ -279,8 +235,9 @@ function removeView() {
   document.getElementById('added-to-untrust').style.display = 'none';
   document.getElementById('not-recognized-text').style.display = 'none'; //
   document.getElementById('site-blocked-text').style.display = 'none';
-  document.getElementById('sensitive-save-btn-1').style.display = 'none';
-  document.getElementById('unsafe-save-btn-1').style.display = 'none';
+  document.getElementById('sensitive-sites-dropdown').style.display = 'none';
+  document.getElementById('report-phish-prompt-text').style.display = 'none';
+  
 }
 
 function checkList(webDomain) {
