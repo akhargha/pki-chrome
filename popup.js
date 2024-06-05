@@ -11,6 +11,7 @@
 // 11. if cert chain does not match then block always subdomain
 // 12. Make blockerMessage more elaborate and explain - done
 // 13. remove login page - done
+// 14. Fix points system conditions - done
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -394,18 +395,22 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       chrome.tabs.sendMessage(tabs[0].id, { action: "checkIfClicked" }, function (response) {
         if (response && response.clicked) {
           document.getElementById('points-feedback-click-when-blocked').style.display = 'block';
-          pointsLocal -= 5;
+          pointsLocal -= 5; // deduct points for interacting with blocked site
           chrome.storage.local.set({ points: pointsLocal }, function () {
             console.log(pointsLocal);
           });
         } else {
-          document.getElementById('points-feedback-click-before-blocked').style.display = 'block';
-          pointsLocal += 5;
-          chrome.storage.local.set({ points: pointsLocal }, function () {
-            console.log(pointsLocal);
+          checkList(domain).then((result) => { // first check if site is protected
+            if (result === 0) {
+              document.getElementById('points-feedback-click-before-blocked').style.display = 'block';
+              pointsLocal += 5; //add points for being proactive in protected sites
+              chrome.storage.local.set({ points: pointsLocal }, function () {
+                console.log(pointsLocal);
+                document.getElementById('points').textContent = `Points: ${pointsLocal}`;
+              });
+            }
           });
         }
-        document.getElementById('points').textContent = `Points: ${pointsLocal}`;
       });
     } else {
       // Optionally, handle the case where the site is in the session list
