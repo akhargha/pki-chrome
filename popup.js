@@ -13,6 +13,21 @@
 // 13. remove login page - done
 
 document.addEventListener('DOMContentLoaded', function () {
+
+  pointsLocal = 0;
+  chrome.storage.local.get('points', function (data) {
+    if (data.points) {
+      pointsLocal = data.points;
+    }
+  });
+
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "testing" }, function (response) {
+      console.log("T" + pointsLocal);
+      document.getElementById('points').textContent = `Points: ${pointsLocal}`;
+    });
+  });
+
   // retrieve user id
   user_id = '123456';
   chrome.storage.local.get('userId', function (data) {
@@ -22,8 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   removeView();
-
-  document.getElementById('points').style.display = 'none';
 
   initializeExtension();
 
@@ -52,7 +65,7 @@ function initializeExtension() {
   document.getElementById('report-phish-prompt-text').style.display = 'block'; //
   document.getElementById('points-feedback-click-before-blocked').style.display = 'none';
   document.getElementById('points-feedback-click-when-blocked').style.display = 'none';
-  
+
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const url = tabs[0].url;
@@ -146,10 +159,10 @@ function initializeExtension() {
     });
 
     document.getElementById('unsafe-save-btn').addEventListener('click', function () {
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentSite = new URL(tabs[0].url).hostname;
         const selectedSite = document.getElementById('sensitive-sites-dropdown').value;
-    
+
         if (currentSite && selectedSite) {
           chrome.storage.local.get({ websiteList: {} }, function (items) {
             const websiteList = items.websiteList;
@@ -158,11 +171,11 @@ function initializeExtension() {
               console.log('Current website marked as unsafe:', currentSite);
               displayUnsafeSites();
             });
-    
+
             // Log the selected site with the current site
             logUserData(user_id, 10, selectedSite, currentSite);
           });
-    
+
           removeView();
           document.getElementById('added-to-untrust').style.display = 'block';
           document.getElementById('unblock-once').style.display = 'block';
@@ -198,7 +211,7 @@ function removeView() {
   document.getElementById('sensitive-sites-dropdown').style.display = 'none';
   document.getElementById('report-phish-prompt-text').style.display = 'none';
   document.getElementById('unblock-once').style.display = 'none';
-  
+
 }
 
 function checkList(webDomain) {
@@ -236,12 +249,12 @@ document.getElementById('nav-unsafe').addEventListener('click', function () {
 
 //temp unblocking site
 document.getElementById('unblock-once').addEventListener('click', function () {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const url = new URL(tabs[0].url);
     const domain = url.hostname;
 
     // Send message to content script to remove the blocker
-    chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
+    chrome.tabs.sendMessage(tabs[0].id, { action: "removeBlocker" });
 
     logUserData(user_id, 11);
 
@@ -368,27 +381,36 @@ document.getElementById('unsafe-save').addEventListener('click', function () {
 });
 
 // for feedback on points
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   const url = new URL(tabs[0].url);
   const domain = url.hostname; // Get the domain of the current site
 
   // Retrieve the session list from storage
-  chrome.storage.local.get({sessionList: {}}, function(items) {
-      const sessionList = items.sessionList;
+  chrome.storage.local.get({ sessionList: {} }, function (items) {
+    const sessionList = items.sessionList;
 
-      // Check if the current site is in the session list
-      if (!sessionList[domain]) {  // Only proceed if the site is NOT in the session list
-          chrome.tabs.sendMessage(tabs[0].id, {action: "checkIfClicked"}, function(response) {
-              if (response && response.clicked) {
-                  document.getElementById('points-feedback-click-when-blocked').style.display = 'block';
-              } else {
-                  document.getElementById('points-feedback-click-before-blocked').style.display = 'block';
-              }
+    // Check if the current site is in the session list
+    if (!sessionList[domain]) {  // Only proceed if the site is NOT in the session list
+      chrome.tabs.sendMessage(tabs[0].id, { action: "checkIfClicked" }, function (response) {
+        if (response && response.clicked) {
+          document.getElementById('points-feedback-click-when-blocked').style.display = 'block';
+          pointsLocal -= 5;
+          chrome.storage.local.set({ points: pointsLocal }, function () {
+            console.log(pointsLocal);
           });
-      } else {
-          // Optionally, handle the case where the site is in the session list
-          console.log('The site is in the session list. No feedback message shown.');
-      }
+        } else {
+          document.getElementById('points-feedback-click-before-blocked').style.display = 'block';
+          pointsLocal += 5;
+          chrome.storage.local.set({ points: pointsLocal }, function () {
+            console.log(pointsLocal);
+          });
+        }
+        document.getElementById('points').textContent = `Points: ${pointsLocal}`;
+      });
+    } else {
+      // Optionally, handle the case where the site is in the session list
+      console.log('The site is in the session list. No feedback message shown.');
+    }
   });
 });
 
