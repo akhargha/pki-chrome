@@ -1,6 +1,6 @@
 # pki-chrome
 
-# How to run backend (needs to be running for the extension to work)-
+# How to run backend (does *NOT* need to be running for the extension to work)-
 First go to the backend directory. Then-
 ```
 source certenv/bin/activate
