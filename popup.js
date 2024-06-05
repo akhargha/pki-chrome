@@ -50,6 +50,8 @@ function initializeExtension() {
   document.getElementById('points').style.display = 'block'; //
   document.getElementById('sensitive-sites-dropdown').style.display = 'block'; //
   document.getElementById('report-phish-prompt-text').style.display = 'block'; //
+  document.getElementById('points-feedback-click-before-blocked').style.display = 'none';
+  document.getElementById('points-feedback-click-when-blocked').style.display = 'none';
   
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -93,6 +95,14 @@ function initializeExtension() {
         removeView();
         document.getElementById('site-blocked-text').style.display = 'block';
         document.getElementById('unblock-once').style.display = 'block';
+
+        chrome.storage.local.get({ sessionList: {} }, function (items) {
+          const sessionList = items.sessionList;
+          sessionList[webDomain] = true;
+          chrome.storage.local.set({ sessionList: sessionList }, function () {
+            console.log('Website added to session list', webDomain);
+          });
+        });
 
       } else {
         console.log('Website not found in the list');
@@ -357,13 +367,28 @@ document.getElementById('unsafe-save').addEventListener('click', function () {
   }
 });
 
-//flag 
+// for feedback on points
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  chrome.tabs.sendMessage(tabs[0].id, {action: "checkIfClicked"}, function(response) {
-    if (response && response.clicked) {
-      console.log("CLICKEDDDD");
-      document.getElementById('points-feedback-click-when-blocked').style.display = 'block';
-    }
+  const url = new URL(tabs[0].url);
+  const domain = url.hostname; // Get the domain of the current site
+
+  // Retrieve the session list from storage
+  chrome.storage.local.get({sessionList: {}}, function(items) {
+      const sessionList = items.sessionList;
+
+      // Check if the current site is in the session list
+      if (!sessionList[domain]) {  // Only proceed if the site is NOT in the session list
+          chrome.tabs.sendMessage(tabs[0].id, {action: "checkIfClicked"}, function(response) {
+              if (response && response.clicked) {
+                  document.getElementById('points-feedback-click-when-blocked').style.display = 'block';
+              } else {
+                  document.getElementById('points-feedback-click-before-blocked').style.display = 'block';
+              }
+          });
+      } else {
+          // Optionally, handle the case where the site is in the session list
+          console.log('The site is in the session list. No feedback message shown.');
+      }
   });
 });
 
