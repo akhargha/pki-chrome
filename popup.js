@@ -5,9 +5,10 @@
 // 5. Feedback (points functionality)
 // 6. change time format - prithvi comment - done
 // 7. List of changes (last meeting)
-// 8. block website when user do not trust it without reload
+// 8. block website when user do not trust it without reload - done
 // 9. do not notify user of pass field when site is protected
 // 10. change background of blocker text to highlight
+// 11. if cert chain does not match then block always subdomain
 
 document.addEventListener('DOMContentLoaded', function () {
   // retrieve user id
@@ -92,6 +93,8 @@ document.addEventListener('DOMContentLoaded', function () {
 function initializeExtension() {
 
   logUserData(user_id, 3);
+
+  displaySensitiveSitesDropdown();
 
   document.getElementById('choose-option').style.display = 'block'; //
   document.getElementById('sensitive-save-btn').style.display = 'block'; //
@@ -212,10 +215,32 @@ function initializeExtension() {
     });
 
     document.getElementById('unsafe-save-btn').addEventListener('click', function () {
-      removeView();
-      document.getElementById('sensitive-save-btn-1').style.display = 'block';
-      document.getElementById('unsafe-save-btn-1').style.display = 'block';
-      document.getElementById('not-marked-sensitive-proceed-caution').style.display = 'block';
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        const currentSite = new URL(tabs[0].url).hostname;
+        const selectedSite = document.getElementById('sensitive-sites-dropdown').value;
+    
+        if (currentSite && selectedSite) {
+          chrome.storage.local.get({ websiteList: {} }, function (items) {
+            const websiteList = items.websiteList;
+            websiteList[currentSite] = { isSensitive: false }; // Mark the current site as unsafe
+            chrome.storage.local.set({ websiteList: websiteList }, function () {
+              console.log('Current website marked as unsafe:', currentSite);
+              displayUnsafeSites();
+            });
+    
+            // Log the selected site with the current site
+            logUserData(user_id, 10, selectedSite, currentSite);
+          });
+    
+          removeView();
+          document.getElementById('added-to-untrust').style.display = 'block';
+          chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "addBlocker" }); // Optionally, send a message to block the site
+          });
+        } else {
+          console.error('Error: No current site or no site selected to report.');
+        }
+      });
     });
 
     document.getElementById('unsafe-save-btn-1').addEventListener('click', function () {
@@ -306,6 +331,31 @@ function displaySensitiveSites() {
           removeSensitiveSite(website);
         });
         sensitiveSitesList.appendChild(siteButton);
+      }
+    }
+  });
+}
+
+function displaySensitiveSitesDropdown() {
+  chrome.storage.local.get({ websiteList: {} }, function (items) {
+    const websiteList = items.websiteList;
+    const sensitiveSitesDropdown = document.getElementById('sensitive-sites-dropdown');
+    // Clear existing options
+    sensitiveSitesDropdown.innerHTML = '';
+
+    // Add a default option
+    const defaultOption = document.createElement('option');
+    defaultOption.textContent = 'Select the Protected Site';
+    defaultOption.value = '';
+    sensitiveSitesDropdown.appendChild(defaultOption);
+
+    // Append new options for each sensitive site
+    for (const website in websiteList) {
+      if (websiteList[website].isSensitive) {
+        const option = document.createElement('option');
+        option.value = website;
+        option.textContent = website;
+        sensitiveSitesDropdown.appendChild(option);
       }
     }
   });
@@ -435,8 +485,7 @@ function fetchCertificateChain(webDomain) {
 }
 
 // log data - happens manually in contentScript
-function logUserData(user_id, event_number) {
-  //var date = new Date();
+function logUserData(user_id, event_number, reportedSite = '', currentSite = '') {
   const timestamp = Date.now();
   console.log(timestamp);
 
@@ -450,7 +499,14 @@ function logUserData(user_id, event_number) {
     '8': 'Protected site removed',
     '9': 'Unsafe site removed',
   };
-  if (event_number === 7) { // 7th event - save sensitive site info
+
+  let comment = eventComments[event_number] || 'Unknown event';
+
+  // Handling event 10 for reporting phishing
+  if (event_number === 10) {
+    comment = `Reported phishing on site ${reportedSite} by ${currentSite}`;
+  }
+  if (event_number === 7) { // Special handling for event 7 - save sensitive site info
     console.log("SAVEE");
     chrome.storage.local.get({ websiteList: {} }, function (items) {
       const websiteList = items.websiteList;
@@ -462,6 +518,7 @@ function logUserData(user_id, event_number) {
       }
       const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
       console.log(sensitiveListComment);
+
       chrome.runtime.sendMessage({
         action: 'logUserData',
         user_id: user_id,
@@ -471,8 +528,7 @@ function logUserData(user_id, event_number) {
       });
     });
   } else {
-    console.log("sad");
-    const comment = eventComments[event_number] || 'Unknown event';
+    console.log(comment);
     chrome.runtime.sendMessage({
       action: 'logUserData',
       user_id: user_id,

@@ -181,6 +181,10 @@
       </button>
     </div>
 
+    <div class="block">
+      <h3 class="subtitle" style="text-align: center;">If you thought this was one of your protected sites, choose that site below: </h1>
+    </div>
+
     <h2
       class="subtitle"
       style="text-align: center; display: none; color: red"
@@ -204,14 +208,19 @@
       Feedback: This was just a test!
     </h2>
 
+    <div class="select is-rounded is-danger" style="margin-left: 25px; margin-bottom: 10px;">
+      <select id="sensitive-sites-dropdown">
+        <!-- Options will be dynamically added here -->
+      </select>
+    </div>
+
     <div class="block">
       <button
-        class="button is-rounded is-danger is-clipped is-fullwidth"
+        class="button is-rounded is-danger is-clipped"
         id="unsafe-save-btn"
-        style="min-height: 4em"
+        style="margin-left: 100px;"
       >
-        I thought this was one of my <br />
-        protected sites
+        Report
       </button>
     </div>
 
