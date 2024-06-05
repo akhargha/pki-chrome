@@ -47,12 +47,12 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
                   } else {
                     console.log("Certificate chain does not match");
                     //DO OTHER STUFF HERE
-                    addBlocker();
+                    addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
                   }
                 } else if (response.error) {
                   console.error('Error fetching certificate chain:', response.error);
                   // If there's an error fetching the certificate chain, add blocker
-                  addBlocker();
+                  addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
                 }
               });
             }
@@ -71,28 +71,28 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
             const savedCertificateChain = items.websiteList[webDomain].certificateChain;
             if (compareCertificateChains(response.certificateChain, savedCertificateChain)) {
               console.log("Certificate chain matches");
-              addBlocker();
+              addBlocker('You have marked this site to be protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.');
             } else {
               console.log("Certificate chain does not match");
               //DO OTHER STUFF HERE
-              addBlocker();
+              addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
             }
           } else if (response.error) {
             console.error('Error fetching certificate chain:', response.error);
             // If there's an error fetching the certificate chain, add blocker
-            addBlocker();
+            addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
           }
         });
       }
     } else {
       console.log("unsafe site");
       // Add blocker
-      addBlocker();
+      addBlocker('This site is marked as unsafe. Please click on the extension before proceeding to prevent yourself from cyber attacks.');
     }
   }
 });
 
-function addBlocker() {
+function addBlocker(message = 'This site is blocked by the extension. Click on the extension to continue') {
   if (!document.getElementById('myBlockerDiv')) {
     var blockerDiv = document.createElement('div');
     blockerDiv.id = 'myBlockerDiv';
@@ -106,22 +106,22 @@ function addBlocker() {
     document.body.appendChild(blockerDiv);
 
     var blockerMessage = document.createElement('h1');
-    blockerMessage.style.backgroundColor = 'yellow'; // Changed to yellow background
+    blockerMessage.style.color = 'black'; // Changed to yellow background
     blockerMessage.style.fontFamily = 'Trebuchet MS';
-    blockerMessage.style.fontSize = '50px'; // Changed to yellow background
+    blockerMessage.style.fontSize = '50px';
     blockerMessage.style.textAlign = 'center';
     blockerMessage.style.position = 'absolute'; // Ensure it's positioned relative to the blockerDiv
     blockerMessage.style.top = '50%'; // Center vertically in the middle of the viewport
     blockerMessage.style.left = '50%'; // Center horizontally
     blockerMessage.style.transform = 'translate(-50%, -50%)'; // Ensure it's centered perfectly
-    blockerMessage.innerHTML = 'This site is blocked by the extension. Click on the extension to continue.';
+    blockerMessage.innerHTML = message; // Use the message parameter
     blockerMessage.style.display = 'none'; // Initially hide the message
 
     // Flashing colors for the text
     var colors = ['red', 'blue', 'green', 'white']; // Define colors to cycle through
     var currentColorIndex = 0; // Starting index
     setInterval(function () {
-      blockerMessage.style.color = colors[currentColorIndex]; // Update the color
+      blockerMessage.style.backgroundColor = colors[currentColorIndex]; // Update the color
       currentColorIndex = (currentColorIndex + 1) % colors.length; // Move to the next color
     }, 500); // Change color every 500 milliseconds
 

@@ -2,14 +2,14 @@
 // 2. Get cookies from a website for the user ID instead of extension login page - done
 // 3. Check cert everytime for our own experiemnts and only per browser session for usual websites - done
 // 4. Send data (timestamp, action, unique user id) - done
-// 5. Feedback (points functionality)
+// 5. Feedback (points functionality) - done
 // 6. change time format - prithvi comment - done
 // 7. List of changes (last meeting) - done
 // 8. block website when user do not trust it without reload - done
 // 9. do not notify user of pass field when site is protected
 // 10. change background of blocker text to highlight - done
 // 11. if cert chain does not match then block always subdomain
-// 12. Make blockerMessage more elaborate and explain
+// 12. Make blockerMessage more elaborate and explain - done
 // 13. remove login page - done
 
 document.addEventListener('DOMContentLoaded', function () {
