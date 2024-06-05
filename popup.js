@@ -10,7 +10,7 @@
 // 10. change background of blocker text to highlight - done
 // 11. if cert chain does not match then block always subdomain
 // 12. Make blockerMessage more elaborate and explain
-// 13. remove login page
+// 13. remove login page - done
 
 document.addEventListener('DOMContentLoaded', function () {
   // retrieve user id
@@ -233,6 +233,8 @@ document.getElementById('unblock-once').addEventListener('click', function () {
     // Send message to content script to remove the blocker
     chrome.tabs.sendMessage(tabs[0].id, {action: "removeBlocker"});
 
+    logUserData(user_id, 11);
+
     // Display the temporary unblock text
     document.getElementById('temp-unblock-text').style.display = 'block';
     document.getElementById('site-blocked-text').style.display = 'none';
@@ -409,6 +411,7 @@ function logUserData(user_id, event_number, reportedSite = '', currentSite = '')
     '6': 'Site saved as unsafe',
     '8': 'Protected site removed',
     '9': 'Unsafe site removed',
+    '11': 'Site Unblocked Temporarily'
   };
 
   let comment = eventComments[event_number] || 'Unknown event';
