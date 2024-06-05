@@ -7,26 +7,25 @@
 // 7. List of changes (last meeting) - done
 // 8. block website when user do not trust it without reload - done
 // 9. do not notify user of pass field when site is protected
-// 10. change background of blocker text to highlight
+// 10. change background of blocker text to highlight - done
 // 11. if cert chain does not match then block always subdomain
+// 12. Make blockerMessage more elaborate and explain
+// 13. remove login page
 
 document.addEventListener('DOMContentLoaded', function () {
   // retrieve user id
+  user_id = '123456';
   chrome.storage.local.get('userId', function (data) {
     if (data.userId) {
       user_id = data.userId;
-    } else {
-      user_id = 'abcde';
     }
   });
 
   removeView();
+
   document.getElementById('points').style.display = 'none';
-  checkUserKey().then((hasUserKey) => {
-    if (hasUserKey) {
-      initializeExtension();
-    }
-  });
+
+  initializeExtension();
 
   const navbarBurger = document.querySelector('.navbar-burger');
   const navbarMenu = document.getElementById('navbarMenu');
@@ -35,64 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
     navbarBurger.classList.toggle('is-active');
     navbarMenu.classList.toggle('is-active');
   });
-
-  document.getElementById('user-key-submit').addEventListener('click', function () {
-    const userKey = document.getElementById('user-key-field').value.trim();
-    if (userKey !== '') {
-      fetch('http://localhost:8080/validate?user_key=' + userKey)
-        .then(response => response.text())
-        .then(data => {
-          if (data === 'success') {
-            chrome.storage.local.set({ user_key: userKey }, function () {
-              console.log('User key saved:', userKey);
-              document.getElementById('user-key-input').style.display = 'none';
-              initializeExtension();
-            });
-          } else {
-            alert('Invalid user key. Please try again.');
-          }
-        })
-        .catch(error => {
-          console.error('Error validating user key');
-          alert('An error occurred while validating the user key. Please try again later.');
-        });
-    }
-  });
-
-
-  document.getElementById('forgot-password').addEventListener('click', function () {
-    document.getElementById('forgot-password-form').style.display = 'block';
-    document.getElementById('recovery-prompt').style.display = 'none';
-    document.getElementById('user-key-field').style.display = 'none';
-    document.getElementById('user-key-submit').style.display = 'none';
-  });
-
-  document.getElementById('recover-password-submit').addEventListener('click', function () {
-    const name = document.getElementById('name-field').value.trim();
-    const dob = document.getElementById('dob-field').value;
-    if (name !== '' && dob !== '') {
-      fetch('http://localhost:8080/validate?name=' + encodeURIComponent(name) + '&dob=' + dob)
-        .then(response => response.text())
-        .then(data => {
-          document.getElementById('password-recovery-response').style.display = 'block';
-          if (data === 'not found') {
-            document.getElementById('password-recovery-response').textContent = 'User not found. Please create a new account.';
-          } else {
-            document.getElementById('password-recovery-response').textContent = 'Your user key: ' + data;
-          }
-        })
-        .catch(error => {
-          document.getElementById('password-recovery-response').style.display = 'block';
-          console.error('Error during password recovery');
-          document.getElementById('password-recovery-response').textContent = 'An error occurred during password recovery. Please try again later.';
-        });
-    }
-  });
 });
 
 function initializeExtension() {
 
   logUserData(user_id, 3);
+  console.log(user_id)
 
   displaySensitiveSitesDropdown();
 
@@ -430,19 +377,6 @@ function removeUnsafeSite(website) {
       displayUnsafeSites();
       logUserData(user_id, 9);
       logUserData(user_id, 7)
-    });
-  });
-}
-
-function checkUserKey() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['user_key'], function (result) {
-      if (result.user_key) {
-        resolve(true);
-      } else {
-        document.getElementById('user-key-input').style.display = 'block';
-        resolve(false);
-      }
     });
   });
 }
