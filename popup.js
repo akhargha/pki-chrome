@@ -6,7 +6,7 @@
 // 6. change time format - prithvi comment - done
 // 7. List of changes (last meeting) - done
 // 8. block website when user do not trust it without reload - done
-// 9. do not notify user of pass field when site is protected
+// 9. do not notify user of pass field when site is protected - done
 // 10. change background of blocker text to highlight - done
 // 11. if cert chain does not match then block always subdomain
 // 12. Make blockerMessage more elaborate and explain - done

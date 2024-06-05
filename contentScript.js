@@ -12,15 +12,6 @@ chrome.storage.local.get('userId', function (data) {
   }
 });
 
-chrome.storage.local.get({ autoSearchEnabled: true }, function (settings) {
-  if (settings.autoSearchEnabled) {
-    const passwordFields = document.querySelectorAll('input[type="password"]');
-    if (passwordFields.length > 0) {
-      alert('🔒 Extension Alert: This site may contain sensitive information with password fields. Click the 🔒 extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in extension settings 🔒.');
-    }
-  }
-});
-
 chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) {
   if (items.websiteList[webDomain]) {
     if (items.websiteList[webDomain].isSensitive) { // Check if the site is in protected list
@@ -86,9 +77,30 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
       }
     } else {
       console.log("unsafe site");
+
+      //check for password fields for unsafe sites
+      chrome.storage.local.get({ autoSearchEnabled: true }, function (settings) {
+        if (settings.autoSearchEnabled) {
+          const passwordFields = document.querySelectorAll('input[type="password"]');
+          if (passwordFields.length > 0) {
+            alert('🔒 Extension Alert: This site may contain sensitive information with password fields. Click the 🔒 extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in extension settings 🔒.');
+          }
+        }
+      });
+
       // Add blocker
       addBlocker('This site is marked as unsafe. Please click on the extension before proceeding to prevent yourself from cyber attacks.');
     }
+  } else{
+    //check for password fields for unsaved sites
+    chrome.storage.local.get({ autoSearchEnabled: true }, function (settings) {
+      if (settings.autoSearchEnabled) {
+        const passwordFields = document.querySelectorAll('input[type="password"]');
+        if (passwordFields.length > 0) {
+          alert('🔒 Extension Alert: This site may contain sensitive information with password fields. Click the 🔒 extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in extension settings 🔒.');
+        }
+      }
+    });
   }
 });
 
