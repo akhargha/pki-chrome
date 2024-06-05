@@ -98,26 +98,39 @@ function addBlocker() {
     blockerDiv.style.position = 'fixed';
     blockerDiv.style.left = '0';
     blockerDiv.style.top = '0';
-    blockerDiv.style.width = '100%';
-    blockerDiv.style.height = '100%';
+    blockerDiv.style.width = '100vw';  // Width as 100% of viewport width
+    blockerDiv.style.height = '100vh'; // Height as 100% of viewport height
     blockerDiv.style.zIndex = '10000';
-    blockerDiv.style.backgroundColor = 'rgba(0,0,0,0.2)';
+
     document.body.appendChild(blockerDiv);
 
     var blockerMessage = document.createElement('h1');
-    blockerMessage.style.color = 'white';
+    blockerMessage.style.backgroundColor = 'yellow'; // Changed to yellow background
+    blockerMessage.style.fontFamily = 'Trebuchet MS';
+    blockerMessage.style.fontSize = '50px'; // Changed to yellow background
     blockerMessage.style.textAlign = 'center';
-    blockerMessage.style.marginTop = '20%';
+    blockerMessage.style.position = 'absolute'; // Ensure it's positioned relative to the blockerDiv
+    blockerMessage.style.top = '50%'; // Center vertically in the middle of the viewport
+    blockerMessage.style.left = '50%'; // Center horizontally
+    blockerMessage.style.transform = 'translate(-50%, -50%)'; // Ensure it's centered perfectly
     blockerMessage.innerHTML = 'This site is blocked by the extension. Click on the extension to continue.';
     blockerMessage.style.display = 'none'; // Initially hide the message
 
+    // Flashing colors for the text
+    var colors = ['red', 'blue', 'green', 'white']; // Define colors to cycle through
+    var currentColorIndex = 0; // Starting index
+    setInterval(function () {
+      blockerMessage.style.color = colors[currentColorIndex]; // Update the color
+      currentColorIndex = (currentColorIndex + 1) % colors.length; // Move to the next color
+    }, 500); // Change color every 500 milliseconds
+
     blockerDiv.appendChild(blockerMessage);
 
-    // show message/feedback when user clicks without opening extension
+    // Show message/feedback when user clicks without opening extension
     blockerDiv.addEventListener('click', function () {
       blockerMessage.style.display = 'block'; // Show the message on click
 
-      chrome.runtime.sendMessage({ action: "blockerDivClicked" }); // send msg to popup.js to show feedback
+      chrome.runtime.sendMessage({ action: "blockerDivClicked" }); // Send msg to popup.js to show feedback
 
       const timestamp = Date.now();
       console.log(timestamp);
