@@ -3,11 +3,12 @@ const webDomain = url.hostname;
 
 console.log(webDomain);
 
+let blockerClicked = false;
+
+user_id = '123456';
 chrome.storage.local.get('userId', function (data) {
   if (data.userId) {
     user_id = data.userId;
-  } else {
-    user_id = 'abcde';
   }
 });
 
@@ -128,6 +129,7 @@ function addBlocker() {
 
     // Show message/feedback when user clicks without opening extension
     blockerDiv.addEventListener('click', function () {
+      blockerClicked = true;
       blockerMessage.style.display = 'block'; // Show the message on click
 
       chrome.runtime.sendMessage({ action: "blockerDivClicked" }); // Send msg to popup.js to show feedback
@@ -155,6 +157,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
   if (request.action === "addBlocker") {
     addBlocker();
+  }
+  if (request.action === "checkIfClicked") {
+    sendResponse({ clicked: blockerClicked });
+    blockerClicked = false;
   }
 });
 

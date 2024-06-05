@@ -357,6 +357,16 @@ document.getElementById('unsafe-save').addEventListener('click', function () {
   }
 });
 
+//flag 
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  chrome.tabs.sendMessage(tabs[0].id, {action: "checkIfClicked"}, function(response) {
+    if (response && response.clicked) {
+      console.log("CLICKEDDDD");
+      document.getElementById('points-feedback-click-when-blocked').style.display = 'block';
+    }
+  });
+});
+
 function removeSensitiveSite(website) {
   chrome.storage.local.get({ websiteList: {} }, function (items) {
     const websiteList = items.websiteList;
