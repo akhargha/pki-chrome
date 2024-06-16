@@ -12,6 +12,13 @@
 // 12. Make blockerMessage more elaborate and explain - done
 // 13. remove login page - done
 // 14. Fix points system conditions - done
+// 15. problem with backend - sometimes data is not updated
+
+// decide on points system
+// review msg system
+// change logo
+// disable extension for period of time
+// cookies stuff
 
 document.addEventListener('DOMContentLoaded', function () {
 

@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Save Website",
+  "name": "Moby Phish",
   "version": "1.0",
-  "description": "Saves website URLs to a sensitive list in localStorage.",
+  "description": "Moby Phish is a browser extension that intelligently safeguards users from phishing sites by performing real-time certificate checks and providing proactive notifications, ensuring secure and informed browsing experiences.",
   "icons": {
-    "128": "lock.png"
+    "128": "fish-emoji.png"
   },
   "permissions": ["activeTab", "storage", "scripting", "tabs"],
   "action": {
