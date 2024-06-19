@@ -38,12 +38,12 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
                   } else {
                     console.log("Certificate chain does not match");
                     //DO OTHER STUFF HERE
-                    addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
+                    addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the Moby Phish extension to proceed.');
                   }
                 } else if (response.error) {
                   console.error('Error fetching certificate chain:', response.error);
                   // If there's an error fetching the certificate chain, add blocker
-                  addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
+                  addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the Moby Phish extension to proceed.');
                 }
               });
             }
@@ -62,16 +62,16 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
             const savedCertificateChain = items.websiteList[webDomain].certificateChain;
             if (compareCertificateChains(response.certificateChain, savedCertificateChain)) {
               console.log("Certificate chain matches");
-              addBlocker('You have marked this site to be protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.');
+              addBlocker('You have marked this site to be protected. Please click on the Moby Phish extension before proceeding to prevent yourself from cyber attacks.');
             } else {
               console.log("Certificate chain does not match");
               //DO OTHER STUFF HERE
-              addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
+              addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the Moby Phish extension to proceed.');
             }
           } else if (response.error) {
             console.error('Error fetching certificate chain:', response.error);
             // If there's an error fetching the certificate chain, add blocker
-            addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.');
+            addBlocker('Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the Moby Phish extension to proceed.');
           }
         });
       }
@@ -83,13 +83,13 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
         if (settings.autoSearchEnabled) {
           const passwordFields = document.querySelectorAll('input[type="password"]');
           if (passwordFields.length > 0) {
-            alert('🔒 Extension Alert: This site may contain sensitive information with password fields. Click the 🔒 extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in extension settings 🔒.');
+            alert('Moby Phish Extension Alert: This site may contain sensitive information with password fields. Open the Moby Phish extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in Moby Phish settings.');
           }
         }
       });
 
       // Add blocker
-      addBlocker('This site is marked as unsafe. Please click on the extension before proceeding to prevent yourself from cyber attacks.');
+      addBlocker('This site is marked as unsafe. Please click on the Moby Phish extension before proceeding to prevent yourself from cyber attacks.');
     }
   } else{
     //check for password fields for unsaved sites
@@ -97,14 +97,14 @@ chrome.storage.local.get({ websiteList: {}, sessionList: {} }, function (items) 
       if (settings.autoSearchEnabled) {
         const passwordFields = document.querySelectorAll('input[type="password"]');
         if (passwordFields.length > 0) {
-          alert('🔒 Extension Alert: This site may contain sensitive information with password fields. Click the 🔒 extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in extension settings 🔒.');
+          alert('Moby Phish Extension Alert: This site may contain sensitive information with password fields. Open the Moby Phish extension for safety. \n \n To disable future alerts, uncheck "automatic detection" in Moby Phish settings.');
         }
       }
     });
   }
 });
 
-function addBlocker(message = 'This site is blocked by the extension. Click on the extension to continue') {
+function addBlocker(message = 'This site is blocked by the Moby Phish extension. Click on the extension to continue') {
   if (!document.getElementById('myBlockerDiv')) {
     var blockerDiv = document.createElement('div');
     blockerDiv.id = 'myBlockerDiv';
