@@ -212,7 +212,6 @@ function removeView() {
   document.getElementById('added-to-trusted').style.display = 'none';
   document.getElementById('sensitive-save-btn').style.display = 'none'; //
   document.getElementById('unsafe-save-btn').style.display = 'none'; //
-  document.getElementById('not-marked-sensitive-proceed-caution').style.display = 'none';
   document.getElementById('added-to-untrust').style.display = 'none';
   document.getElementById('not-recognized-text').style.display = 'none'; //
   document.getElementById('site-blocked-text').style.display = 'none';
