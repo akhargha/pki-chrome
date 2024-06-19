@@ -1,0 +1,35 @@
+# pki-chrome
+
+## Requirements
+
+Since this is a javascript project, you'll need node.js installed. 
+
+This is essential to running webpack, which will compile the extension.
+
+You can find nodejs at [this link](https://nodejs.org/en). 
+
+I recommend installing the latest version, which at the time of writing is `Node.js v20.14.0`
+
+## Installing
+
+After cloning the github repo to your respective folder, and installing Node.js, you first want to install all the necessary modules.
+
+You may do this by calling `npm install` in your the base directory.
+
+After that, compiling the program is as simple as running `npm run build` to build a production version of the extension.
+
+**developers may want to build the dev version instead using `npm run dev`!**
+
+You should be all set after that.
+
+## Loading the Extension
+
+Go to 'Extension' in Chrome-
+![Screenshot 2024-05-22 at 7 48 54 AM](https://github.com/akhargha/pki-chrome/assets/118499953/70add5d8-d1ca-4e07-907f-a6a9dd850e68)
+
+Then check on the developer's mode on the top right conrner.
+
+Then, click on 'Load Unpacked'-
+![Screenshot 2024-05-22 at 7 49 32 AM](https://github.com/akhargha/pki-chrome/assets/118499953/382de2e0-3a4a-4c58-8851-eab52cfe98c3)
+
+Finally, select the directory of the extension (so that manifest.json is in the root directory).
