@@ -1,0 +1,35 @@
+body {
+  min-height: 700px;
+  min-width:300px;
+  max-height: 700px;
+  max-width:300px;
+}
+
+.navbar{
+  z-index: 1000;
+}
+
+#settings-btn{
+  margin: 1em;
+}
+
+#points-btn{
+  margin-top: 1em;
+  margin-left: 1em;
+}
+
+#favicon-img{
+  min-height: 15px;
+  min-width: 15px;
+  max-height: 30px;
+  max-width: 30px
+}
+
+#favicon-container {
+  display: inline-block;
+  margin-left: 8em;
+}
+
+#url-container {
+  text-align: center;
+}

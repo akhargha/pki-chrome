@@ -1,0 +1,20 @@
+{
+	"files.eol": "\r\n",
+	"[javascript]": {
+		"editor.defaultFormatter": "numso.prettier-standard-vscode",
+		"editor.formatOnSave": true
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "numso.prettier-standard-vscode",
+		"editor.formatOnSave": true
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "numso.prettier-standard-vscode",
+		"editor.formatOnSave": true
+	},
+	"[html]": {
+		"editor.defaultFormatter": "vscode.html-language-features"
+	},
+	"eslint.run": "onType",
+	"eslint.format.enable": true
+}
