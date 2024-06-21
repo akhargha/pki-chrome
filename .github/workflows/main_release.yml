@@ -28,7 +28,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git checkout dustin 
+          git checkout main 
           versionName="Production v$(date +'%Y%m%d%H%M%S')"
           echo "TAG=${versionName}" >> $GITHUB_ENV
           git tag $TAG
