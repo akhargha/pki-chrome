@@ -1,6 +1,27 @@
 # pki-chrome
 
-## Requirements
+## General Users
+
+For general users, getting the latest version is simple.
+
+Simply navigate to the [releases](https://github.com/akhargha/pki-chrome/releases) tab.
+
+Then, just grab the latest release with the label `Latest`.
+
+![image](./docs/prerelexample.png)
+
+## For Testers
+
+For testers, getting the latest version is simple.
+
+Simply navigate to the [releases](https://github.com/akhargha/pki-chrome/releases) tab.
+
+If you want the latest in development version, look for the latest release with the `Pre-release` label.
+
+![image](./docs/prerelexample.png)
+
+## BUILDING
+### Requirements
 
 Since this is a javascript project, you'll need node.js installed. 
 
@@ -10,7 +31,7 @@ You can find nodejs at [this link](https://nodejs.org/en).
 
 I recommend installing the latest version, which at the time of writing is `Node.js v20.14.0`
 
-## Installing
+### Installing
 
 After cloning the github repo to your respective folder, and installing Node.js, you first want to install all the necessary modules.
 
@@ -22,7 +43,7 @@ After that, compiling the program is as simple as running `npm run build` to bui
 
 You should be all set after that.
 
-## Loading the Extension
+### Loading the Extension
 
 Go to 'Extension' in Chrome-
 ![Screenshot 2024-05-22 at 7 48 54 AM](https://github.com/akhargha/pki-chrome/assets/118499953/70add5d8-d1ca-4e07-907f-a6a9dd850e68)
