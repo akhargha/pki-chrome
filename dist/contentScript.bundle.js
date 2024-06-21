@@ -1,5 +1,9 @@
 /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
+/*!******************************!*\
+  !*** ./src/contentScript.js ***!
+  \******************************/
+//CONTENT SCRIPTS ARE SCRIPTS RAN IN THE CONTEXT OF THE WEBPAGES. THEY ARE WHAT HAS ACCESS TO THE DOM AND ALL IT'S ELEMENTS
 const url = new URL(window.location.href)
 const webDomain = url.hostname
 

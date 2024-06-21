@@ -1,7 +1,32 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 88:
+/***/ "./src/utils/Enums.js":
+/*!****************************!*\
+  !*** ./src/utils/Enums.js ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ViewStates: () => (/* binding */ ViewStates)
+/* harmony export */ });
+const ViewStates = {
+  DEFAULT: 0,
+  SavedSitesList: 1,
+  Settings: 2
+}
+
+
+
+
+/***/ }),
+
+/***/ "./src/utils/LocalStorage.js":
+/*!***********************************!*\
+  !*** ./src/utils/LocalStorage.js ***!
+  \***********************************/
 /***/ (() => {
 
 function checkList (webDomain) {
@@ -19,6 +44,47 @@ function checkList (webDomain) {
       }
     })
   })
+}
+
+
+/***/ }),
+
+/***/ "./src/utils/fetchUtils.js":
+/*!*********************************!*\
+  !*** ./src/utils/fetchUtils.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   fetchCertificateChain: () => (/* binding */ fetchCertificateChain)
+/* harmony export */ });
+function fetchCertificateChain (webDomain) {
+  // Remove "www." from the beginning of the domain
+  const shortenedDomain = webDomain.replace(/^www\./, '')
+  return fetch(
+    `http://pkie.engr.uconn.edu/certificate_chain/${shortenedDomain}`
+  )
+    .then(response => response.json())
+    .then(data => {
+      if (data.status) {
+        return data.output
+      } else {
+        throw new Error('Failed to fetch certificate chain')
+      }
+    })
+}
+
+function fetchTestWebsites () {
+  return fetch(`http://localhost:8080/websites`)
+    .then(response => response.json())
+    .then(data => {
+      return data
+    })
+    .catch(error => {
+      throw new Error('Failed to fetch websites')
+    })
 }
 
 
@@ -51,51 +117,59 @@ function checkList (webDomain) {
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-
-;// CONCATENATED MODULE: ./src/utils/Enums.js
-const ViewStates = {
-  DEFAULT: 0,
-  SavedSitesList: 1,
-  Settings: 2
-}
-
-
-
-;// CONCATENATED MODULE: ./src/utils/fetchUtils.js
-function fetchCertificateChain (webDomain) {
-  // Remove "www." from the beginning of the domain
-  const shortenedDomain = webDomain.replace(/^www\./, '')
-  return fetch(
-    `http://pkie.engr.uconn.edu/certificate_chain/${shortenedDomain}`
-  )
-    .then(response => response.json())
-    .then(data => {
-      if (data.status) {
-        return data.output
-      } else {
-        throw new Error('Failed to fetch certificate chain')
-      }
-    })
-}
-
-function fetchTestWebsites () {
-  return fetch(`http://localhost:8080/websites`)
-    .then(response => response.json())
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      throw new Error('Failed to fetch websites')
-    })
-}
-
-// EXTERNAL MODULE: ./src/utils/LocalStorage.js
-var LocalStorage = __webpack_require__(88);
-;// CONCATENATED MODULE: ./src/popup.js
+/*!**********************!*\
+  !*** ./src/popup.js ***!
+  \**********************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils_Enums__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/Enums */ "./src/utils/Enums.js");
+/* harmony import */ var _utils_fetchUtils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/fetchUtils */ "./src/utils/fetchUtils.js");
+/* harmony import */ var _utils_LocalStorage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/LocalStorage */ "./src/utils/LocalStorage.js");
+/* harmony import */ var _utils_LocalStorage__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_utils_LocalStorage__WEBPACK_IMPORTED_MODULE_2__);
 // 1. Make website get unblocked when extension is opened (unblock by sending message on session open) - done
 // 2. Get cookies from a website for the user ID instead of extension login page - done
 // 3. Check cert everytime for our own experiemnts and only per browser session for usual websites - done
@@ -124,7 +198,7 @@ var LocalStorage = __webpack_require__(88);
 
 var pointsLocal = 0
 var user_id = '123456'
-var viewState = ViewStates.DEFAULT
+var viewState = _utils_Enums__WEBPACK_IMPORTED_MODULE_0__.ViewStates.DEFAULT
 document.addEventListener('DOMContentLoaded', function () {
   chrome.storage.local.get('points', function (data) {
     if (data.points) {
@@ -211,7 +285,7 @@ function initializeExtension () {
     const faviconContainer = document.getElementById('favicon-container')
     faviconContainer.appendChild(faviconImage)
 
-    ;(0,LocalStorage.checkList)(webDomain).then(result => {
+    ;(0,_utils_LocalStorage__WEBPACK_IMPORTED_MODULE_2__.checkList)(webDomain).then(result => {
       if (result === 0) {
         removeView()
         document.getElementById('all-set').style.display = 'block'
@@ -252,7 +326,7 @@ function initializeExtension () {
             const websiteList = items.websiteList
             const sessionList = items.sessionList
 
-            fetchCertificateChain(webDomain)
+            ;(0,_utils_fetchUtils__WEBPACK_IMPORTED_MODULE_1__.fetchCertificateChain)(webDomain)
               .then(certificateChain => {
                 websiteList[webDomain] = {
                   isSensitive: true,
@@ -370,7 +444,7 @@ const navEditSavedSitesButton = document.getElementById(
 )
 navEditSavedSitesButton.addEventListener('click', () => {
   switch (viewState) {
-    case ViewStates.DEFAULT:
+    case _utils_Enums__WEBPACK_IMPORTED_MODULE_0__.ViewStates.DEFAULT:
       removeView()
       // document.getElementById('sensitive-sites-list').style.display = 'block'
       // document.getElementById('sensitive-input').style.display = 'block'
@@ -380,9 +454,9 @@ navEditSavedSitesButton.addEventListener('click', () => {
       displaySensitiveSites()
       displayUnsafeSites()
       navEditSavedSitesButton.textContent = 'BACK'
-      viewState = ViewStates.SavedSitesList
+      viewState = _utils_Enums__WEBPACK_IMPORTED_MODULE_0__.ViewStates.SavedSitesList
       break
-    case ViewStates.SavedSitesList:
+    case _utils_Enums__WEBPACK_IMPORTED_MODULE_0__.ViewStates.SavedSitesList:
       document.getElementById('sensitive-site-controls').style.display = 'none'
       document.getElementById('choose-option').style.display = 'block' //
       document.getElementById('sensitive-save-btn').style.display = 'block' //
@@ -420,7 +494,7 @@ navEditSavedSitesButton.addEventListener('click', () => {
       //   document.getElementById('added-to-trusted').style.display = 'block'
       // })
 
-      viewState = ViewStates.DEFAULT
+      viewState = _utils_Enums__WEBPACK_IMPORTED_MODULE_0__.ViewStates.DEFAULT
       break
   }
 })
@@ -544,7 +618,7 @@ document
     const website = sensitiveInput.value.trim()
     console.log(sensitiveInput)
     if (website !== '') {
-      fetchCertificateChain(website)
+      (0,_utils_fetchUtils__WEBPACK_IMPORTED_MODULE_1__.fetchCertificateChain)(website)
         .then(certificateChain => {
           chrome.storage.local.get({ websiteList: {} }, function (items) {
             const websiteList = items.websiteList
@@ -614,7 +688,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
               console.log(pointsLocal)
             })
           } else {
-            (0,LocalStorage.checkList)(domain).then(result => {
+            (0,_utils_LocalStorage__WEBPACK_IMPORTED_MODULE_2__.checkList)(domain).then(result => {
               // first check if site is protected
               if (result === 0) {
                 document.getElementById(
