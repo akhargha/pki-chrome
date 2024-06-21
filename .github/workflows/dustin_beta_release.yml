@@ -28,7 +28,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git checkout main
+          git checkout dustin
           NEW_TAG="v$(date +'%Y%m%d%H%M%S')"
           echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
           git tag $NEW_TAG
