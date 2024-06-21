@@ -8,7 +8,19 @@ Simply navigate to the [releases](https://github.com/akhargha/pki-chrome/release
 
 Then, just grab the latest release with the label `Latest`.
 
-![image](./docs/prerelexample.png)
+![image](./docs/relexample.png)
+
+Download the zip file and extract it. Then open the folder.
+
+You should find another folder, that folder is the one you want to use when installing the extension. This folder contains all the extension contents, such as the manifest file.
+
+The contents of the folder should look like this.
+
+![image](./docs/folderexample.png)
+
+Load this folder when installing your extension into the relevant browser.
+
+For instructions on how to install the extension, go [here](#loading-the-extension)
 
 ## For Testers
 
@@ -19,6 +31,8 @@ Simply navigate to the [releases](https://github.com/akhargha/pki-chrome/release
 If you want the latest in development version, look for the latest release with the `Pre-release` label.
 
 ![image](./docs/prerelexample.png)
+
+The rest of the installation is the same as stated above in [General Users](#general-users)
 
 ## BUILDING
 ### Requirements
@@ -53,4 +67,4 @@ Then check on the developer's mode on the top right conrner.
 Then, click on 'Load Unpacked'-
 ![Screenshot 2024-05-22 at 7 49 32 AM](https://github.com/akhargha/pki-chrome/assets/118499953/382de2e0-3a4a-4c58-8851-eab52cfe98c3)
 
-Finally, select the `dist` directory as your target folder.
+Finally, select the `dist` directory (or whatever directory your manifest is in) as your target folder.

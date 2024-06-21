@@ -28,8 +28,8 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git checkout dustin 
-          versionName="Production v$(date +'%Y%m%d%H%M%S')"
+          git checkout main 
+          versionName="v$(date +'%Y%m%d%H%M%S')"
           echo "TAG=${versionName}" >> $GITHUB_ENV
           git tag $TAG
           git push origin $TAG
@@ -40,8 +40,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.NEW_TAG }}
-          release_name: ${{ env.TAG }}
+          tag_name: ${{ env.TAG }}
+          release_name: Production build ${{ env.TAG }}
           draft: false
           prerelease: false
 
