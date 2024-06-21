@@ -19,7 +19,7 @@
 // change logo
 // disable extension for period of time
 // cookies stuff
-
+//random to test beta release builder
 document.addEventListener('DOMContentLoaded', function () {
 
   pointsLocal = 0;
@@ -520,5 +520,3 @@ function logUserData(user_id, event_number, reportedSite = '', currentSite = '')
     });
   }
 }
-
-
