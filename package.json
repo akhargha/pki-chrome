@@ -1,0 +1,21 @@
+{
+  "name": "pki-chrome",
+  "version": "1.0.0",
+  "main": "popup.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "GITHUB_BUILD_DEV": "webpack --config webpack.GITHUB_DEV.js --mode production",
+    "GITHUB_BUILD_RELEASE": "webpack --config webpack.GITHUB_RELEASE.js --mode production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "copy-webpack-plugin": "^12.0.2",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
