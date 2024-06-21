@@ -1,4 +1,4 @@
-name: Create Dustin Release
+name: Create DEV Release
 
 on: 
   push:
