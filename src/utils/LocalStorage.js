@@ -1,4 +1,4 @@
-function checkList (webDomain) {
+export function checkList (webDomain) {
   return new Promise((resolve, reject) => {
     chrome.storage.local.get({ websiteList: {} }, function (items) {
       const websiteList = items.websiteList
