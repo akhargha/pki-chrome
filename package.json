@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --mode development",
     "build": "webpack --mode production",
-    "GITHUB_BUILD": "webpack --config webpack.GITHUB_RELEASE.js --mode production"
+    "GITHUB_BUILD_DEV": "webpack --config webpack.GITHUB_DEV.js --mode production",
+    "GITHUB_BUILD_RELEASE": "webpack --config webpack.GITHUB_RELEASE.js --mode production"
   },
   "keywords": [],
   "author": "",
