@@ -44,13 +44,17 @@ jobs:
           release_name: Release ${{ env.NEW_TAG }}
           draft: false
           prerelease: false
-    
+
+      - name: ZIP up everything
+        run: |
+            zip -r dist.zip dist/
+
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist
-          asset_name: asset.zip
+          asset_path: ./
+          asset_name: dist.zip
           asset_content_type: application/zip
