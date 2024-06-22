@@ -50,7 +50,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 })
 
 function logUserData (user_id, timestamp, event, comment) {
-  fetch(
-    `http://pkie.engr.uconn.edu/user_data/${user_id}/${timestamp}/${event}/${comment}`
-  )
+  try{
+    fetch(
+      `http://pkie.engr.uconn.edu/user_data/${user_id}/${timestamp}/${event}/${comment}`
+    ).catch((e)=>{
+      console.log("failed to send data")
+      //TODO: tell the client.
+    })
+  }catch(e){
+    console.log("failed to send data")
+    //TODO: tell the client.
+  }
+
 }
