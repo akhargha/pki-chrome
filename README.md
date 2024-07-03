@@ -12,7 +12,7 @@ Then, just grab the latest release with the label `Latest`.
 
 Download the zip file and extract it. Then open the folder.
 
-You should find another folder, that folder is the one you want to use when installing the extension. This folder contains all the extension contents, such as the manifest file.
+You should find another folder (GITHUB_RELEASE), that folder is the one you want to use when installing the extension. If you are using Safari, it may open this folder for you by default. This folder contains all the extension contents, such as the manifest file.
 
 The contents of the folder should look like this.
 
