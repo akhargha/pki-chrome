@@ -1,8 +1,12 @@
+/* eslint-disable jsx-a11y/role-supports-aria-props */
 import { Component } from 'react'
 import { useSpring, animated, Spring, SpringValue } from 'react-spring'
+import { ExtensionSettings } from '../types/Settings'
 interface NavbarProps {
   toggleSensitiveSiteControls: () => void
   viewState: 0 | 1
+
+  settings: ExtensionSettings
 }
 interface NavbarState {
   burgerOpen: boolean
@@ -34,7 +38,8 @@ class Navbar extends Component<NavbarProps, NavbarState> {
             Points:
           </h2>
           {/* <!--POINTS--> */}
-          <button
+          <img
+            src='./icons/gear-solid.svg'
             className={`navbar-burger burger ${
               this.state.burgerOpen || !this.state.animationDone
                 ? 'is-active'
@@ -51,12 +56,21 @@ class Navbar extends Component<NavbarProps, NavbarState> {
               const original = this.state.burgerOpen
               this.setState({ burgerOpen: !original, animationDone: false })
             }}
-            style={{ marginLeft: '55%', justifyContent: 'right' }}
+            style={{
+              marginLeft: '55%',
+              justifyContent: 'right',
+              cursor: 'pointer',
+              width: '5vh', // Adjust the width to match the button size
+              height: 'auto', // Adjust the height to match the button size
+              maxWidth: '50px',
+              outline: 'none',
+              border: 'none'
+            }}
           >
+            {/* <span aria-hidden='true'></span>
             <span aria-hidden='true'></span>
-            <span aria-hidden='true'></span>
-            <span aria-hidden='true'></span>
-          </button>
+            <span aria-hidden='true'></span> */}
+          </img>
         </div>
         <Spring
           from={{
@@ -73,7 +87,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
         >
           {(props: { transform: SpringValue<string> }) => (
             <animated.div
-              style={{ ...props, zIndex: -1, position: 'fixed', top: '60px' }}
+              style={{ ...props, zIndex: -1, position: 'fixed', top: '50px' }}
               id='navbarMenu'
               className={`navbar-menu ${
                 this.state.burgerOpen || !this.state.animationDone
@@ -102,8 +116,17 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                     <label className='checkbox'>
                       <input
                         type='checkbox'
-                        checked
+                        checked={
+                          this.props.settings.autoSearchEnabled ? true : false
+                        }
                         id='auto-search-checkbox'
+                        onClick={() => {
+                          console.log('clicked')
+                          chrome.storage.local.set({
+                            autoSearchEnabled:
+                              !this.props.settings.autoSearchEnabled
+                          })
+                        }}
                       />
                       Search for sensitive sites automatically
                     </label>

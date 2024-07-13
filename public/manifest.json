@@ -3,7 +3,7 @@
   "name": "Moby Phish (REACT)",
   "version": "1.0",
   "description": "Moby Phish is a browser extension that intelligently safeguards users from phishing sites by performing real-time certificate checks and providing proactive notifications, ensuring secure and informed browsing experiences.",
-  "permissions": ["activeTab", "storage", "scripting", "tabs"],
+  "permissions": ["activeTab", "storage", "scripting", "tabs", "background", "cookies"],
   "host_permissions": [
     "*://*/*"
   ],
@@ -17,7 +17,11 @@
   "content_scripts": [
    {
       "matches": ["<all_urls>"],
-      "js": ["./static/js/content.js"]
+      "js": ["./static/js/contentService.js"]
    }
-  ]
+  ],
+
+  "background": {
+    "service_worker": "./static/js/serviceWorker.js"
+  }
 }
