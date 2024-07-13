@@ -221,18 +221,22 @@ class App extends Component<{}, AppState> {
               //this honestly sucks
               //TODO: MAKE THIS ASYNC SO WE DONT HAVE ALL THIS NESTED STUFF
               //TODO: ADD METADATA FOR IF THE CERTIFICATE WAS CHANGED!
-              fetchCertificateChain(shortenedDomain).then(cert => {
-                const savedCertificateChain =
-                  d.websiteList[shortenedDomain].certChain
+              if (d.websiteList[shortenedDomain]) {
+                fetchCertificateChain(shortenedDomain).then(cert => {
+                  const savedCertificateChain =
+                    d.websiteList[shortenedDomain].certChain
 
-                if (compareCertificateChains(cert, savedCertificateChain)) {
-                  //does match do nothing
-                } else {
-                  t.doShowCertChangedButton = true
-                }
+                  if (compareCertificateChains(cert, savedCertificateChain)) {
+                    //does match do nothing
+                  } else {
+                    t.doShowCertChangedButton = true
+                  }
 
+                  setter(t)
+                })
+              } else {
                 setter(t)
-              })
+              }
             }
           )
         })
