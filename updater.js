@@ -13,7 +13,8 @@ const fs = require('fs')
 const filename = __dirname + '/src/version.js'
 fs.writeFile(
   filename,
-  `const d = { version: '${content}' };\nexport default d`,
+  //`const d = { version: '${content}' };\nexport default d`,
+  `const d = {version: 'v20240713094711-beta'};\nexport default d`,
   err => {
     if (err) throw err
     console.log(`File created and content written to ${filename}`)

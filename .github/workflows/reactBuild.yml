@@ -48,7 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.TAG }}
+          tag_name: ${{ env.TAG }}-beta
           release_name: React ${{ env.TAG }}-beta
           draft: false
           prerelease: true

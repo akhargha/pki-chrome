@@ -78,7 +78,7 @@ function main () {
           const url = `https://api.github.com/repos/${owner}/${repo}/releases`
           const vers: string = require('../version').default.version
           const isbeta = vers.endsWith('-beta')
-
+          console.warn(require('../version'), vers)
           if (vers !== 'dev') {
             fetch(url)
               .then(response => response.json())
@@ -90,6 +90,7 @@ function main () {
                 )
                 let last: GitHubRelease | undefined = undefined
                 let current: GitHubRelease | undefined = undefined
+                // console.log(data)
                 data.forEach((release: GitHubRelease) => {
                   // console.log(release)
                   if (isbeta && release.prerelease === true) {
@@ -108,6 +109,7 @@ function main () {
                   }
                 })
                 if (current === undefined) {
+                  //this shouldnt happen but... just ignore.
                   // return
                   throw new Error('undefined error when checking version')
                 }
@@ -151,7 +153,7 @@ function main () {
                 )
               })
 
-              .catch(error => console.error('Error fetching releases:', error))
+              .catch(error => console.warn('Error fetching releases:', error))
           }
         }
       }
