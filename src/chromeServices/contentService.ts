@@ -107,8 +107,13 @@ function main () {
                     }
                   }
                 })
-                if (last === undefined || current === undefined) {
+                if (current === undefined) {
+                  // return
                   throw new Error('undefined error when checking version')
+                }
+                if (last === undefined) {
+                  console.log('Is latest version')
+                  return
                 }
                 last = last as GitHubRelease
                 current = current as GitHubRelease
