@@ -112,8 +112,6 @@ function main () {
                 }
                 last = last as GitHubRelease
                 current = current as GitHubRelease
-                let lastIndex = data.indexOf(last)
-                let currentIndex = data.indexOf(current)
 
                 customAlertUpdatePrompt(
                   'MobyPish Alert!',

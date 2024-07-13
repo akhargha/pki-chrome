@@ -143,7 +143,6 @@ class App extends Component<{}, AppState> {
     }
 
     const processActiveTab = (tabs: chrome.tabs.Tab[]) => {
-      const state = this.state
       const url = tabs[0].url
       const urlObj = new URL(url as string)
       const webDomain = urlObj.hostname

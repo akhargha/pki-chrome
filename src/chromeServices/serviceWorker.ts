@@ -1,7 +1,7 @@
 //this file is used for background stuff
 // has no direct access to the DOM
 
-import { fetchCertificateChain, fetchTestWebsites } from '../utils/fetchUtils'
+import { fetchCertificateChain } from '../utils/fetchUtils'
 import {
   eMsgReq,
   eMsgReqType,
@@ -9,10 +9,7 @@ import {
   iMsgReqType
 } from '../types/MessageTypes'
 import { getTabData } from '../utils/ChromeQueryUtils'
-import {
-  localSendUserActionInfo,
-  sendUserActionInfo
-} from '../utils/ExtensionPageUtils'
+import { localSendUserActionInfo } from '../utils/ExtensionPageUtils'
 import {
   WebsiteListEntry,
   WebsiteListEntryLogType

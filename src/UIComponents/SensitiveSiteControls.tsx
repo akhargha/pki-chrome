@@ -34,7 +34,7 @@ class SensitiveSiteControls extends Component<
     }
   }
   componentDidMount (): void {
-    chrome.runtime.onMessage.addListener((_data, sender, sendResponse) => {
+    chrome.runtime.onMessage.addListener(_data => {
       const data = _data as iMsgReq
       switch (data.type) {
         case iMsgReqType.fetchCertificateChain:
@@ -48,10 +48,6 @@ class SensitiveSiteControls extends Component<
             //session list is the list of sites that we have visitied in this session, so no reverification is needed.
             { websiteList: {}, sessionList: {} },
             function (items) {
-              const websiteList: { [key: string]: WebsiteListEntry } =
-                items.websiteList
-              const sessionList: { [key: string]: boolean } = items.sessionList
-
               // ss({ websiteData: websiteList })
             }
           )
@@ -192,7 +188,7 @@ class SensitiveSiteControls extends Component<
                             .sendMessage({
                               type: iMsgReqType.siteDataRefresh
                             })
-                            .then(v => {})
+                            .then(() => {})
                             .catch(e => console.warn(e))
 
                           localSendUserActionInfo(userid, 4)
@@ -303,7 +299,7 @@ class SensitiveSiteControls extends Component<
                             .sendMessage({
                               type: iMsgReqType.siteDataRefresh
                             })
-                            .then(v => {})
+                            .then(() => {})
                             .catch(e => console.warn(e))
 
                           localSendUserActionInfo(userid, 4)

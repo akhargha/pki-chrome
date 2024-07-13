@@ -1,4 +1,3 @@
-import { ConnectionOptions, connect } from 'tls'
 export function fetchCertificateChain (webDomain: string) {
   // Remove "www." from the beginning of the domain
   const shortenedDomain = webDomain.replace(/^www\./, '')
@@ -19,7 +18,6 @@ export function fetchCertificateChain (webDomain: string) {
     .catch(reason => {
       console.log(reason)
       throw new Error('Failed to fetch certificate chain')
-      return {}
     })
 }
 export function compareCertificateChains (

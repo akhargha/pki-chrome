@@ -6,7 +6,7 @@ import {
 } from '../utils/LocalStorage'
 import { fetchCertificateChain } from '../utils/fetchUtils'
 import { sendUserActionInfo } from '../utils/ExtensionPageUtils'
-import { iMsgReq, iMsgReqType } from '../types/MessageTypes'
+import { iMsgReqType } from '../types/MessageTypes'
 import { getTabData } from '../utils/ChromeQueryUtils'
 interface LandingPageProps {
   isVisible: boolean
@@ -211,7 +211,6 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               const websiteList: {
                                 [key: string]: WebsiteListEntry
                               } = items.websiteList
-                              const old = websiteList[currentSite]
                               const currentTimeInMs = Date.now() // Get current time in milliseconds since Unix epoch
                               const localTimeString = new Date(
                                 currentTimeInMs

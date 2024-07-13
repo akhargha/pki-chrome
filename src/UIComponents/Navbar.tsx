@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 import { Component } from 'react'
-import { useSpring, animated, Spring, SpringValue } from 'react-spring'
+import { animated, Spring, SpringValue } from 'react-spring'
 import { ExtensionSettings } from '../types/Settings'
 interface NavbarProps {
   toggleSensitiveSiteControls: () => void

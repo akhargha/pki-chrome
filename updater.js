@@ -11,7 +11,11 @@ if (args.length < 1) {
 const [content] = args
 const fs = require('fs')
 const filename = __dirname + '/src/version.js'
-fs.writeFile(filename, `export default { version: '${content}' }`, err => {
-  if (err) throw err
-  console.log(`File created and content written to ${filename}`)
-})
+fs.writeFile(
+  filename,
+  `const d = { version: '${content}' };\nexport default d`,
+  err => {
+    if (err) throw err
+    console.log(`File created and content written to ${filename}`)
+  }
+)

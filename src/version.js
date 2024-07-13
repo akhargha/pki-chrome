@@ -1,1 +1,2 @@
-export default { version: 'dev' }
+const d = { version: 'dev' };
+export default d
