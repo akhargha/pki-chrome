@@ -26,7 +26,7 @@ jobs:
 
       
       - name: Run GITHUB_BUILD
-        run: cross-env INLINE_RUNTIME_CHUNK=false node updater.js $TAG && craco build
+        run: node updater.js $TAG && craco build
     
       - name: Bump version and create a tag
         id: tag
