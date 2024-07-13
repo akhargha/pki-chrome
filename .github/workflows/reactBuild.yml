@@ -23,7 +23,12 @@ jobs:
           versionName="v$(date +'%Y%m%d%H%M%S')"
           echo "TAG=${versionName}" >> $GITHUB_ENV
       
-
+      - name: Verify craco installation
+        run: |
+          ls -la node_modules/.bin
+          npm list @craco/craco
+          npx craco --version
+  
       
       - name: Run GITHUB_BUILD
         run: node updater.js $TAG && craco build
