@@ -31,16 +31,14 @@ jobs:
   
       
       - name: Run GITHUB_BUILD
-        run: node updater.js $TAG && npx craco build
+        run: node updater.js ${{ env.TAG }} && npx craco build
     
       - name: Bump version and create a tag
         id: tag
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git checkout main 
-          versionName="v$(date +'%Y%m%d%H%M%S')"
-          echo "TAG=${versionName}" >> $GITHUB_ENV
+          git checkout dustin-react
           git tag $TAG
           git push origin $TAG
     
