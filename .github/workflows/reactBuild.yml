@@ -31,7 +31,7 @@ jobs:
   
       
       - name: Run GITHUB_BUILD
-        run: node updater.js ${{ env.TAG }} && npx craco build
+        run: node updater.js ${{ env.TAG }}-beta && npx craco build
     
       - name: Bump version and create a tag
         id: tag

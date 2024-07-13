@@ -224,9 +224,11 @@ class App extends Component<{}, AppState> {
               fetchCertificateChain(shortenedDomain).then(cert => {
                 const savedCertificateChain =
                   d.websiteList[shortenedDomain].certChain
+
                 if (compareCertificateChains(cert, savedCertificateChain)) {
-                  t.doShowCertChangedButton = true
+                  //does match do nothing
                 } else {
+                  t.doShowCertChangedButton = true
                 }
 
                 setter(t)
