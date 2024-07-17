@@ -13,17 +13,17 @@ interface LandingPageProps {
   webUrl: string;
   tabId: number;
   favImg: string;
-  websiteData: { [key: string]: WebsiteListEntry };
+  websiteData: { [key: string]: WebsiteListEntry; };
   showchanged: boolean;
   user_id: string;
 }
-interface LandingPageState {}
+interface LandingPageState { }
 const localStorage = chrome.storage.local;
 
 class LandingPage extends Component<LandingPageProps, LandingPageState> {
-  componentWillUnmount (): void {}
-  componentDidMount (): void {}
-  componentDidUpdate (
+  componentWillUnmount(): void { }
+  componentDidMount(): void { }
+  componentDidUpdate(
     prevProps: Readonly<LandingPageProps>,
     prevState: Readonly<LandingPageState>,
     snapshot?: any,
@@ -32,7 +32,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
       console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
     }
   }
-  render (): ReactNode {
+  render(): ReactNode {
     const user_id = this.props.user_id;
 
     const data = this.props.websiteData[this.props.webUrl];
@@ -82,9 +82,9 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   localStorage.get(
                     { websiteList: {}, sessionList: {} },
                     async i => {
-                      const websiteList: { [key: string]: WebsiteListEntry } =
+                      const websiteList: { [key: string]: WebsiteListEntry; } =
                         i.websiteList;
-                      const sessionList: { [key: string]: boolean } =
+                      const sessionList: { [key: string]: boolean; } =
                         i.sessionList;
 
                       const webDomain = this.props.webUrl;
@@ -193,8 +193,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   <option>Select the Protected Site</option>
                   {Object.keys(this.props.websiteData).map(key =>
                     this.props.websiteData[key].LogType ===
-                    WebsiteListEntryLogType.PROTECTED ? (
-                      <option value={key}>{key}</option>
+                      WebsiteListEntryLogType.PROTECTED ? (
+                      <option value={key} key={key}>{key}</option>
                     ) : undefined,
                   )}
                 </select>
@@ -392,7 +392,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 textAlign: 'center',
                 display:
                   data.LogType === WebsiteListEntryLogType.PROTECTED &&
-                  this.props.showchanged === true
+                    this.props.showchanged === true
                     ? ''
                     : 'none',
                 color: 'red',
@@ -408,7 +408,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               style={{
                 display:
                   data.LogType === WebsiteListEntryLogType.PROTECTED &&
-                  this.props.showchanged === true
+                    this.props.showchanged === true
                     ? ''
                     : 'none',
               }}

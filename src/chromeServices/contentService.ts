@@ -24,7 +24,7 @@ let blockerClicked = false;
 let user_id = '123456';
 let isActive = true;
 
-chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, (c) => {
+chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   const cookies: ChromeCookie[] = c;
 
   //this is because we have one cookie which is the crsf token! we need at least 2 cookies
@@ -54,7 +54,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, (c) => {
   });
 });
 
-function main() {
+function main () {
   if (!isActive) {
     //if extension shouldn't be used... don't do anything.
     return;
@@ -68,7 +68,7 @@ function main() {
           lastCheck: 0,
         },
       },
-      (d) => {
+      d => {
         console.warn(
           d,
           d._pkiExtensionUpdateInfo.lastCheck + 60 * 60 * 1000,
@@ -85,7 +85,7 @@ function main() {
           console.warn(url, vers);
           if (vers !== 'dev') {
             fetch(url)
-              .then((response) => response.json())
+              .then(response => response.json())
               .then((data: GitHubRelease[]) => {
                 data.sort(
                   (a, b) =>
@@ -94,7 +94,7 @@ function main() {
                 );
                 let last: GitHubRelease | undefined = undefined;
                 let current: GitHubRelease | undefined = undefined;
-                console.log(data)
+                console.log(data);
                 data.forEach((release: GitHubRelease) => {
                   // console.log(release)
                   if (isbeta && release.prerelease === true) {
@@ -157,14 +157,14 @@ function main() {
                 );
               })
 
-              .catch((error) =>
-                console.warn('Error fetching releases:', error),
-              );
+              .catch(error => console.warn('Error fetching releases:', error));
           }
         }
       },
     );
-  } catch (e) {}
+  } catch (e) {
+    //do something with error
+  }
   chrome.storage.local.get(
     //websiteList is the list of sites we have saved as safe or unsafe
     //session list is the list of sites that we have visitied in this session, so no reverification is needed.
@@ -196,7 +196,7 @@ function main() {
                       },
                     },
                   },
-                  (data) => {
+                  data => {
                     if (
                       data._pki_Test_Data.ilogicalloanssavings.realCert !=
                       undefined
@@ -439,14 +439,11 @@ function main() {
 
                         //we add this to our saved list(?)
                         if (check1.checked) {
-                          chrome.storage.local.get(
-                            { ignoreList: [] },
-                            (data) => {
-                              const ignoreList: string[] = data.ignoreList;
-                              ignoreList.push(shortenedDomain);
-                              chrome.storage.local.set({ ignoreList });
-                            },
-                          );
+                          chrome.storage.local.get({ ignoreList: [] }, data => {
+                            const ignoreList: string[] = data.ignoreList;
+                            ignoreList.push(shortenedDomain);
+                            chrome.storage.local.set({ ignoreList });
+                          });
                         }
                         if (check2.checked) {
                           // set autosearch to off.
@@ -481,7 +478,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-function compareCertificateChains(
+function compareCertificateChains (
   chain1: { [x: string]: any },
   chain2: { [x: string]: any },
 ) {
@@ -510,7 +507,7 @@ function compareCertificateChains(
   return true;
 }
 
-function compareObjects(
+function compareObjects (
   obj1: { [x: string]: any },
   obj2: { [x: string]: any },
 ) {
@@ -530,7 +527,7 @@ function compareObjects(
   return true;
 }
 
-function addBlocker(
+function addBlocker (
   message = 'This site is blocked by the extension. Click on the extension to continue',
 ) {
   const find = document.getElementById('myBlockerDiv');
@@ -539,7 +536,7 @@ function addBlocker(
   }
   console.log('made blocker');
   // if (!document.getElementById('myBlockerDiv')) {
-  var blockerDiv = document.createElement('div');
+  const blockerDiv = document.createElement('div');
   blockerDiv.id = 'myBlockerDiv';
   blockerDiv.style.position = 'fixed';
   blockerDiv.style.left = '0';
@@ -550,7 +547,7 @@ function addBlocker(
 
   document.body.appendChild(blockerDiv);
 
-  var blockerMessage = document.createElement('h1');
+  const blockerMessage = document.createElement('h1');
   blockerMessage.style.color = 'black'; // Changed to yellow background
   blockerMessage.style.fontFamily = 'Trebuchet MS';
   blockerMessage.style.fontSize = '50px';
@@ -563,8 +560,8 @@ function addBlocker(
   blockerMessage.style.display = 'none'; // Initially hide the message
 
   // Flashing colors for the text
-  var colors = ['red', 'blue', 'green', 'white']; // Define colors to cycle through
-  var currentColorIndex = 0; // Starting index
+  const colors = ['red', 'blue', 'green', 'white']; // Define colors to cycle through
+  let currentColorIndex = 0; // Starting index
   setInterval(function () {
     blockerMessage.style.backgroundColor = colors[currentColorIndex]; // Update the color
     currentColorIndex = (currentColorIndex + 1) % colors.length; // Move to the next color
@@ -595,9 +592,9 @@ function addBlocker(
   // }
 }
 
-function removeBlocker() {
+function removeBlocker () {
   console.log('ok remove');
-  var blockerDiv = document.getElementById('myBlockerDiv');
+  const blockerDiv = document.getElementById('myBlockerDiv');
   if (blockerDiv) {
     blockerDiv.remove();
   }

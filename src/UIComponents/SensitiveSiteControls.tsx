@@ -12,7 +12,7 @@ import { localSendUserActionInfo } from '../utils/ExtensionPageUtils';
 
 interface SensitiveSiteControlsProps {
   isVisible: boolean;
-  websiteData: { [key: string]: WebsiteListEntry };
+  websiteData: { [key: string]: WebsiteListEntry; };
 }
 interface SensitiveSiteControlsState {
   websiteOpen?: WebsiteListEntry;
@@ -25,7 +25,7 @@ class SensitiveSiteControls extends Component<
   SensitiveSiteControlsProps,
   SensitiveSiteControlsState
 > {
-  constructor (P: SensitiveSiteControlsProps, S: SensitiveSiteControlsState) {
+  constructor(P: SensitiveSiteControlsProps, S: SensitiveSiteControlsState) {
     super(P, S);
     this.state = {
       url: '',
@@ -33,7 +33,7 @@ class SensitiveSiteControls extends Component<
       blockedInput: '',
     };
   }
-  componentDidMount (): void {
+  componentDidMount(): void {
     chrome.runtime.onMessage.addListener(_data => {
       const data = _data as iMsgReq;
       switch (data.type) {
@@ -55,7 +55,7 @@ class SensitiveSiteControls extends Component<
       }
     });
   }
-  render () {
+  render() {
     const wData = this.props.websiteData;
     return (
       <div
@@ -70,7 +70,7 @@ class SensitiveSiteControls extends Component<
         {/* Site data overlay */}
         <MoreSiteInfo
           isVisible={this.state.websiteOpen !== undefined}
-          closeFunc={(webData?: { [key: string]: WebsiteListEntry }) => {
+          closeFunc={(webData?: { [key: string]: WebsiteListEntry; }) => {
             if (webData) {
               // this.setState({ websiteOpen: undefined, websiteData: webData })
               this.setState({ websiteOpen: undefined });
@@ -91,13 +91,13 @@ class SensitiveSiteControls extends Component<
               this.state.websiteOpen === undefined ? 'blur(0px)' : 'blur(5px)',
           }}
         >
-          {(props: { filter: SpringValue<string> }) => (
+          {(props: { filter: SpringValue<string>; }) => (
             <>
               {/* Safe list */}
               <animated.div id='sensitive-sites-list' style={{ ...props }}>
                 {Object.keys(wData).map(key =>
                   wData[key] !== undefined &&
-                  wData[key].LogType === WebsiteListEntryLogType.PROTECTED ? (
+                    wData[key].LogType === WebsiteListEntryLogType.PROTECTED ? (
                     <SiteListingButton
                       key={key}
                       url={key}
@@ -162,7 +162,7 @@ class SensitiveSiteControls extends Component<
                           const websiteList: {
                             [key: string]: WebsiteListEntry;
                           } = localStorageData.websiteList;
-                          const sessionList: { [key: string]: boolean } =
+                          const sessionList: { [key: string]: boolean; } =
                             localStorageData.sessionList;
 
                           websiteList[webDomain] = {
@@ -187,7 +187,7 @@ class SensitiveSiteControls extends Component<
                             .sendMessage({
                               type: iMsgReqType.siteDataRefresh,
                             })
-                            .then(() => {})
+                            .then(() => { })
                             .catch(e => console.warn(e));
 
                           localSendUserActionInfo(userid, 4);
@@ -205,7 +205,7 @@ class SensitiveSiteControls extends Component<
               <animated.div id='unsafe-sites-list' style={{ ...props }}>
                 {Object.keys(wData).map(key =>
                   wData[key] !== undefined &&
-                  wData[key].LogType === WebsiteListEntryLogType.BLOCKED ? (
+                    wData[key].LogType === WebsiteListEntryLogType.BLOCKED ? (
                     <SiteListingButton
                       key={key}
                       url={key}
@@ -270,7 +270,7 @@ class SensitiveSiteControls extends Component<
                           const websiteList: {
                             [key: string]: WebsiteListEntry;
                           } = localStorageData.websiteList;
-                          const sessionList: { [key: string]: boolean } =
+                          const sessionList: { [key: string]: boolean; } =
                             localStorageData.sessionList;
 
                           websiteList[webDomain] = {
@@ -295,7 +295,7 @@ class SensitiveSiteControls extends Component<
                             .sendMessage({
                               type: iMsgReqType.siteDataRefresh,
                             })
-                            .then(() => {})
+                            .then(() => { })
                             .catch(e => console.warn(e));
 
                           localSendUserActionInfo(userid, 4);

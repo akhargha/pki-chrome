@@ -38,14 +38,14 @@ interface AppState {
   // currentSiteCert: {}
   //remember to remove this once todo is done.
   doShowCertChangedButton: boolean;
-  websiteList: { [key: string]: WebsiteListEntry };
-  sessionList: { [key: string]: boolean };
+  websiteList: { [key: string]: WebsiteListEntry; };
+  sessionList: { [key: string]: boolean; };
   SHOULD_EXTENSION_BE_ACTIVE: boolean;
 
   settings: ExtensionSettings;
 }
-class App extends Component<{}, AppState> {
-  constructor () {
+class App extends Component<object, AppState> {
+  constructor() {
     const state = {
       viewing: ViewState.Landing,
       pointsLocal: 0,
@@ -78,7 +78,7 @@ class App extends Component<{}, AppState> {
     chrome.storage.onChanged.addListener((changes, namespace) => {
       console.warn('CHANGES:', changes);
       if (namespace === 'local') {
-        for (let key in changes) {
+        for (const key in changes) {
           const change = changes[key];
           console.log('New change', key);
           console.log(`Old value: `, change.oldValue);
@@ -113,13 +113,13 @@ class App extends Component<{}, AppState> {
     });
   }
 
-  componentDidMount (): void {
+  componentDidMount(): void {
     let pointsLocal = this.state.pointsLocal;
     let user_id = this.state.user_id;
 
     sendUserActionInfo(this.state.user_id, 3);
     //this is what we upload via setState at the end of this function.
-    let payload: {
+    const payload: {
       faviconImage: string;
       websiteUrl: string;
       tabId: number;
@@ -149,11 +149,10 @@ class App extends Component<{}, AppState> {
       const webDomain = urlObj.hostname;
       const tabId = tabs[0].id;
       const favicon = tabs[0].favIconUrl;
-
       // const urlContainer = document.getElementById('url-container')
       // urlContainer.textContent = 'URL: ' + webDomain
-      const shortenedDomain = grabMainUrl(urlObj);
 
+      const shortenedDomain = grabMainUrl(urlObj);
       payload.websiteUrl = shortenedDomain;
       payload.currentTabData.url = shortenedDomain;
       payload.currentTabData.tabId = tabId as number;
@@ -279,7 +278,7 @@ class App extends Component<{}, AppState> {
     //     }
     //   )
     // })
-    const func = (items: { [key: string]: any }) => {
+    const func = (items: { [key: string]: any; }) => {
       this.setState({
         settings: { autoSearchEnabled: items.autoSearchEnabled },
       });
@@ -290,7 +289,7 @@ class App extends Component<{}, AppState> {
       this.setState({ websiteList: data.websiteList });
     });
   }
-  render () {
+  render() {
     // this.reloadWebData()
     return (
       <div className='App'>

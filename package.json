@@ -26,7 +26,8 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
+    "eslint-config-prettier": "^9.1.0"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=development INLINE_RUNTIME_CHUNK=false node updater.js dev && craco start",

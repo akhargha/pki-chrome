@@ -1,7 +1,7 @@
 import { warn } from 'console';
 import { URL } from 'url';
 
-export function fetchCertificateChain(webDomain: string) {
+export function fetchCertificateChain (webDomain: string) {
   // Remove "www." from the beginning of the domain
   const shortenedDomain = webDomain.replace(/^www\./, '');
   console.log(
@@ -10,20 +10,20 @@ export function fetchCertificateChain(webDomain: string) {
   return fetch(
     `https://extension.mobyphish.com/certificate_chain/${shortenedDomain}`,
   )
-    .then((response) => response.json())
-    .then((data) => {
+    .then(response => response.json())
+    .then(data => {
       if (data.status) {
         return data.output;
       } else {
         throw new Error('Failed to fetch certificate chain');
       }
     })
-    .catch((reason) => {
+    .catch(reason => {
       console.log(reason);
       throw new Error('Failed to fetch certificate chain');
     });
 }
-export function compareCertificateChains(
+export function compareCertificateChains (
   chain1: { [x: string]: any },
   chain2: { [x: string]: any },
 ) {
@@ -52,7 +52,7 @@ export function compareCertificateChains(
   return true;
 }
 
-export function compareObjects(
+export function compareObjects (
   obj1: { [x: string]: any },
   obj2: { [x: string]: any },
 ) {
@@ -71,18 +71,18 @@ export function compareObjects(
 
   return true;
 }
-export function fetchTestWebsites() {
+export function fetchTestWebsites () {
   return fetch(`https://extension.mobyphish.com/websites`)
-    .then((response) => response.json())
-    .then((data) => {
+    .then(response => response.json())
+    .then(data => {
       return data;
     })
-    .catch((error) => {
+    .catch(error => {
       throw new Error('Failed to fetch websites');
     });
 }
 
-export function grabMainUrl(urlObj: URL) {
+export function grabMainUrl (urlObj: URL) {
   // List of common second-level domains for country code and US TLDs
   const secondLevelDomains = new Set([
     'ac.uk',
@@ -105,7 +105,7 @@ export function grabMainUrl(urlObj: URL) {
   ]);
 
   // Extract the protocol
-  let protocol = urlObj.protocol; // http: or https:
+  // const protocol = urlObj.protocol; // http: or https:
 
   // Extract the hostname
 
@@ -117,7 +117,7 @@ export function grabMainUrl(urlObj: URL) {
   }
 
   // Split the hostname by dots
-  let parts = hostname.split('.');
+  const parts = hostname.split('.');
 
   // Check if the domain ends with a known second-level domain
   if (parts.length > 2) {
@@ -131,7 +131,7 @@ export function grabMainUrl(urlObj: URL) {
         // return protocol + '//' + parts.slice(-3).join('.');
         return parts.slice(-4).join('.');
     }
-    let potentialSecondLevelDomain = parts.slice(-2).join('.');
+    const potentialSecondLevelDomain = parts.slice(-2).join('.');
     if (secondLevelDomains.has(potentialSecondLevelDomain)) {
       return parts.slice(-3).join('.');
     }
