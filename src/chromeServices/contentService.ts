@@ -7,11 +7,7 @@ import {
   customAlert3Prompts,
   customAlertUpdatePrompt,
 } from '../utils/PagesUtils';
-import {
-  fetchCertificateChain,
-  GitHubRelease,
-  grabMainUrl,
-} from '../utils/fetchUtils';
+import { GitHubRelease, grabMainUrl } from '../utils/fetchUtils';
 import { ChromeCookie } from '../types/Cookies';
 
 //CONTENT SCRIPTS ARE SCRIPTS RAN IN THE CONTEXT OF THE WEBPAGES. THEY ARE WHAT HAS ACCESS TO THE DOM AND ALL IT'S ELEMENTS
@@ -186,7 +182,7 @@ function main () {
             if (response.certificateChain) {
               console.log(response.certificateChain);
               const localCert = response.certificateChain;
-              if (localCert[0].issuer["b'O'"] == "b'ZeroSSL'") {
+              if (localCert[0].issuer["b'O'"] === "b'ZeroSSL'") {
                 //check if we have saved data, else do nothing.
                 chrome.storage.local.get(
                   {
@@ -198,7 +194,7 @@ function main () {
                   },
                   data => {
                     if (
-                      data._pki_Test_Data.ilogicalloanssavings.realCert !=
+                      data._pki_Test_Data.ilogicalloanssavings.realCert !==
                       undefined
                     ) {
                       if (
@@ -223,7 +219,7 @@ function main () {
                     }
                   },
                 );
-              } else if (localCert[0].issuer["b'O'"] == 'b"Let\'s Encrypt"') {
+              } else if (localCert[0].issuer["b'O'"] === 'b"Let\'s Encrypt"') {
                 //save our real cert to check against the fake one
                 chrome.storage.local.set({
                   _pki_Test_Data: {

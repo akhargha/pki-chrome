@@ -30,7 +30,8 @@
     "no-case-declarations": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "no-prototype-builtins": "off"
+    "no-prototype-builtins": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "settings": {
     "react": {

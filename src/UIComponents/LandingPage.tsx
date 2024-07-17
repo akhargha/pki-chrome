@@ -26,9 +26,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
   componentDidUpdate(
     prevProps: Readonly<LandingPageProps>,
     prevState: Readonly<LandingPageState>,
-    snapshot?: any,
   ): void {
-    if (this.props.webUrl != prevProps.webUrl) {
+    if (this.props.webUrl !== prevProps.webUrl) {
       console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
     }
   }

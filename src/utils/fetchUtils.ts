@@ -121,12 +121,12 @@ export function grabMainUrl (urlObj: URL) {
 
   // Check if the domain ends with a known second-level domain
   if (parts.length > 2) {
-    if (parts.length == 5) {
+    if (parts.length === 5) {
       if (
-        parts[1] == 'acct' &&
-        parts[2] == 'ilogicalloanssavings' &&
-        parts[3] == 'mobyphish' &&
-        parts[4] == 'com'
+        parts[1] === 'acct' &&
+        parts[2] === 'ilogicalloanssavings' &&
+        parts[3] === 'mobyphish' &&
+        parts[4] === 'com'
       )
         // return protocol + '//' + parts.slice(-3).join('.');
         return parts.slice(-4).join('.');

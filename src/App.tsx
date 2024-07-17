@@ -146,7 +146,7 @@ class App extends Component<object, AppState> {
     const processActiveTab = (tabs: chrome.tabs.Tab[]) => {
       const url = tabs[0].url;
       const urlObj = new URL(url as string);
-      const webDomain = urlObj.hostname;
+      // const webDomain = urlObj.hostname;
       const tabId = tabs[0].id;
       const favicon = tabs[0].favIconUrl;
       // const urlContainer = document.getElementById('url-container')
@@ -278,7 +278,7 @@ class App extends Component<object, AppState> {
     //     }
     //   )
     // })
-    const func = (items: { [key: string]: any; }) => {
+    const func = (items: { [key: string]: boolean; }) => {
       this.setState({
         settings: { autoSearchEnabled: items.autoSearchEnabled },
       });
