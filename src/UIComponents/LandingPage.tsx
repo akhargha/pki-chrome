@@ -1,35 +1,44 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { Component, ReactNode } from 'react'
+import { Component, ReactNode } from 'react';
 import {
   WebsiteListEntry,
-  WebsiteListEntryLogType
-} from '../utils/LocalStorage'
-import { fetchCertificateChain } from '../utils/fetchUtils'
-import { sendUserActionInfo } from '../utils/ExtensionPageUtils'
-import { iMsgReqType } from '../types/MessageTypes'
-import { getTabData } from '../utils/ChromeQueryUtils'
+  WebsiteListEntryLogType,
+} from '../utils/LocalStorage';
+import { fetchCertificateChain } from '../utils/fetchUtils';
+import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
+import { iMsgReqType } from '../types/MessageTypes';
+import { getTabData } from '../utils/ChromeQueryUtils';
 interface LandingPageProps {
-  isVisible: boolean
-  webUrl: string
-  tabId: number
-  favImg: string
-  websiteData: { [key: string]: WebsiteListEntry }
-  showchanged: boolean
-  user_id: string
+  isVisible: boolean;
+  webUrl: string;
+  tabId: number;
+  favImg: string;
+  websiteData: { [key: string]: WebsiteListEntry };
+  showchanged: boolean;
+  user_id: string;
 }
 interface LandingPageState {}
-const localStorage = chrome.storage.local
+const localStorage = chrome.storage.local;
 
 class LandingPage extends Component<LandingPageProps, LandingPageState> {
   componentWillUnmount (): void {}
   componentDidMount (): void {}
+  componentDidUpdate (
+    prevProps: Readonly<LandingPageProps>,
+    prevState: Readonly<LandingPageState>,
+    snapshot?: any,
+  ): void {
+    if (this.props.webUrl != prevProps.webUrl) {
+      console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
+    }
+  }
   render (): ReactNode {
-    const user_id = this.props.user_id
+    const user_id = this.props.user_id;
 
-    const data = this.props.websiteData[this.props.webUrl]
+    const data = this.props.websiteData[this.props.webUrl];
 
-    let selectedSiteToReport: string | undefined = undefined
-    console.warn(this.props.websiteData, data, this.props.webUrl)
+    let selectedSiteToReport: string | undefined = undefined;
+    console.warn(this.props.websiteData, data, this.props.webUrl);
     return (
       <div style={{ display: this.props.isVisible ? 'block' : 'none' }}>
         {/* <div id='favicon-container'>
@@ -48,7 +57,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 src='/icons/triangle-exclamation-solid.svg'
                 style={{
                   maxWidth: '20px',
-                  maxHeight: '20px'
+                  maxHeight: '20px',
                 }}
               />
               We do <strong>not</strong> recognize this site. If you think you
@@ -74,18 +83,18 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     { websiteList: {}, sessionList: {} },
                     async i => {
                       const websiteList: { [key: string]: WebsiteListEntry } =
-                        i.websiteList
+                        i.websiteList;
                       const sessionList: { [key: string]: boolean } =
-                        i.sessionList
+                        i.sessionList;
 
-                      const webDomain = this.props.webUrl
-                      const tabId = this.props.tabId
-                      const currentTimeInMs = Date.now() // Get current time in milliseconds since Unix epoch
+                      const webDomain = this.props.webUrl;
+                      const tabId = this.props.tabId;
+                      const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
 
                       const currentTime = new Date(
-                        currentTimeInMs
-                      ).toLocaleString()
-                      const iconurl = (await getTabData()).favIconUrl
+                        currentTimeInMs,
+                      ).toLocaleString();
+                      const iconurl = (await getTabData()).favIconUrl;
                       fetchCertificateChain(webDomain)
                         .then(certificateChain => {
                           websiteList[webDomain] = {
@@ -93,51 +102,51 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                             certChain: certificateChain,
                             addedAt: currentTime,
                             lastVisit: currentTime,
-                            faviconUrl: iconurl as string
-                          }
-                          sessionList[webDomain] = true
+                            faviconUrl: iconurl as string,
+                          };
+                          sessionList[webDomain] = true;
 
                           chrome.storage.local.set(
                             {
                               websiteList: websiteList,
-                              sessionList: sessionList
+                              sessionList: sessionList,
                             },
                             function () {
                               console.log(
                                 'Website Saved as Sensitive',
-                                webDomain
-                              )
+                                webDomain,
+                              );
                               console.log(
                                 'Website added to session list',
-                                webDomain
-                              )
+                                webDomain,
+                              );
                               chrome.runtime.sendMessage({
-                                type: iMsgReqType.siteDataRefresh
-                              })
+                                type: iMsgReqType.siteDataRefresh,
+                              });
                               chrome.tabs.sendMessage(
                                 tabId,
                                 {
-                                  action: 'removeBlocker'
+                                  action: 'removeBlocker',
                                 },
                                 () => {
-                                  console.log('done removed')
-                                }
-                              ) //send message to unblock
-                            }
-                          )
+                                  console.log('done removed');
+                                },
+                              ); //send message to unblock
+                            },
+                          );
                           // removeView()
                           // document.getElementById('added-to-trusted').style.display =
                           //   'block'
 
-                          sendUserActionInfo(user_id, 4)
-                          sendUserActionInfo(user_id, 7)
-                          return true
+                          sendUserActionInfo(user_id, 4);
+                          sendUserActionInfo(user_id, 7);
+                          return true;
                         })
                         .catch(error => {
                           console.warn(
                             'Error fetching certificate chain:',
-                            error
-                          )
+                            error,
+                          );
                           // console.log('checking local vers')
                           // localFetchCertChain(webDomain)
                           //   .then(data => {
@@ -147,9 +156,9 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                           //     console.warn('Failed to get local version', e)
                           //   })
                           // Handle the error, e.g., display an error message to the user
-                        })
-                    }
-                  )
+                        });
+                    },
+                  );
                 }}
               >
                 Save new protected site
@@ -171,20 +180,23 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 <select
                   id='sensitive-sites-dropdown'
                   onChange={event => {
-                    const selectedOption = event.target.value
+                    const selectedOption = event.target.value;
                     if (selectedOption === '') {
-                      selectedSiteToReport = undefined
+                      selectedSiteToReport = undefined;
                     } else {
-                      selectedSiteToReport = selectedOption
+                      selectedSiteToReport = selectedOption;
                     }
-                    console.log('Selected option:', selectedOption)
+                    console.log('Selected option:', selectedOption);
                   }}
                 >
                   {/* Options will be dynamically added here */}
                   <option>Select the Protected Site</option>
-                  {Object.keys(this.props.websiteData).map(key => (
-                    <option value={key}>{key}</option>
-                  ))}
+                  {Object.keys(this.props.websiteData).map(key =>
+                    this.props.websiteData[key].LogType ===
+                    WebsiteListEntryLogType.PROTECTED ? (
+                      <option value={key}>{key}</option>
+                    ) : undefined,
+                  )}
                 </select>
               </div>
             </div>
@@ -199,52 +211,52 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     chrome.tabs.query(
                       { active: true, currentWindow: true },
                       function (tabs) {
-                        const url = tabs[0].url
-                        const urlObj = new URL(url as string)
-                        const currentSite = urlObj.hostname
-                        const currentTabId = tabs[0].id
-                        const favicon = tabs[0].favIconUrl
+                        const url = tabs[0].url;
+                        const urlObj = new URL(url as string);
+                        const currentSite = urlObj.hostname;
+                        const currentTabId = tabs[0].id;
+                        const favicon = tabs[0].favIconUrl;
                         if (currentSite && selectedSiteToReport) {
                           chrome.storage.local.get(
                             { websiteList: {} },
                             function (items) {
                               const websiteList: {
-                                [key: string]: WebsiteListEntry
-                              } = items.websiteList
-                              const currentTimeInMs = Date.now() // Get current time in milliseconds since Unix epoch
+                                [key: string]: WebsiteListEntry;
+                              } = items.websiteList;
+                              const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
                               const localTimeString = new Date(
-                                currentTimeInMs
-                              ).toLocaleString() // Convert to local date and time string
+                                currentTimeInMs,
+                              ).toLocaleString(); // Convert to local date and time string
 
                               websiteList[currentSite] = {
                                 LogType: WebsiteListEntryLogType.BLOCKED,
                                 certChain: undefined,
                                 addedAt: localTimeString,
                                 lastVisit: localTimeString,
-                                faviconUrl: favicon as string
-                              } // Mark the current site as unsafe
+                                faviconUrl: favicon as string,
+                              }; // Mark the current site as unsafe
                               chrome.storage.local.set(
                                 { websiteList: websiteList },
                                 function () {
                                   console.log(
                                     'Current website marked as unsafe:',
-                                    currentSite
-                                  )
+                                    currentSite,
+                                  );
                                   // displayUnsafeSites()
-                                }
-                              )
+                                },
+                              );
                               chrome.tabs.sendMessage(currentTabId as number, {
-                                action: 'addBlocker'
-                              })
+                                action: 'addBlocker',
+                              });
                               // Log the selected site with the current site
                               sendUserActionInfo(
                                 user_id,
                                 10,
                                 selectedSiteToReport,
-                                currentSite
-                              )
-                            }
-                          )
+                                currentSite,
+                              );
+                            },
+                          );
                           // removeView()
                           // document.getElementById(
                           //   'added-to-untrust'
@@ -253,11 +265,11 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                           //   'block'
                         } else {
                           console.warn(
-                            'Error: No current site or no site selected to report.'
-                          )
+                            'Error: No current site or no site selected to report.',
+                          );
                         }
-                      }
-                    )
+                      },
+                    );
                   }
                 }}
               >
@@ -286,7 +298,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 display:
                   data.LogType === WebsiteListEntryLogType.PROTECTED
                     ? '' // show is protected, not else.
-                    : 'none'
+                    : 'none',
               }}
             >
               You are safe!
@@ -297,7 +309,9 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               style={{
                 textAlign: 'center',
                 display:
-                  data.LogType === WebsiteListEntryLogType.BLOCKED ? '' : 'none'
+                  data.LogType === WebsiteListEntryLogType.BLOCKED
+                    ? ''
+                    : 'none',
               }}
             >
               You had previously marked this website as unsafe. Please proceed
@@ -346,7 +360,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   data.LogType === WebsiteListEntryLogType.BLOCKED
                     ? ''
                     : 'none',
-                minHeight: '4em'
+                minHeight: '4em',
               }}
               onClick={() => {
                 //TODO: do we want to make this unblock for the remainder of the session, or perhaps on a tab
@@ -361,8 +375,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 //   action: 'removeBlocker'
                 // })
                 chrome.tabs.sendMessage(this.props.tabId, {
-                  action: 'removeBlocker'
-                })
+                  action: 'removeBlocker',
+                });
               }}
             >
               I want to risk my online security <br />
@@ -381,7 +395,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   this.props.showchanged === true
                     ? ''
                     : 'none',
-                color: 'red'
+                color: 'red',
               }}
               id='cert-info-change'
             >
@@ -391,7 +405,13 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             <button
               className='button is-rounded is-info is-fullwidth'
               id='trust-on-change'
-              style={{ display: 'none' }}
+              style={{
+                display:
+                  data.LogType === WebsiteListEntryLogType.PROTECTED &&
+                  this.props.showchanged === true
+                    ? ''
+                    : 'none',
+              }}
             >
               I still trust this website
             </button>
@@ -406,8 +426,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
           Feedback: This was just a test!
         </h2>
       </div>
-    )
+    );
   }
 }
 
-export default LandingPage
+export default LandingPage;

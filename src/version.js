@@ -1,2 +1,2 @@
-const d = {version: 'v20240713094711-beta'};
+const d = { version: 'dev' };
 export default d

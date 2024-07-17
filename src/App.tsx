@@ -1,47 +1,48 @@
-import React, { Component } from 'react'
-import './App.css'
-import Navbar from './UIComponents/Navbar'
-import SensitiveSiteControls from './UIComponents/SensitiveSiteControls'
-import LandingPage from './UIComponents/LandingPage'
+import React, { Component } from 'react';
+import './App.css';
+import Navbar from './UIComponents/Navbar';
+import SensitiveSiteControls from './UIComponents/SensitiveSiteControls';
+import LandingPage from './UIComponents/LandingPage';
 import {
   WebsiteListEntry,
   checkList,
-  checkListReturn
-} from './utils/LocalStorage'
-import { sendUserActionInfo } from './utils/ExtensionPageUtils'
-import { iMsgReq, iMsgReqType } from './types/MessageTypes'
-import { ExtensionSettings } from './types/Settings'
+  checkListReturn,
+} from './utils/LocalStorage';
+import { sendUserActionInfo } from './utils/ExtensionPageUtils';
+import { iMsgReq, iMsgReqType } from './types/MessageTypes';
+import { ExtensionSettings } from './types/Settings';
 import {
   compareCertificateChains,
-  fetchCertificateChain
-} from './utils/fetchUtils'
+  fetchCertificateChain,
+  grabMainUrl,
+} from './utils/fetchUtils';
 
 const enum ViewState {
   Landing,
-  SensitiveSiteControls
+  SensitiveSiteControls,
 }
 interface AppState {
-  viewing: ViewState
-  pointsLocal: number
-  user_id: string
-  websiteUrl: string
+  viewing: ViewState;
+  pointsLocal: number;
+  user_id: string;
+  websiteUrl: string;
   currentTabData: {
-    url: string
-    tabId: number
-    hasUnblocked: boolean
-  }
-  faviconImage: string
-  tabId: number
+    url: string;
+    tabId: number;
+    hasUnblocked: boolean;
+  };
+  faviconImage: string;
+  tabId: number;
 
   //super important
   // currentSiteCert: {}
   //remember to remove this once todo is done.
-  doShowCertChangedButton: boolean
-  websiteList: { [key: string]: WebsiteListEntry }
-  sessionList: { [key: string]: boolean }
-  SHOULD_EXTENSION_BE_ACTIVE: boolean
+  doShowCertChangedButton: boolean;
+  websiteList: { [key: string]: WebsiteListEntry };
+  sessionList: { [key: string]: boolean };
+  SHOULD_EXTENSION_BE_ACTIVE: boolean;
 
-  settings: ExtensionSettings
+  settings: ExtensionSettings;
 }
 class App extends Component<{}, AppState> {
   constructor () {
@@ -59,74 +60,74 @@ class App extends Component<{}, AppState> {
       sessionList: {},
 
       settings: {
-        autoSearchEnabled: true
+        autoSearchEnabled: true,
       },
       currentTabData: {
         url: '',
         tabId: -1,
-        hasUnblocked: false
+        hasUnblocked: false,
       },
 
-      doShowCertChangedButton: false //dont show the button by default
-    }
+      doShowCertChangedButton: false, //dont show the button by default
+    };
 
-    super({}, state)
+    super({}, state);
 
-    this.state = state
+    this.state = state;
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
-      console.warn('CHANGES:', changes)
+      console.warn('CHANGES:', changes);
       if (namespace === 'local') {
         for (let key in changes) {
-          const change = changes[key]
-          console.log('New change', key)
-          console.log(`Old value: `, change.oldValue)
-          console.log(`New value: `, change.newValue)
+          const change = changes[key];
+          console.log('New change', key);
+          console.log(`Old value: `, change.oldValue);
+          console.log(`New value: `, change.newValue);
           if (key === 'websiteList') {
-            console.warn('WebsiteList storage change')
-            console.log(`Old value: `, change.oldValue)
-            console.log(`New value: `, change.newValue)
-            this.setState({ websiteList: change.newValue })
+            console.warn('WebsiteList storage change');
+            console.log(`Old value: `, change.oldValue);
+            console.log(`New value: `, change.newValue);
+            this.setState({ websiteList: change.newValue });
           }
           if (key === 'autoSearchEnabled') {
             this.setState({
-              settings: { autoSearchEnabled: change.newValue }
-            })
+              settings: { autoSearchEnabled: change.newValue },
+            });
           }
 
           //user info changed
           if (key === '_pki_userData') {
             //this needs to be fixed to incorporate logouts
-            if (!change.newValue) return
+            if (!change.newValue) return;
             this.setState({
               user_id: change.newValue.user_id,
               SHOULD_EXTENSION_BE_ACTIVE:
                 change.newValue.TEST_ExtensionActive !== undefined
                   ? change.newValue.TEST_ExtensionActive
-                  : true
-            })
-            console.warn('Set state with new user data.')
+                  : true,
+            });
+            console.warn('Set state with new user data.');
           }
         }
       }
-    })
+    });
   }
 
   componentDidMount (): void {
-    let pointsLocal = this.state.pointsLocal
-    let user_id = this.state.user_id
+    let pointsLocal = this.state.pointsLocal;
+    let user_id = this.state.user_id;
 
-    sendUserActionInfo(this.state.user_id, 3)
+    sendUserActionInfo(this.state.user_id, 3);
     //this is what we upload via setState at the end of this function.
     let payload: {
-      faviconImage: string
-      websiteUrl: string
-      tabId: number
+      faviconImage: string;
+      websiteUrl: string;
+      tabId: number;
       currentTabData: {
-        url: string
-        tabId: number
-        hasUnblocked: boolean
-      }
+        url: string;
+        tabId: number;
+        hasUnblocked: boolean;
+      };
     } = {
       faviconImage: '',
       websiteUrl: '',
@@ -135,47 +136,47 @@ class App extends Component<{}, AppState> {
       currentTabData: {
         url: '',
         tabId: 0,
-        hasUnblocked: false
-      }
-    }
+        hasUnblocked: false,
+      },
+    };
     const setter = (props: unknown) => {
-      this.setState(props as AppState)
-    }
+      this.setState(props as AppState);
+    };
 
     const processActiveTab = (tabs: chrome.tabs.Tab[]) => {
-      const url = tabs[0].url
-      const urlObj = new URL(url as string)
-      const webDomain = urlObj.hostname
-      const tabId = tabs[0].id
-      const favicon = tabs[0].favIconUrl
+      const url = tabs[0].url;
+      const urlObj = new URL(url as string);
+      const webDomain = urlObj.hostname;
+      const tabId = tabs[0].id;
+      const favicon = tabs[0].favIconUrl;
 
       // const urlContainer = document.getElementById('url-container')
       // urlContainer.textContent = 'URL: ' + webDomain
-      const shortenedDomain = webDomain.replace(/^www\./, '')
+      const shortenedDomain = grabMainUrl(urlObj);
 
-      payload.websiteUrl = shortenedDomain
-      payload.currentTabData.url = shortenedDomain
-      payload.currentTabData.tabId = tabId as number
-      payload.tabId = tabId as number
-      payload.faviconImage = favicon ? favicon : ''
+      payload.websiteUrl = shortenedDomain;
+      payload.currentTabData.url = shortenedDomain;
+      payload.currentTabData.tabId = tabId as number;
+      payload.tabId = tabId as number;
+      payload.faviconImage = favicon ? favicon : '';
       checkList(shortenedDomain).then(result => {
-        console.warn(result)
+        console.warn(result);
         if (result === checkListReturn.Safe) {
           // removeView()
           // document.getElementById('all-set').style.display = 'block'
 
-          sendUserActionInfo(user_id, 2)
+          sendUserActionInfo(user_id, 2);
 
           chrome.storage.local.get({ sessionList: {} }, function (items) {
-            const sessionList = items.sessionList
-            sessionList[shortenedDomain] = true
+            const sessionList = items.sessionList;
+            sessionList[shortenedDomain] = true;
             chrome.storage.local.set({ sessionList: sessionList }, function () {
-              console.log('Website added to session list', shortenedDomain)
+              console.log('Website added to session list', shortenedDomain);
               chrome.tabs.sendMessage(tabs[0].id as number, {
-                action: 'removeBlocker'
-              }) //send message to unblock
-            })
-          })
+                action: 'removeBlocker',
+              }); //send message to unblock
+            });
+          });
         } else if (result === checkListReturn.Unsafe) {
           // removeView()
           // document.getElementById('site-blocked-text').style.display = 'block'
@@ -188,25 +189,25 @@ class App extends Component<{}, AppState> {
           //   })
           // })
         } else {
-          console.log('Website not found in the list')
+          console.log('Website not found in the list');
         }
 
         chrome.storage.local.get('points', function (data) {
           if (data.points) {
-            pointsLocal = data.points
+            pointsLocal = data.points;
           }
           chrome.storage.local.get(
             {
               websiteList: {},
               _pki_userData: {
                 user_id: 'abcd',
-                TEST_ExtensionActive: true
-              }
+                TEST_ExtensionActive: true,
+              },
             },
             d => {
-              const data = d._pki_userData
-              user_id = data.user_id
-              const b = data.TEST_ExtensionActive
+              const data = d._pki_userData;
+              user_id = data.user_id;
+              const b = data.TEST_ExtensionActive;
               const t = {
                 faviconImage: payload.faviconImage,
                 websiteUrl: payload.websiteUrl,
@@ -216,54 +217,54 @@ class App extends Component<{}, AppState> {
                 tabId: payload.tabId,
 
                 SHOULD_EXTENSION_BE_ACTIVE: b,
-                doShowCertChangedButton: false
-              }
+                doShowCertChangedButton: false,
+              };
               //this honestly sucks
               //TODO: MAKE THIS ASYNC SO WE DONT HAVE ALL THIS NESTED STUFF
               //TODO: ADD METADATA FOR IF THE CERTIFICATE WAS CHANGED!
               if (d.websiteList[shortenedDomain]) {
                 fetchCertificateChain(shortenedDomain).then(cert => {
                   const savedCertificateChain =
-                    d.websiteList[shortenedDomain].certChain
+                    d.websiteList[shortenedDomain].certChain;
 
                   if (compareCertificateChains(cert, savedCertificateChain)) {
                     //does match do nothing
                   } else {
-                    t.doShowCertChangedButton = true
+                    t.doShowCertChangedButton = true;
                   }
 
-                  setter(t)
-                })
+                  setter(t);
+                });
               } else {
-                setter(t)
+                setter(t);
               }
-            }
-          )
-        })
-      })
-    }
+            },
+          );
+        });
+      });
+    };
     //todo: totally remove this later.
     chrome.runtime.onMessage.addListener((_data, sender, sendResponse) => {
-      const data = _data as iMsgReq
+      const data = _data as iMsgReq;
       switch (data.type) {
         case iMsgReqType.fetchCertificateChain:
         case iMsgReqType.sendUserActionInfo:
         case iMsgReqType.fetchTestWebsites:
         case iMsgReqType.frontEndRequestUserSaveSite:
-          break
+          break;
         case iMsgReqType.siteDataRefresh:
-          console.warn('RELOAD')
+          console.warn('RELOAD');
           chrome.tabs.query(
             { active: true, currentWindow: true },
-            processActiveTab
-          )
+            processActiveTab,
+          );
           // reloadWebData()
-          console.warn('COMPLETE')
-          break
+          console.warn('COMPLETE');
+          break;
       }
-    })
+    });
 
-    chrome.tabs.query({ active: true, currentWindow: true }, processActiveTab)
+    chrome.tabs.query({ active: true, currentWindow: true }, processActiveTab);
     // reloadWebData()
     //what is this
     // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -280,14 +281,14 @@ class App extends Component<{}, AppState> {
     // })
     const func = (items: { [key: string]: any }) => {
       this.setState({
-        settings: { autoSearchEnabled: items.autoSearchEnabled }
-      })
-    }
-    chrome.storage.local.get({ autoSearchEnabled: true }, func)
+        settings: { autoSearchEnabled: items.autoSearchEnabled },
+      });
+    };
+    chrome.storage.local.get({ autoSearchEnabled: true }, func);
 
     chrome.storage.local.get({ websiteList: {} }, data => {
-      this.setState({ websiteList: data.websiteList })
-    })
+      this.setState({ websiteList: data.websiteList });
+    });
   }
   render () {
     // this.reloadWebData()
@@ -314,13 +315,13 @@ class App extends Component<{}, AppState> {
             <>
               <Navbar
                 toggleSensitiveSiteControls={() => {
-                  const current = this.state.viewing
+                  const current = this.state.viewing;
                   this.setState({
                     viewing:
                       current === ViewState.Landing
                         ? ViewState.SensitiveSiteControls
-                        : ViewState.Landing
-                  })
+                        : ViewState.Landing,
+                  });
                 }}
                 viewState={this.state.viewing}
                 settings={this.state.settings}
@@ -376,8 +377,8 @@ class App extends Component<{}, AppState> {
           )}
         </body>
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;

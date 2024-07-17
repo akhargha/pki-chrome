@@ -1,24 +1,24 @@
-import { Component } from 'react'
+import { Component } from 'react';
 import {
   WebsiteListEntry,
-  WebsiteListEntryLogType
-} from '../utils/LocalStorage'
-import { SiteListingButton } from './SiteListingButton'
-import { iMsgReq, iMsgReqType } from '../types/MessageTypes'
-import { MoreSiteInfo } from './MoreSiteInfo'
-import { Spring, SpringValue, animated } from 'react-spring'
-import { fetchCertificateChain } from '../utils/fetchUtils'
-import { localSendUserActionInfo } from '../utils/ExtensionPageUtils'
+  WebsiteListEntryLogType,
+} from '../utils/LocalStorage';
+import { SiteListingButton } from './SiteListingButton';
+import { iMsgReq, iMsgReqType } from '../types/MessageTypes';
+import { MoreSiteInfo } from './MoreSiteInfo';
+import { Spring, SpringValue, animated } from 'react-spring';
+import { fetchCertificateChain, grabMainUrl } from '../utils/fetchUtils';
+import { localSendUserActionInfo } from '../utils/ExtensionPageUtils';
 
 interface SensitiveSiteControlsProps {
-  isVisible: boolean
-  websiteData: { [key: string]: WebsiteListEntry }
+  isVisible: boolean;
+  websiteData: { [key: string]: WebsiteListEntry };
 }
 interface SensitiveSiteControlsState {
-  websiteOpen?: WebsiteListEntry
-  url: string
-  sensitiveInput: string
-  blockedInput: string
+  websiteOpen?: WebsiteListEntry;
+  url: string;
+  sensitiveInput: string;
+  blockedInput: string;
 }
 
 class SensitiveSiteControls extends Component<
@@ -26,22 +26,22 @@ class SensitiveSiteControls extends Component<
   SensitiveSiteControlsState
 > {
   constructor (P: SensitiveSiteControlsProps, S: SensitiveSiteControlsState) {
-    super(P, S)
+    super(P, S);
     this.state = {
       url: '',
       sensitiveInput: '',
-      blockedInput: ''
-    }
+      blockedInput: '',
+    };
   }
   componentDidMount (): void {
     chrome.runtime.onMessage.addListener(_data => {
-      const data = _data as iMsgReq
+      const data = _data as iMsgReq;
       switch (data.type) {
         case iMsgReqType.fetchCertificateChain:
         case iMsgReqType.sendUserActionInfo:
         case iMsgReqType.fetchTestWebsites:
         case iMsgReqType.frontEndRequestUserSaveSite:
-          break
+          break;
         case iMsgReqType.siteDataRefresh:
           chrome.storage.local.get(
             //websiteList is the list of sites we have saved as safe or unsafe
@@ -49,14 +49,14 @@ class SensitiveSiteControls extends Component<
             { websiteList: {}, sessionList: {} },
             function (items) {
               // ss({ websiteData: websiteList })
-            }
-          )
-          break
+            },
+          );
+          break;
       }
-    })
+    });
   }
   render () {
-    const wData = this.props.websiteData
+    const wData = this.props.websiteData;
     return (
       <div
         id='sensitive-site-controls'
@@ -64,7 +64,7 @@ class SensitiveSiteControls extends Component<
           display: this.props.isVisible ? 'flex' : 'none',
           justifyContent: 'center',
           alignItems: 'center',
-          flexDirection: 'column'
+          flexDirection: 'column',
         }}
       >
         {/* Site data overlay */}
@@ -73,9 +73,9 @@ class SensitiveSiteControls extends Component<
           closeFunc={(webData?: { [key: string]: WebsiteListEntry }) => {
             if (webData) {
               // this.setState({ websiteOpen: undefined, websiteData: webData })
-              this.setState({ websiteOpen: undefined })
+              this.setState({ websiteOpen: undefined });
             } else {
-              this.setState({ websiteOpen: undefined })
+              this.setState({ websiteOpen: undefined });
             }
           }}
           data={this.state.websiteOpen}
@@ -84,11 +84,11 @@ class SensitiveSiteControls extends Component<
         <Spring
           from={{
             filter:
-              this.state.websiteOpen === undefined ? 'blur(5px)' : 'blur(0px)'
+              this.state.websiteOpen === undefined ? 'blur(5px)' : 'blur(0px)',
           }}
           to={{
             filter:
-              this.state.websiteOpen === undefined ? 'blur(0px)' : 'blur(5px)'
+              this.state.websiteOpen === undefined ? 'blur(0px)' : 'blur(5px)',
           }}
         >
           {(props: { filter: SpringValue<string> }) => (
@@ -104,11 +104,11 @@ class SensitiveSiteControls extends Component<
                       onClick={() => {
                         this.setState({
                           websiteOpen: wData[key],
-                          url: key
-                        })
+                          url: key,
+                        });
                       }}
                     />
-                  ) : null
+                  ) : null,
                 )}
               </animated.div>
 
@@ -123,13 +123,12 @@ class SensitiveSiteControls extends Component<
                     type='text'
                     placeholder='Enter site URL to protect'
                     onBlur={event => {
-                      const shortenedDomain = event.target.value.replace(
-                        /^www\./,
-                        ''
-                      )
+                      const url = new URL(event.target.value);
+                      const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
+
                       this.setState({
-                        sensitiveInput: shortenedDomain
-                      })
+                        sensitiveInput: shortenedDomain,
+                      });
                     }}
                   />
                 </div>
@@ -138,33 +137,33 @@ class SensitiveSiteControls extends Component<
                     className='button is-info'
                     id='sensitive-save'
                     onClick={() => {
-                      const webDomain = this.state.sensitiveInput
-                      if (webDomain === '') return
+                      const webDomain = this.state.sensitiveInput;
+                      if (webDomain === '') return;
                       fetchCertificateChain(webDomain as string).then(
                         async certificateChain => {
-                          const currentTimeInMs = Date.now() // Get current time in milliseconds since Unix epoch
+                          const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
                           const currentTime = new Date(
-                            currentTimeInMs
-                          ).toLocaleString() // Convert to local date and time string
+                            currentTimeInMs,
+                          ).toLocaleString(); // Convert to local date and time string
 
                           const localStorageData =
                             await chrome.storage.local.get({
                               websiteList: {},
-                              sessionList: {}
-                            })
+                              sessionList: {},
+                            });
                           const userid = (
                             await chrome.storage.local.get({
                               _pki_userData: {
                                 user_id: 'abcd',
-                                TEST_ExtensionActive: true
-                              }
+                                TEST_ExtensionActive: true,
+                              },
                             })
-                          )._pki_userData.user_id
+                          )._pki_userData.user_id;
                           const websiteList: {
-                            [key: string]: WebsiteListEntry
-                          } = localStorageData.websiteList
+                            [key: string]: WebsiteListEntry;
+                          } = localStorageData.websiteList;
                           const sessionList: { [key: string]: boolean } =
-                            localStorageData.sessionList
+                            localStorageData.sessionList;
 
                           websiteList[webDomain] = {
                             LogType: WebsiteListEntryLogType.PROTECTED,
@@ -173,28 +172,28 @@ class SensitiveSiteControls extends Component<
                             lastVisit: currentTime,
                             //faviconUrl: tab.favIconUrl as string
                             //TODO: add refresh for this when opening the site.
-                            faviconUrl: ''
-                          }
+                            faviconUrl: '',
+                          };
 
-                          sessionList[webDomain] = true
+                          sessionList[webDomain] = true;
 
                           await chrome.storage.local.set({
                             websiteList,
-                            sessionList
-                          })
+                            sessionList,
+                          });
 
                           //so our ui can refresh on open
                           chrome.runtime
                             .sendMessage({
-                              type: iMsgReqType.siteDataRefresh
+                              type: iMsgReqType.siteDataRefresh,
                             })
                             .then(() => {})
-                            .catch(e => console.warn(e))
+                            .catch(e => console.warn(e));
 
-                          localSendUserActionInfo(userid, 4)
-                          localSendUserActionInfo(userid, 7)
-                        }
-                      )
+                          localSendUserActionInfo(userid, 4);
+                          localSendUserActionInfo(userid, 7);
+                        },
+                      );
                     }}
                   >
                     Save
@@ -213,11 +212,11 @@ class SensitiveSiteControls extends Component<
                       onClick={() => {
                         this.setState({
                           websiteOpen: wData[key],
-                          url: key
-                        })
+                          url: key,
+                        });
                       }}
                     />
-                  ) : null
+                  ) : null,
                 )}
               </animated.div>
 
@@ -232,14 +231,11 @@ class SensitiveSiteControls extends Component<
                     type='text'
                     placeholder='Enter unsafe site URL'
                     onBlur={event => {
-                      const shortenedDomain = event.target.value.replace(
-                        /^www\./,
-                        ''
-                      )
-
+                      const url = new URL(event.target.value);
+                      const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
                       this.setState({
-                        blockedInput: shortenedDomain
-                      })
+                        blockedInput: shortenedDomain,
+                      });
                     }}
                   />
                 </div>
@@ -248,34 +244,34 @@ class SensitiveSiteControls extends Component<
                     className='button is-info'
                     id='unsafe-save'
                     onClick={() => {
-                      const webDomain = this.state.blockedInput
-                      if (webDomain === '') return
+                      const webDomain = this.state.blockedInput;
+                      if (webDomain === '') return;
                       fetchCertificateChain(webDomain as string).then(
                         async certificateChain => {
-                          const currentTimeInMs = Date.now() // Get current time in milliseconds since Unix epoch
+                          const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
                           const currentTime = new Date(
-                            currentTimeInMs
-                          ).toLocaleString() // Convert to local date and time string
+                            currentTimeInMs,
+                          ).toLocaleString(); // Convert to local date and time string
 
                           const localStorageData =
                             await chrome.storage.local.get({
                               websiteList: {},
-                              sessionList: {}
-                            })
+                              sessionList: {},
+                            });
 
                           const userid = (
                             await chrome.storage.local.get({
                               _pki_userData: {
                                 user_id: 'abcd',
-                                TEST_ExtensionActive: true
-                              }
+                                TEST_ExtensionActive: true,
+                              },
                             })
-                          )._pki_userData.user_id
+                          )._pki_userData.user_id;
                           const websiteList: {
-                            [key: string]: WebsiteListEntry
-                          } = localStorageData.websiteList
+                            [key: string]: WebsiteListEntry;
+                          } = localStorageData.websiteList;
                           const sessionList: { [key: string]: boolean } =
-                            localStorageData.sessionList
+                            localStorageData.sessionList;
 
                           websiteList[webDomain] = {
                             LogType: WebsiteListEntryLogType.BLOCKED,
@@ -284,28 +280,28 @@ class SensitiveSiteControls extends Component<
                             lastVisit: currentTime,
                             //faviconUrl: tab.favIconUrl as string
                             //TODO: add refresh for this when opening the site.
-                            faviconUrl: ''
-                          }
+                            faviconUrl: '',
+                          };
 
-                          sessionList[webDomain] = true
+                          sessionList[webDomain] = true;
 
                           await chrome.storage.local.set({
                             websiteList,
-                            sessionList
-                          })
+                            sessionList,
+                          });
 
                           //so our ui can refresh on open
                           chrome.runtime
                             .sendMessage({
-                              type: iMsgReqType.siteDataRefresh
+                              type: iMsgReqType.siteDataRefresh,
                             })
                             .then(() => {})
-                            .catch(e => console.warn(e))
+                            .catch(e => console.warn(e));
 
-                          localSendUserActionInfo(userid, 4)
-                          localSendUserActionInfo(userid, 7)
-                        }
-                      )
+                          localSendUserActionInfo(userid, 4);
+                          localSendUserActionInfo(userid, 7);
+                        },
+                      );
                     }}
                   >
                     Save
@@ -316,8 +312,8 @@ class SensitiveSiteControls extends Component<
           )}
         </Spring>
       </div>
-    )
+    );
   }
 }
 
-export default SensitiveSiteControls
+export default SensitiveSiteControls;
