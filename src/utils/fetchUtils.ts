@@ -1,4 +1,3 @@
-import { warn } from 'console';
 import { URL } from 'url';
 
 export function fetchCertificateChain (webDomain: string) {
