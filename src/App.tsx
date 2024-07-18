@@ -116,8 +116,6 @@ class App extends Component<object, AppState> {
   componentDidMount(): void {
     let pointsLocal = this.state.pointsLocal;
     let user_id = this.state.user_id;
-
-    sendUserActionInfo(this.state.user_id, 3);
     //this is what we upload via setState at the end of this function.
     const payload: {
       faviconImage: string;
@@ -218,6 +216,7 @@ class App extends Component<object, AppState> {
                 SHOULD_EXTENSION_BE_ACTIVE: b,
                 doShowCertChangedButton: false,
               };
+              console.warn("OK", t);
               //this honestly sucks
               //TODO: MAKE THIS ASYNC SO WE DONT HAVE ALL THIS NESTED STUFF
               //TODO: ADD METADATA FOR IF THE CERTIFICATE WAS CHANGED!
@@ -233,14 +232,19 @@ class App extends Component<object, AppState> {
                   }
 
                   setter(t);
+
+                  sendUserActionInfo(user_id, 3);
                 });
               } else {
                 setter(t);
+
+                sendUserActionInfo(user_id, 3);
               }
             },
           );
         });
       });
+
     };
     //todo: totally remove this later.
     chrome.runtime.onMessage.addListener((_data, sender, sendResponse) => {

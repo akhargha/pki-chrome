@@ -121,7 +121,7 @@ class SensitiveSiteControls extends Component<
                   <input
                     className='input'
                     type='text'
-                    placeholder='Enter site URL to protect'
+                    placeholder='Enter site domain to protect'
                     onBlur={event => {
                       const url = new URL(event.target.value);
                       const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
@@ -229,7 +229,7 @@ class SensitiveSiteControls extends Component<
                   <input
                     className='input'
                     type='text'
-                    placeholder='Enter unsafe site URL'
+                    placeholder='Enter unsafe site domain'
                     onBlur={event => {
                       const url = new URL(event.target.value);
                       const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')

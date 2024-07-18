@@ -28,7 +28,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
     prevState: Readonly<LandingPageState>,
   ): void {
     if (this.props.webUrl !== prevProps.webUrl) {
-      console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
+      // console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
+      //do something...
     }
   }
   render(): ReactNode {

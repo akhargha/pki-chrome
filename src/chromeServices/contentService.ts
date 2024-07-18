@@ -32,10 +32,13 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
     switch (cookie.name) {
       case 'user_id':
         user_id = cookie.value;
+        console.log('Found cookie', user_id);
         break;
       case 'use_extension':
         //convert to boolean, is string.
         isActive = cookie.value === 'True' ? true : false;
+        console.log('Found extension access. Enabled: ', isActive);
+
         break;
       default:
         break;
@@ -90,28 +93,28 @@ function main () {
                 );
                 let last: GitHubRelease | undefined = undefined;
                 let current: GitHubRelease | undefined = undefined;
-                console.log(data);
                 data.forEach((release: GitHubRelease) => {
                   // console.log(release)
                   if (isbeta && release.prerelease === true) {
-                    if (release.tag_name === vers) {
+                    if (release.tag_name === vers && last) {
                       current = release;
                     } else {
-                      last = release;
+                      if (last === undefined) last = release;
                     }
                   } else {
                     if (isbeta && release.prerelease === false) return;
-                    if (release.tag_name === vers) {
+                    if (release.tag_name === vers && last) {
                       current = release;
                     } else {
-                      last = release;
+                      if (last === undefined) last = release;
                     }
                   }
                 });
                 if (current === undefined) {
                   //this shouldnt happen but... just ignore.
                   // return
-                  throw new Error('undefined error when checking version');
+                  console.log('Is latest version');
+                  return;
                 }
                 if (last === undefined) {
                   console.log('Is latest version');
