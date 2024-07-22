@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import './App.css';
 import Navbar from './UIComponents/Navbar';
 import SensitiveSiteControls from './UIComponents/SensitiveSiteControls';
@@ -16,7 +16,6 @@ import {
   fetchCertificateChain,
   grabMainUrl,
 } from './utils/fetchUtils';
-import { warn } from 'console';
 
 const enum ViewState {
   Landing,
