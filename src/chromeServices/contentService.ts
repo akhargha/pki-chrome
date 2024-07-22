@@ -19,14 +19,16 @@ let blockerClicked = false;
 
 let user_id = '123456';
 let isActive = true;
-
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   const cookies: ChromeCookie[] = c;
 
   //this is because we have one cookie which is the crsf token! we need at least 2 cookies
   //should we check this on every page... idk. but I don't think this
   //will have an impact on performance either way.
-  if (cookies.length <= 1) return; // we dont have the required data, do nothing as of right now...
+  if (cookies.length <= 1) {
+    main();
+    return;
+  } // we dont have the required data, do nothing as of right now...
 
   cookies.forEach((cookie: ChromeCookie) => {
     switch (cookie.name) {
@@ -51,6 +53,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
       TEST_ExtensionActive: isActive,
     },
   });
+  if (isActive) main();
 });
 
 function main () {
@@ -598,5 +601,3 @@ function removeBlocker () {
     blockerDiv.remove();
   }
 }
-
-main();
