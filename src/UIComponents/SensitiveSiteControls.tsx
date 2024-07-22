@@ -123,12 +123,17 @@ class SensitiveSiteControls extends Component<
                     type='text'
                     placeholder='Enter site domain to protect'
                     onBlur={event => {
-                      const url = new URL(event.target.value);
-                      const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
+                      let s = event.target.value;
+                      if (!s.startsWith("http")) {
+                        s = "https" + s;
+                        const url = new URL(s);
+                        const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
 
-                      this.setState({
-                        sensitiveInput: shortenedDomain,
-                      });
+                        this.setState({
+                          sensitiveInput: shortenedDomain,
+                        });
+                      }
+
                     }}
                   />
                 </div>
@@ -231,11 +236,17 @@ class SensitiveSiteControls extends Component<
                     type='text'
                     placeholder='Enter unsafe site domain'
                     onBlur={event => {
-                      const url = new URL(event.target.value);
-                      const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
-                      this.setState({
-                        blockedInput: shortenedDomain,
-                      });
+                      let s = event.target.value;
+                      if (!s.startsWith("http")) {
+                        s = "https://" + s;
+                        const url = new URL(s);
+                        const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
+
+                        this.setState({
+                          blockedInput: shortenedDomain,
+                        });
+                      }
+
                     }}
                   />
                 </div>

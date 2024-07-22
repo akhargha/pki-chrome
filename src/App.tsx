@@ -16,6 +16,7 @@ import {
   fetchCertificateChain,
   grabMainUrl,
 } from './utils/fetchUtils';
+import { warn } from 'console';
 
 const enum ViewState {
   Landing,
@@ -200,11 +201,17 @@ class App extends Component<object, AppState> {
                 user_id: 'abcd',
                 TEST_ExtensionActive: true,
               },
+              _pki_Test_Data: {
+                ilogicalloanssavings: {
+                  realCert: false,
+                },
+              },
             },
             d => {
               const data = d._pki_userData;
               user_id = data.user_id;
               const b = data.TEST_ExtensionActive;
+              const g = d._pki_Test_Data;
               const t = {
                 faviconImage: payload.faviconImage,
                 websiteUrl: payload.websiteUrl,
@@ -221,19 +228,52 @@ class App extends Component<object, AppState> {
               //TODO: MAKE THIS ASYNC SO WE DONT HAVE ALL THIS NESTED STUFF
               //TODO: ADD METADATA FOR IF THE CERTIFICATE WAS CHANGED!
               if (d.websiteList[shortenedDomain]) {
-                fetchCertificateChain(shortenedDomain).then(cert => {
-                  const savedCertificateChain =
-                    d.websiteList[shortenedDomain].certChain;
+                let filter = shortenedDomain;
+                if (filter === 'acct.ilogicalloanssavings.mobyphish.com') {
+                  filter = urlObj.hostname.replace(/^www\./, '');
+                  console.warn("Filter thing", filter);
+                }
 
-                  if (compareCertificateChains(cert, savedCertificateChain)) {
-                    //does match do nothing
+                fetchCertificateChain(filter).then(cert => {
+                  if (g.ilogicalloanssavings.realCert === false) {
+                    fetchCertificateChain("real.acct.ilogicalloanssavings.mobyphish.com").then(realCert => {
+                      chrome.storage.local.set({
+                        _pki_Test_Data: {
+                          ilogicalloanssavings: {
+                            realCert: realCert,
+                          },
+                        },
+                      });
+
+                      console.log("COMPARE", cert, cert, d.websiteList[shortenedDomain]);
+
+                      if (compareCertificateChains(cert, realCert)) {
+                        //does match do nothing
+                      } else {
+                        t.doShowCertChangedButton = true;
+                      }
+
+                      setter(t);
+
+                      sendUserActionInfo(user_id, 3);
+                      return;
+                    });
+                    return; // exit out of process
                   } else {
-                    t.doShowCertChangedButton = true;
+                    const savedCertificateChain = g.ilogicalloanssavings.realCert;
+
+                    console.log("COMPARE", cert, savedCertificateChain, d.websiteList[shortenedDomain]);
+
+                    if (compareCertificateChains(cert, savedCertificateChain)) {
+                      //does match do nothing
+                    } else {
+                      t.doShowCertChangedButton = true;
+                    }
+
+                    setter(t);
+
+                    sendUserActionInfo(user_id, 3);
                   }
-
-                  setter(t);
-
-                  sendUserActionInfo(user_id, 3);
                 });
               } else {
                 setter(t);

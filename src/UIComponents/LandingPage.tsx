@@ -4,7 +4,7 @@ import {
   WebsiteListEntry,
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
-import { fetchCertificateChain } from '../utils/fetchUtils';
+import { fetchCertificateChain, grabMainUrl } from '../utils/fetchUtils';
 import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 import { iMsgReqType } from '../types/MessageTypes';
 import { getTabData } from '../utils/ChromeQueryUtils';
@@ -213,7 +213,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                       function (tabs) {
                         const url = tabs[0].url;
                         const urlObj = new URL(url as string);
-                        const currentSite = urlObj.hostname;
+                        const currentSite = grabMainUrl(urlObj);
                         const currentTabId = tabs[0].id;
                         const favicon = tabs[0].favIconUrl;
                         if (currentSite && selectedSiteToReport) {
@@ -296,7 +296,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               style={{
                 textAlign: 'center',
                 display:
-                  data.LogType === WebsiteListEntryLogType.PROTECTED
+                  data.LogType === WebsiteListEntryLogType.PROTECTED &&
+                    this.props.showchanged === false
                     ? '' // show is protected, not else.
                     : 'none',
               }}
@@ -400,9 +401,9 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               id='cert-info-change'
             >
               Some security information about this site has been changed! This
-              is usually an indicator of an attack. Please proceed carefully.
+              is usually an indicator of an attack. Please proceed carefully, and refrain from submitting any credentials.
             </h2>
-            <button
+            {/* <button
               className='button is-rounded is-info is-fullwidth'
               id='trust-on-change'
               style={{
@@ -414,7 +415,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               }}
             >
               I still trust this website
-            </button>
+            </button> */}
           </>
         ) : undefined}
 

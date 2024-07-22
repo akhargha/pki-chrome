@@ -237,7 +237,7 @@ function main () {
 
                 chrome.runtime.sendMessage({
                   type: iMsgReqType.frontEndRequestUserSaveSite,
-                  webDomain: shortenedDomain,
+                  webDomain: 'wxxx.' + shortenedDomain, // random prefix for lets encrypt
                 });
               }
             } else if (response.error) {
