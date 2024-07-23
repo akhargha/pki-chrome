@@ -172,10 +172,11 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               </h3>
             </div>
             <div id='sensitive-sites-dropdown-container'>
+
               <div
                 className='select is-rounded is-danger'
                 id='sensitive-sites-dropdown-container'
-                style={{ marginLeft: '25px', marginBottom: '10px' }}
+                style={{ marginLeft: '25px', marginBottom: '10px', width: 'auto', overflowX: 'hidden', wordWrap: 'break-word', maxWidth: '75vw' }}
               >
                 <select
                   id='sensitive-sites-dropdown'
