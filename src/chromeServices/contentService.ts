@@ -222,6 +222,35 @@ function main () {
                       }
                     } else {
                       console.warn('Should visit base site first.');
+
+                      chrome.runtime.sendMessage(
+                        {
+                          type: iMsgReqType.fetchCertificateChain,
+                          webDomain:
+                            'real.acct.ilogicalloanssavings.mobyphish.com',
+                        },
+                        realCert => {
+                          //save our real cert to check against the fake one
+                          chrome.storage.local.set({
+                            _pki_Test_Data: {
+                              ilogicalloanssavings: {
+                                realCert: realCert,
+                              },
+                            },
+                          });
+
+                          chrome.runtime.sendMessage({
+                            type: iMsgReqType.frontEndRequestUserSaveSite,
+                            webDomain: shortenedDomain, // random prefix for lets encrypt
+                          });
+
+                          console.log('Certificate chain does not match');
+                          //DO OTHER STUFF HERE
+                          addBlocker(
+                            'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                          );
+                        },
+                      );
                     }
                   },
                 );
@@ -237,7 +266,7 @@ function main () {
 
                 chrome.runtime.sendMessage({
                   type: iMsgReqType.frontEndRequestUserSaveSite,
-                  webDomain: 'wxxx.' + shortenedDomain, // random prefix for lets encrypt
+                  webDomain: shortenedDomain, // random prefix for lets encrypt
                 });
               }
             } else if (response.error) {

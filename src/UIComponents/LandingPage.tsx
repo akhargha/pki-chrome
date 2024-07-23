@@ -402,7 +402,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               id='cert-info-change'
             >
               Some security information about this site has been changed! This
-              is usually an indicator of an attack. Please proceed carefully, and refrain from submitting any credentials.
+              is usually an indicator of an attack. Please proceed carefully, and refrain from submitting any credentials. The blocker has been removed.
             </h2>
             {/* <button
               className='button is-rounded is-info is-fullwidth'
@@ -417,6 +417,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             >
               I still trust this website
             </button> */}
+
           </>
         ) : undefined}
 
