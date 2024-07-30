@@ -71,11 +71,6 @@ function main () {
         },
       },
       d => {
-        console.warn(
-          d,
-          d._pkiExtensionUpdateInfo.lastCheck + 60 * 60 * 1000,
-          Date.now(),
-        );
         //only check once per hr
         if (d._pkiExtensionUpdateInfo.lastCheck + 60 * 60 * 1000 < Date.now()) {
           const owner = 'akhargha';
@@ -84,7 +79,6 @@ function main () {
           const url = `https://api.github.com/repos/${owner}/${repo}/releases`;
           const vers: string = require('../version').default.version;
           const isbeta = vers.endsWith('-beta');
-          console.warn(url, vers);
           if (vers !== 'dev') {
             fetch(url)
               .then(response => response.json())
@@ -186,7 +180,6 @@ function main () {
           },
           function (response) {
             if (response.certificateChain) {
-              console.log(response.certificateChain);
               const localCert = response.certificateChain;
               if (localCert[0].issuer["b'O'"] === "b'ZeroSSL'") {
                 //check if we have saved data, else do nothing.
@@ -221,8 +214,6 @@ function main () {
                         );
                       }
                     } else {
-                      console.warn('Should visit base site first.');
-
                       chrome.runtime.sendMessage(
                         {
                           type: iMsgReqType.fetchCertificateChain,
@@ -285,7 +276,6 @@ function main () {
         return;
       }
       const siteData = websiteList[shortenedDomain];
-      console.warn(siteData);
       if (siteData) {
         const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
         const localTimeString = new Date(currentTimeInMs).toLocaleString(); // Convert to local date and time string
@@ -310,7 +300,6 @@ function main () {
             chrome.runtime.sendMessage(
               { type: iMsgReqType.fetchTestWebsites },
               function (response) {
-                console.log('checking');
                 if (response && response.websites) {
                   const testWebsites = response.websites;
                   if (testWebsites.includes(shortenedDomain)) {
@@ -445,7 +434,7 @@ function main () {
                     },
                     { text: 'Do not ask again for any website.' },
                     {
-                      text: 'Add to safe list',
+                      text: 'Add to protected list',
                       color: 'green',
                       callback: () => {
                         chrome.runtime.sendMessage({
@@ -496,7 +485,6 @@ function main () {
 }
 // Listener for messages
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.warn(request);
   if (request.action === 'removeBlocker') {
     removeBlocker();
   }

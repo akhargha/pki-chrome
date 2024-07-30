@@ -231,22 +231,37 @@ class App extends Component<object, AppState> {
                 if (filter === 'acct.ilogicalloanssavings.mobyphish.com') {
                   filter = urlObj.hostname.replace(/^www\./, '');
                   console.warn("Filter thing", filter);
-                }
-
-                fetchCertificateChain(filter).then(cert => {
-                  if (g.ilogicalloanssavings.realCert === false) {
-                    fetchCertificateChain("real.acct.ilogicalloanssavings.mobyphish.com").then(realCert => {
-                      chrome.storage.local.set({
-                        _pki_Test_Data: {
-                          ilogicalloanssavings: {
-                            realCert: realCert,
+                  fetchCertificateChain(filter).then(cert => {
+                    if (g.ilogicalloanssavings.realCert === false) {
+                      fetchCertificateChain("real.acct.ilogicalloanssavings.mobyphish.com").then(realCert => {
+                        chrome.storage.local.set({
+                          _pki_Test_Data: {
+                            ilogicalloanssavings: {
+                              realCert: realCert,
+                            },
                           },
-                        },
+                        });
+
+                        console.log("COMPARE", cert, cert, d.websiteList[shortenedDomain]);
+
+                        if (compareCertificateChains(cert, realCert)) {
+                          //does match do nothing
+                        } else {
+                          t.doShowCertChangedButton = true;
+                        }
+
+                        setter(t);
+
+                        sendUserActionInfo(user_id, 3);
+                        return;
                       });
+                      return; // exit out of process
+                    } else {
+                      const savedCertificateChain = g.ilogicalloanssavings.realCert;
 
-                      console.log("COMPARE", cert, cert, d.websiteList[shortenedDomain]);
+                      console.log("COMPARE", cert, savedCertificateChain, d.websiteList[shortenedDomain]);
 
-                      if (compareCertificateChains(cert, realCert)) {
+                      if (compareCertificateChains(cert, savedCertificateChain)) {
                         //does match do nothing
                       } else {
                         t.doShowCertChangedButton = true;
@@ -255,25 +270,13 @@ class App extends Component<object, AppState> {
                       setter(t);
 
                       sendUserActionInfo(user_id, 3);
-                      return;
-                    });
-                    return; // exit out of process
-                  } else {
-                    const savedCertificateChain = g.ilogicalloanssavings.realCert;
-
-                    console.log("COMPARE", cert, savedCertificateChain, d.websiteList[shortenedDomain]);
-
-                    if (compareCertificateChains(cert, savedCertificateChain)) {
-                      //does match do nothing
-                    } else {
-                      t.doShowCertChangedButton = true;
                     }
+                  });
+                } else {
+                  setter(t);
 
-                    setter(t);
-
-                    sendUserActionInfo(user_id, 3);
-                  }
-                });
+                  sendUserActionInfo(user_id, 3);
+                }
               } else {
                 setter(t);
 

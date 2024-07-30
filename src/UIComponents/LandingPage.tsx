@@ -240,7 +240,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                                 { websiteList: websiteList },
                                 function () {
                                   console.log(
-                                    'Current website marked as unsafe:',
+                                    'Current website marked as blocked:',
                                     currentSite,
                                   );
                                   // displayUnsafeSites()
@@ -303,7 +303,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     : 'none',
               }}
             >
-              You are safe!
+              You are protected!
             </h2>
             <h2
               className='subtitle'
@@ -316,7 +316,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     : 'none',
               }}
             >
-              You had previously marked this website as unsafe. Please proceed
+              You had previously marked this website as blocked. Please proceed
               carefully.
             </h2>
           </>
@@ -350,7 +350,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               style={{ textAlign: 'center', display: 'none' }}
             >
               We've temporarily unblocked this site. To permanently unblock it,
-              click the hamburger icon in the top right and edit unsafe sites.
+              click the hamburger icon in the top right and edit blocked sites.
               Only do so if you trust this site.
             </h3>
 
