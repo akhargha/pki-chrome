@@ -16,6 +16,7 @@ import {
   fetchCertificateChain,
   grabMainUrl,
 } from './utils/fetchUtils';
+import { AddPoints, SubtractPoints } from './utils/PointsUtil';
 
 const enum ViewState {
   Landing,
@@ -24,6 +25,7 @@ const enum ViewState {
 interface AppState {
   viewing: ViewState;
   pointsLocal: number;
+  group: number,
   user_id: string;
   websiteUrl: string;
   currentTabData: {
@@ -51,6 +53,7 @@ class App extends Component<object, AppState> {
       pointsLocal: 0,
       user_id: 'abcd',
       SHOULD_EXTENSION_BE_ACTIVE: true,
+      group: 0,
       websiteUrl: '',
       faviconImage: '',
       tabId: 0,
@@ -94,6 +97,11 @@ class App extends Component<object, AppState> {
               settings: { autoSearchEnabled: change.newValue },
             });
           }
+          if (key === "Points") {
+            this.setState({
+              pointsLocal: change.newValue
+            });
+          }
 
           //user info changed
           if (key === '_pki_userData') {
@@ -105,6 +113,7 @@ class App extends Component<object, AppState> {
                 change.newValue.TEST_ExtensionActive !== undefined
                   ? change.newValue.TEST_ExtensionActive
                   : true,
+              group: change.newValue.group
             });
             console.warn('Set state with new user data.');
           }
@@ -166,6 +175,23 @@ class App extends Component<object, AppState> {
 
           chrome.storage.local.get({ sessionList: {} }, function (items) {
             const sessionList = items.sessionList;
+            if (!sessionList[shortenedDomain]) {
+              chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
+                console.log("Our resp", response, response.clicked);
+                if (response && !response.clicked) {
+                  // document.getElementById(
+                  //   'points-feedback-click-when-blocked'
+                  // ).style.display = 'block';
+                  // pointsLocal -= 5; // deduct points for interacting with blocked site
+                  // chrome.storage.local.set({ points: pointsLocal }, function () {
+                  //   console.log(pointsLocal);
+                  // });
+                  console.log("what");
+                  AddPoints(); //TODO: feedback that user interacted with extension when it was blocked
+                  console.log("added points");
+                }
+              });
+            }
             sessionList[shortenedDomain] = true;
             chrome.storage.local.set({ sessionList: sessionList }, function () {
               console.log('Website added to session list', shortenedDomain);
@@ -174,24 +200,20 @@ class App extends Component<object, AppState> {
               }); //send message to unblock
             });
           });
+
         } else if (result === checkListReturn.Unsafe) {
-          // removeView()
-          // document.getElementById('site-blocked-text').style.display = 'block'
-          // document.getElementById('unblock-once').style.display = 'block'
-          // chrome.storage.local.get({ sessionList: {} }, function (items) {
-          //   const sessionList = items.sessionList
-          //   sessionList[webDomain] = true
-          //   chrome.storage.local.set({ sessionList: sessionList }, function () {
-          //     console.log('Website added to session list', webDomain)
-          //   })
-          // })
+          chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
+            if (response && response.clicked) {
+              SubtractPoints(); //TODO: feedback that user interacted with extension when it was blocked
+            }
+          });
         } else {
           console.log('Website not found in the list');
         }
 
-        chrome.storage.local.get('points', function (data) {
-          if (data.points) {
-            pointsLocal = data.points;
+        chrome.storage.local.get('Points', function (data) {
+          if (data.Points) {
+            pointsLocal = data.Points;
           }
           chrome.storage.local.get(
             {
@@ -199,6 +221,7 @@ class App extends Component<object, AppState> {
               _pki_userData: {
                 user_id: 'abcd',
                 TEST_ExtensionActive: true,
+                group: 0,
               },
               _pki_Test_Data: {
                 ilogicalloanssavings: {
@@ -216,6 +239,7 @@ class App extends Component<object, AppState> {
                 websiteUrl: payload.websiteUrl,
                 viewing: ViewState.Landing,
                 pointsLocal: pointsLocal,
+                group: g.group,
                 user_id: user_id,
                 tabId: payload.tabId,
 
@@ -310,20 +334,7 @@ class App extends Component<object, AppState> {
     });
 
     chrome.tabs.query({ active: true, currentWindow: true }, processActiveTab);
-    // reloadWebData()
-    //what is this
-    // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    //   chrome.tabs.sendMessage(
-    //     tabs[0].id,
-    //     { action: 'testing' },
-    //     function (response) {
-    //       console.log('T' + pointsLocal)
-    //       document.getElementById(
-    //         'points'
-    //       ).textContent = `Points: ${pointsLocal}`
-    //     }
-    //   )
-    // })
+
     const func = (items: { [key: string]: boolean; }) => {
       this.setState({
         settings: { autoSearchEnabled: items.autoSearchEnabled },
@@ -370,6 +381,8 @@ class App extends Component<object, AppState> {
                 }}
                 viewState={this.state.viewing}
                 settings={this.state.settings}
+                points={this.state.pointsLocal}
+                group={this.state.group}
               />
 
               <h2

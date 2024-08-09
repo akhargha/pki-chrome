@@ -1,32 +1,34 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
-import { Component } from 'react'
-import { animated, Spring, SpringValue } from 'react-spring'
-import { ExtensionSettings } from '../types/Settings'
+import { Component } from 'react';
+import { animated, Spring, SpringValue } from 'react-spring';
+import { ExtensionSettings } from '../types/Settings';
 interface NavbarProps {
-  toggleSensitiveSiteControls: () => void
-  viewState: 0 | 1
+  toggleSensitiveSiteControls: () => void;
+  viewState: 0 | 1;
 
-  settings: ExtensionSettings
+  settings: ExtensionSettings;
+  points: number;
+  group: number;
 }
 interface NavbarState {
-  burgerOpen: boolean
-  animationDone: boolean
+  burgerOpen: boolean;
+  animationDone: boolean;
 }
 class Navbar extends Component<NavbarProps, NavbarState> {
-  constructor (props: NavbarProps) {
-    super(props, {})
+  constructor(props: NavbarProps) {
+    super(props, {});
 
     // const props = useSpring({ opacity: 1, from: { opacity: 0 } })
     this.state = {
       burgerOpen: false,
 
       animationDone: true
-    }
+    };
   }
   handleAnimationRest = () => {
-    this.setState({ animationDone: true })
-  }
-  render () {
+    this.setState({ animationDone: true });
+  };
+  render() {
     return (
       <nav className='navbar' role='navigation' aria-label='main navigation'>
         <div className='navbar-brand' style={{ zIndex: 5, position: 'fixed' }}>
@@ -34,17 +36,19 @@ class Navbar extends Component<NavbarProps, NavbarState> {
             <span style={{ fontSize: '2em' }}>🐟</span>
             {/* <!-- <img src="/icons/shield-halved-solid.svg" width="40" height="28" /> --> */}
           </a>
-          <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
-            Points:
-          </h2>
           {/* <!--POINTS--> */}
+          {
+            this.props.group <= 1 ? (<h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
+              Points:{this.props.points}
+            </h2>) : undefined
+          }
+
           <img
             src='./icons/gear-solid.svg'
-            className={`navbar-burger burger ${
-              this.state.burgerOpen || !this.state.animationDone
-                ? 'is-active'
-                : ''
-            }`}
+            className={`navbar-burger burger ${this.state.burgerOpen || !this.state.animationDone
+              ? 'is-active'
+              : ''
+              }`}
             aria-label='menu'
             aria-expanded={
               this.state.burgerOpen || !this.state.animationDone
@@ -53,8 +57,8 @@ class Navbar extends Component<NavbarProps, NavbarState> {
             }
             data-target='navbarMenu'
             onClick={() => {
-              const original = this.state.burgerOpen
-              this.setState({ burgerOpen: !original, animationDone: false })
+              const original = this.state.burgerOpen;
+              this.setState({ burgerOpen: !original, animationDone: false });
             }}
             style={{
               marginLeft: '55%',
@@ -85,15 +89,14 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           }}
           onRest={this.handleAnimationRest}
         >
-          {(props: { transform: SpringValue<string> }) => (
+          {(props: { transform: SpringValue<string>; }) => (
             <animated.div
               style={{ ...props, zIndex: -1, position: 'fixed', top: '50px' }}
               id='navbarMenu'
-              className={`navbar-menu ${
-                this.state.burgerOpen || !this.state.animationDone
-                  ? 'is-active'
-                  : ''
-              }`}
+              className={`navbar-menu ${this.state.burgerOpen || !this.state.animationDone
+                ? 'is-active'
+                : ''
+                }`}
             >
               <div className='navbar-end'>
                 <div className='navbar-item'>
@@ -105,8 +108,8 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                         this.setState({
                           burgerOpen: false,
                           animationDone: false
-                        })
-                        this.props.toggleSensitiveSiteControls()
+                        });
+                        this.props.toggleSensitiveSiteControls();
                       }}
                     >
                       {this.props.viewState === 0 ? 'Edit site list' : 'BACK'}
@@ -121,11 +124,11 @@ class Navbar extends Component<NavbarProps, NavbarState> {
                         }
                         id='auto-search-checkbox'
                         onClick={() => {
-                          console.log('clicked')
+                          console.log('clicked');
                           chrome.storage.local.set({
                             autoSearchEnabled:
                               !this.props.settings.autoSearchEnabled
-                          })
+                          });
                         }}
                       />
                       Search for sensitive sites automatically
@@ -137,8 +140,8 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           )}
         </Spring>
       </nav>
-    )
+    );
   }
 }
 
-export default Navbar
+export default Navbar;

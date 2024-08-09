@@ -9,6 +9,7 @@ import {
 } from '../utils/PagesUtils';
 import { GitHubRelease, grabMainUrl } from '../utils/fetchUtils';
 import { ChromeCookie } from '../types/Cookies';
+import { SubtractPoints } from '../utils/PointsUtil';
 
 //CONTENT SCRIPTS ARE SCRIPTS RAN IN THE CONTEXT OF THE WEBPAGES. THEY ARE WHAT HAS ACCESS TO THE DOM AND ALL IT'S ELEMENTS
 const url = new URL(window.location.href);
@@ -19,6 +20,7 @@ let blockerClicked = false;
 
 let user_id = '123456';
 let isActive = true;
+let group = 0;
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   const cookies: ChromeCookie[] = c;
 
@@ -42,17 +44,54 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
         console.log('Found extension access. Enabled: ', isActive);
 
         break;
+      case 'long_term_group':
+        group = parseInt(cookie.value) ? parseInt(cookie.value) : 0;
+        break;
       default:
         break;
     }
   });
-
-  chrome.storage.local.set({
-    _pki_userData: {
-      user_id: user_id,
-      TEST_ExtensionActive: isActive,
-    },
-  });
+  if (user_id) {
+    chrome.storage.local.get(
+      {
+        _pki_userData: {
+          user_id: user_id,
+          TEST_ExtensionActive: isActive,
+          group: group,
+        },
+      },
+      d => {
+        const data = d._pki_userData;
+        //if user is diff from last user then reset points
+        if (data.user_id !== user_id) {
+          chrome.storage.local.set({
+            _pki_userData: {
+              user_id: user_id,
+              TEST_ExtensionActive: isActive,
+              group: group,
+            },
+            Points: 0,
+          });
+        } else {
+          chrome.storage.local.set({
+            _pki_userData: {
+              user_id: user_id,
+              TEST_ExtensionActive: isActive,
+              group: group,
+            },
+          });
+        }
+      },
+    );
+  } else {
+    chrome.storage.local.set({
+      _pki_userData: {
+        user_id: user_id,
+        TEST_ExtensionActive: isActive,
+        group: group,
+      },
+    });
+  }
   if (isActive) main();
 });
 
@@ -483,6 +522,78 @@ function main () {
     },
   );
 }
+
+//kind of lazy implementation but... oh well.
+const targetNode = document;
+
+// Options for the observer (which mutations to observe)
+const config = {
+  childList: true, // Observe direct children
+  subtree: true, // Observe all descendants
+  attributes: true, // Observe attribute changes
+  characterData: true, // Observe text content changes
+  //I hope logging this doesn't lag.
+};
+function doCheckPassFields (node: Document) {
+  const passwordFields = node.querySelectorAll(
+    'input[type="password"]:not([_pki_HasChecked="true"])',
+  );
+  console.log('OUR FIELDS:', passwordFields);
+  if (passwordFields.length > 0) {
+    // You can perform additional actions here, such as logging or alerting
+    console.log('OK WAIIIT');
+    for (const field in passwordFields) {
+      (field as unknown as Element).setAttribute('_pki_HasChecked', 'true');
+    }
+
+    main();
+    return true;
+  }
+
+  const inputs = node.getElementsByTagName('input');
+  for (const I in inputs) {
+    const input = I as unknown as HTMLInputElement;
+    if ((input as HTMLInputElement).type === 'password') {
+      const checked = input.getAttribute('_pki_HasChecked');
+      if (checked !== undefined) continue;
+      for (const I in inputs) {
+        // reloop through and set all of them to true, we only want to warn once for every detection.
+        const input = I as unknown as HTMLInputElement;
+        if ((input as HTMLInputElement).type === 'password') {
+          input.setAttribute('_pki_HasChecked', 'true');
+        }
+      }
+      main();
+      return true;
+    }
+  }
+  const iframes = node.querySelectorAll('iframe');
+  for (const d in iframes) {
+    const iframe = d as unknown as HTMLIFrameElement;
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (iframeDoc) {
+      const f = doCheckPassFields(iframeDoc);
+      if (f) return;
+    }
+  }
+}
+// Callback function to execute when mutations are observed
+const callback = function (mutationsList: any, observer: any) {
+  for (const mutation of mutationsList) {
+    // if (mutation.type === 'childList') {
+    //   console.log('A child node has been added or removed.');
+    // }
+  }
+  doCheckPassFields(document);
+};
+
+// Create an observer and start observing
+const observer = new MutationObserver(callback);
+observer.observe(targetNode, config);
+//because our updater doesn't work... reliably.
+setInterval(() => {
+  doCheckPassFields(document);
+}, 1000);
 // Listener for messages
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === 'removeBlocker') {
@@ -547,7 +658,7 @@ function compareObjects (
 }
 
 function addBlocker (
-  message = 'This site is blocked by the extension. Click on the extension to continue',
+  message = 'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
 ) {
   const find = document.getElementById('myBlockerDiv');
   if (find) {
