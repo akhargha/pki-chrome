@@ -9,7 +9,6 @@ import {
 } from '../utils/PagesUtils';
 import { GitHubRelease, grabMainUrl } from '../utils/fetchUtils';
 import { ChromeCookie } from '../types/Cookies';
-import { SubtractPoints } from '../utils/PointsUtil';
 
 //CONTENT SCRIPTS ARE SCRIPTS RAN IN THE CONTEXT OF THE WEBPAGES. THEY ARE WHAT HAS ACCESS TO THE DOM AND ALL IT'S ELEMENTS
 const url = new URL(window.location.href);
@@ -579,11 +578,6 @@ function doCheckPassFields (node: Document) {
 }
 // Callback function to execute when mutations are observed
 const callback = function (mutationsList: any, observer: any) {
-  for (const mutation of mutationsList) {
-    // if (mutation.type === 'childList') {
-    //   console.log('A child node has been added or removed.');
-    // }
-  }
   doCheckPassFields(document);
 };
 
