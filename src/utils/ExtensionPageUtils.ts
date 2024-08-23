@@ -105,7 +105,7 @@ export function localSendUserActionInfo (
       const sensitiveListComment =
         'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
       fetch(
-        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}/${points}`,
+        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}/?points=${points}`,
       )
         .catch(reason => {
           console.warn('Failed to upload data: ', reason);
