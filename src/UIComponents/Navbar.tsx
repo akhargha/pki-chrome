@@ -38,9 +38,9 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           </a>
           {/* <!--POINTS--> */}
           {
-            this.props.group <= 1 ? (<h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
+            <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
               Points:{this.props.points}
-            </h2>) : undefined
+            </h2>
           }
 
           <img
