@@ -93,8 +93,9 @@ export function localSendUserActionInfo (
   }
   if (event_number === 7) {
     // Special handling for event 7 - save sensitive site info
-    chrome.storage.local.get({ websiteList: {} }, function (items) {
+    chrome.storage.local.get({ websiteList: {}, Points: 0 }, function (items) {
       const websiteList = items.websiteList;
+      const points = items.Points;
       const sensitiveWebsites = [];
       for (const domain in websiteList) {
         if (websiteList[domain].isSensitive) {
@@ -104,7 +105,7 @@ export function localSendUserActionInfo (
       const sensitiveListComment =
         'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
       fetch(
-        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}`,
+        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}/${points}`,
       )
         .catch(reason => {
           console.warn('Failed to upload data: ', reason);
@@ -112,12 +113,16 @@ export function localSendUserActionInfo (
         .finally(() => {});
     });
   } else {
-    fetch(
-      `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${comment}`,
-    )
-      .catch(reason => {
-        console.warn('Failed to upload data: ', reason);
-      })
-      .finally(() => {});
+    chrome.storage.local.get({ points: 0 }, function (items) {
+      const points = items.points;
+
+      fetch(
+        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${comment}/${points}`,
+      )
+        .catch(reason => {
+          console.warn('Failed to upload data: ', reason);
+        })
+        .finally(() => {});
+    });
   }
 }
