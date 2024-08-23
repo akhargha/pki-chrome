@@ -16,7 +16,7 @@ import {
   fetchCertificateChain,
   grabMainUrl,
 } from './utils/fetchUtils';
-import { AddPoints, SubtractPoints } from './utils/PointsUtil';
+import { AddPoints } from './utils/PointsUtil';
 
 const enum ViewState {
   Landing,
@@ -186,7 +186,6 @@ class App extends Component<object, AppState> {
                   // chrome.storage.local.set({ points: pointsLocal }, function () {
                   //   console.log(pointsLocal);
                   // });
-                  console.log("what");
                   AddPoints(); //TODO: feedback that user interacted with extension when it was blocked
                   console.log("added points");
                 }
@@ -204,7 +203,13 @@ class App extends Component<object, AppState> {
         } else if (result === checkListReturn.Unsafe) {
           chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
             if (response && response.clicked) {
-              SubtractPoints(); //TODO: feedback that user interacted with extension when it was blocked
+              chrome.notifications.create({
+                // TODO: should we have this notification?
+                type: 'basic',
+                iconUrl: 'icon.png',
+                title: 'No points earned',
+                message: 'You did not interact with the extension while the site was blocked. No points were earned.',
+              });
             }
           });
         } else {
