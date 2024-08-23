@@ -61,7 +61,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 }}
               />
               We do <strong>not</strong> recognize this site. If you think you
-              are visiting a protected site, please recheck your source and
+              are visiting a Moby-protected site, please recheck your source and
               verify you are visiting the correct website.
             </p>
             <br />
@@ -161,13 +161,13 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   );
                 }}
               >
-                Save new protected site
+                Save new Moby-protected site
               </button>
             </div>
 
             <div className='block' id='report-phish-prompt-text'>
               <h3 className='subtitle' style={{ textAlign: 'center' }}>
-                If you thought this was one of your protected sites, choose that
+                If you thought this was one of your Moby-protected sites, choose that
                 site below:{' '}
               </h3>
             </div>
@@ -191,7 +191,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   }}
                 >
                   {/* Options will be dynamically added here */}
-                  <option>Select the Protected Site</option>
+                  <option>Select the Moby-protected Site</option>
                   {Object.keys(this.props.websiteData).map(key =>
                     this.props.websiteData[key].LogType ===
                       WebsiteListEntryLogType.PROTECTED ? (
@@ -285,7 +285,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
           id='not-marked-sensitive-proceed-caution'
           style={{ textAlign: 'center', display: 'none' }}
         >
-          This site has NOT been marked to be protected by you. Please proceed
+          This site has NOT been marked to be Moby-protected by you. Please proceed
           carefully and check your source
         </h2>
         {data ? (

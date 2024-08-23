@@ -9,13 +9,13 @@ export function sendUserActionInfo (
   const timestamp = Date.now();
 
   const eventComments = {
-    1: 'Interact with protected website without opening extension',
-    2: 'Open popup on protected site',
+    1: 'Interact with Moby-protected website without opening extension',
+    2: 'Open popup on Moby-protected site',
     3: 'Open popup',
-    4: 'Site saved as protected',
-    5: 'Site saved as protected after being saved as unsafe',
+    4: 'Site saved as Moby-protected',
+    5: 'Site saved as Moby-protected after being saved as unsafe',
     6: 'Site saved as unsafe',
-    8: 'Protected site removed',
+    8: 'Moby-protected site removed',
     9: 'Unsafe site removed',
     11: 'Site Unblocked Temporarily',
   };
@@ -71,13 +71,13 @@ export function localSendUserActionInfo (
   const timestamp = Date.now();
 
   const eventComments = {
-    1: 'Interact with protected website without opening extension',
-    2: 'Open popup on protected site',
+    1: 'Interact with Moby-protected website without opening extension',
+    2: 'Open popup on Moby-protected site',
     3: 'Open popup',
-    4: 'Site saved as protected',
-    5: 'Site saved as protected after being saved as unsafe',
+    4: 'Site saved as Moby-protected',
+    5: 'Site saved as Moby-protected after being saved as unsafe',
     6: 'Site saved as unsafe',
-    8: 'Protected site removed',
+    8: 'Moby-protected site removed',
     9: 'Unsafe site removed',
     11: 'Site Unblocked Temporarily',
   };

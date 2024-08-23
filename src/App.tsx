@@ -203,13 +203,7 @@ class App extends Component<object, AppState> {
         } else if (result === checkListReturn.Unsafe) {
           chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
             if (response && response.clicked) {
-              chrome.notifications.create({
-                // TODO: should we have this notification?
-                type: 'basic',
-                iconUrl: 'icon.png',
-                title: 'No points earned',
-                message: 'You did not interact with the extension while the site was blocked. No points were earned.',
-              });
+              // do nothing
             }
           });
         } else {
@@ -394,8 +388,8 @@ class App extends Component<object, AppState> {
                 id='points-feedback-click-when-blocked'
                 style={{ textAlign: 'center', display: 'none', color: 'red' }}
               >
-                Oh no! Your points were deducted. Click the extension before
-                accessing protected sites to shield against cyber threats!
+                Oh no! You did not earn any points. Click the extension before
+                accessing Moby-protected sites to shield against cyber threats!
               </h2>
 
               <h2
@@ -403,7 +397,7 @@ class App extends Component<object, AppState> {
                 style={{ textAlign: 'center', display: 'none', color: 'green' }}
               >
                 Great job! Your points increased. Clicking the extension before
-                accessing protected sites shields you against cyber threats!
+                accessing Moby-protected sites shields you against cyber threats!
               </h2>
 
               {/* <!--Top Bar--> */}

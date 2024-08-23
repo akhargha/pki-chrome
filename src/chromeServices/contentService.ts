@@ -242,7 +242,7 @@ function main () {
                       ) {
                         console.log('Certificate chain matches');
                         addBlocker(
-                          'You have marked this site to be protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
+                          'You have marked this site to be Moby-protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
                         );
                       } else {
                         console.log('Certificate chain does not match');
@@ -404,7 +404,7 @@ function main () {
                   ) {
                     console.log('Certificate chain matches');
                     addBlocker(
-                      'You have marked this site to be protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
+                      'You have marked this site to be Moby-protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
                     );
                   } else {
                     console.log('Certificate chain does not match');
@@ -472,7 +472,7 @@ function main () {
                     },
                     { text: 'Do not ask again for any website.' },
                     {
-                      text: 'Add to protected list',
+                      text: 'Add to Moby-protected list',
                       color: 'green',
                       callback: () => {
                         chrome.runtime.sendMessage({
@@ -704,7 +704,7 @@ function addBlocker (
     const timestamp = Date.now();
 
     const event = '1';
-    const comment = 'Interact with protected website without opening extension';
+    const comment = 'Interact with Moby-protected website without opening extension';
     chrome.runtime.sendMessage({
       type: iMsgReqType.sendUserActionInfo,
       user_id: user_id,
