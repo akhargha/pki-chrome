@@ -1,0 +1,67 @@
+name: Create Main Release
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.3.0'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          versionName="v$(date +'%Y%m%d%H%M%S')"
+          echo "TAG=${versionName}" >> $GITHUB_ENV
+
+      - name: Verify craco installation
+        run: |
+          ls -la node_modules/.bin
+          npm list @craco/craco
+          npx craco --version
+
+      - name: Run GITHUB_BUILD
+        run: node updater.js ${{ env.TAG }}-beta && npx craco build
+
+      - name: Bump version and create a tag
+        id: tag
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git checkout dev
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG }}-beta
+          release_name: React ${{ env.TAG }}-beta
+          draft: false
+          prerelease: true
+
+      - name: ZIP up everything
+        run: |
+          zip -r PKI_CHROME.zip build/
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./PKI_CHROME.zip
+          asset_name: PKI_CHROME.zip
+          asset_content_type: application/zip

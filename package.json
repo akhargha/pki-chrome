@@ -1,21 +1,58 @@
 {
-  "name": "pki-chrome",
-  "version": "1.0.0",
-  "main": "popup.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --mode development",
-    "build": "webpack --mode production",
-    "GITHUB_BUILD_DEV": "webpack --config webpack.GITHUB_DEV.js --mode production",
-    "GITHUB_BUILD_RELEASE": "webpack --config webpack.GITHUB_RELEASE.js --mode production"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "name": "pki-react",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "copy-webpack-plugin": "^12.0.2",
-    "webpack": "^5.92.0",
-    "webpack-cli": "^5.1.4"
+    "@craco/craco": "^5.9.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/chrome": "^0.0.268",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.100",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "cross-env": "^7.0.3",
+    "https": "^1.0.0",
+    "pretty": "^2.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "^5.0.1",
+    "react-spring": "^9.7.3",
+    "terser-webpack-plugin": "^5.3.10",
+    "tls": "^0.0.1",
+    "typescript": "^4.9.5",
+    "url": "^0.11.3",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
+    "eslint-config-prettier": "^9.1.0"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=development INLINE_RUNTIME_CHUNK=false node updater.js dev && craco start",
+    "dev": "cross-env  INLINE_RUNTIME_CHUNK=false node updater.js dev && craco build",
+    "build": "cross-env INLINE_RUNTIME_CHUNK=false node updater.js dev && craco build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
