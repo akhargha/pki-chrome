@@ -37,7 +37,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git checkout dev
+          git checkout main
           git tag $TAG
           git push origin $TAG
 
@@ -47,8 +47,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.TAG }}-beta
-          release_name: React ${{ env.TAG }}-beta
+          tag_name: ${{ env.TAG }}
+          release_name: React ${{ env.TAG }}
           draft: false
           prerelease: false
 
