@@ -33,3 +33,4 @@ dist/
 /dist
 /dist
 /GITHUB_DEV
+package-lock.json
