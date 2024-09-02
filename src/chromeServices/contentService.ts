@@ -548,7 +548,7 @@ function doCheckPassFields (node: Document) {
   }
 
   const inputs = node.getElementsByTagName('input');
-  for (const I in inputs) {
+  for (const I of inputs) {
     const input = I as unknown as HTMLInputElement;
     if ((input as HTMLInputElement).type === 'password') {
       const checked = input.getAttribute('_pki_HasChecked');
