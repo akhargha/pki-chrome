@@ -210,6 +210,22 @@ class App extends Component<object, AppState> {
           console.log('Website not found in the list');
         }
 
+        // trying to make it so that we dont get stuck in inactive session
+        chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+          if (changeInfo.status === 'complete') {
+            chrome.storage.local.get('_pki_userData', (data) => {
+              const userData = data._pki_userData;
+              const shouldBeActive = userData.TEST_ExtensionActive !== undefined
+                ? userData.TEST_ExtensionActive
+                : true;
+
+              this.setState({
+                SHOULD_EXTENSION_BE_ACTIVE: shouldBeActive,
+              });
+            });
+          }
+        });
+
         chrome.storage.local.get('Points', function (data) {
           if (data.Points) {
             pointsLocal = data.Points;

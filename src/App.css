@@ -96,3 +96,9 @@ body {
 .close-button:hover {
   background-color: darkgreen;
 }
+
+
+#_pkiPopupCheckbox1, #_pkiPopupCheckbox2 {
+  display: inline-block;
+  margin-right: 10px;
+}
