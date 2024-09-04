@@ -453,11 +453,16 @@ function main () {
             'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
           );
         }
-      } else if (!ignoreList.includes(shortenedDomain) || shortenedDomain.includes('mobyphish')) {
+      } else if (!ignoreList.includes(shortenedDomain)) {
           //check for password fields for unsaved sites
           chrome.storage.local.get(
             { autoSearchEnabled: true },
             function (settings) {
+              const currentUrl = window.location.href.toLowerCase();
+              if (currentUrl.includes('mobyphish')) {
+                // we don't want the dialog to pop up if the website has mobyphish.com
+                return;
+              }
               if (settings.autoSearchEnabled) {
                 const passwordFields = document.querySelectorAll(
                   'input[type="password"]',
