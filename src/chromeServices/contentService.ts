@@ -94,7 +94,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   if (isActive) main();
 });
 
-function main () {
+function main() {
   if (!isActive) {
     //if extension shouldn't be used... don't do anything.
     return;
@@ -454,73 +454,73 @@ function main () {
           );
         }
       } else if (!ignoreList.includes(shortenedDomain)) {
-          //check for password fields for unsaved sites
-          chrome.storage.local.get(
-            { autoSearchEnabled: true },
-            function (settings) {
-              const currentUrl = window.location.href.toLowerCase();
-              if (currentUrl.includes('mobyphish')) {
-                // we don't want the dialog to pop up if the website has mobyphish.com
-                return;
-              }
-              if (settings.autoSearchEnabled) {
-                const passwordFields = document.querySelectorAll(
-                  'input[type="password"]',
-                );
-                if (passwordFields.length > 0) {
-                  customAlert3Prompts(
-                    'MobyPhish Info',
-                    'Moby thinks this page contains password fields, so it recommends to protect it.',
-                    {
-                      text: 'Do not ask again for this website.',
+        //check for password fields for unsaved sites
+        chrome.storage.local.get(
+          { autoSearchEnabled: true },
+          function (settings) {
+            const currentUrl = window.location.href.toLowerCase();
+            if (currentUrl.includes('mobyphish')) {
+              // we don't want the dialog to pop up if the website has mobyphish.com
+              return;
+            }
+            if (settings.autoSearchEnabled) {
+              const passwordFields = document.querySelectorAll(
+                'input[type="password"]',
+              );
+              if (passwordFields.length > 0) {
+                customAlert3Prompts(
+                  'MobyPhish Info',
+                  'Moby thinks this page contains password fields, so it recommends to protect it.',
+                  {
+                    text: 'Do not ask again for this website.',
+                  },
+                  { text: 'Do not ask again for any website.' },
+                  {
+                    text: 'Add to Moby-protected list',
+                    color: 'green',
+                    callback: () => {
+                      chrome.runtime.sendMessage({
+                        type: iMsgReqType.frontEndRequestUserSaveSite,
+                        webDomain: shortenedDomain,
+                      });
                     },
-                    { text: 'Do not ask again for any website.' },
-                    {
-                      text: 'Add to Moby-protected list',
-                      color: 'green',
-                      callback: () => {
-                        chrome.runtime.sendMessage({
-                          type: iMsgReqType.frontEndRequestUserSaveSite,
-                          webDomain: shortenedDomain,
+                  },
+                  {
+                    text: 'Close',
+                    color: 'red',
+                    callback: () => {
+                      //Do not ask again for this website.
+                      const check1 = document.getElementById(
+                        '_pkiPopupCheckbox1',
+                      ) as HTMLInputElement;
+
+                      //DO NOT ASK AGAIN FOR ANY WEBSITE
+                      const check2 = document.getElementById(
+                        '_pkiPopupCheckbox2',
+                      ) as HTMLInputElement;
+
+                      //we add this to our saved list(?)
+                      if (check1.checked) {
+                        chrome.storage.local.get({ ignoreList: [] }, data => {
+                          const ignoreList: string[] = data.ignoreList;
+                          ignoreList.push(shortenedDomain);
+                          chrome.storage.local.set({ ignoreList });
                         });
-                      },
+                      }
+                      if (check2.checked) {
+                        // set autosearch to off.
+                        chrome.storage.local.set({
+                          autoSearchEnabled: false,
+                        });
+                      }
                     },
-                    {
-                      text: 'Close',
-                      color: 'red',
-                      callback: () => {
-                        //Do not ask again for this website.
-                        const check1 = document.getElementById(
-                          '_pkiPopupCheckbox1',
-                        ) as HTMLInputElement;
-
-                        //DO NOT ASK AGAIN FOR ANY WEBSITE
-                        const check2 = document.getElementById(
-                          '_pkiPopupCheckbox2',
-                        ) as HTMLInputElement;
-
-                        //we add this to our saved list(?)
-                        if (check1.checked) {
-                          chrome.storage.local.get({ ignoreList: [] }, data => {
-                            const ignoreList: string[] = data.ignoreList;
-                            ignoreList.push(shortenedDomain);
-                            chrome.storage.local.set({ ignoreList });
-                          });
-                        }
-                        if (check2.checked) {
-                          // set autosearch to off.
-                          chrome.storage.local.set({
-                            autoSearchEnabled: false,
-                          });
-                        }
-                      },
-                    },
-                  );
-                }
+                  },
+                );
               }
-            },
-          );
-        }
+            }
+          },
+        );
+      }
     },
   );
 }
@@ -536,7 +536,7 @@ const config = {
   characterData: true, // Observe text content changes
   //I hope logging this doesn't lag.
 };
-function doCheckPassFields (node: Document) {
+function doCheckPassFields(node: Document) {
   const passwordFields = node.querySelectorAll(
     'input[type="password"]:not([_pki_HasChecked="true"])',
   );
@@ -605,7 +605,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-function compareCertificateChains (
+function compareCertificateChains(
   chain1: { [x: string]: any },
   chain2: { [x: string]: any },
 ) {
@@ -634,7 +634,7 @@ function compareCertificateChains (
   return true;
 }
 
-function compareObjects (
+function compareObjects(
   obj1: { [x: string]: any },
   obj2: { [x: string]: any },
 ) {
@@ -654,7 +654,7 @@ function compareObjects (
   return true;
 }
 
-function addBlocker (
+function addBlocker(
   message = 'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
 ) {
   const find = document.getElementById('myBlockerDiv');
@@ -719,7 +719,7 @@ function addBlocker (
   // }
 }
 
-function removeBlocker () {
+function removeBlocker() {
   console.log('ok remove');
   const blockerDiv = document.getElementById('myBlockerDiv');
   if (blockerDiv) {

@@ -3,9 +3,7 @@ export function AddPoints() {
     const userData = data._pki_userData;
     const currentPoints = data.Points || 0;
 
-    if (userData.group === 2 || userData.group === 3) {
-      chrome.storage.local.set({ Points: -1 });
-    } else {
+    if (userData.group === 1) {
       chrome.storage.local.set({ Points: currentPoints + 1 });
     }
   });
