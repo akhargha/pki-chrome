@@ -1,66 +1,46 @@
+# Getting Started with Create React App
 
-# pki-chrome
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## General Users
+## Available Scripts
 
-For general users, getting the latest version is simple.
+In the project directory, you can run:
 
-Simply navigate to the [releases](https://github.com/akhargha/pki-chrome/releases) tab.
+### `npm start`
 
-Then, just grab the latest release with the label `Latest`.
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-![image](./docs/relexample.png)
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-Download the zip file and extract it. Then open the folder.
+### `npm test`
 
-You should find another folder, that folder is the one you want to use when installing the extension. If you are using Safari, it may open this folder for you by default. This folder contains all the extension contents, such as the manifest file.
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-The contents of the folder should look like this.
+### `npm run build`
 
-![image](./docs/folderexample.png)
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-Load this folder when installing your extension into the relevant browser.
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-For instructions on how to install the extension, go [here](#loading-the-extension)
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## For Testers
+### `npm run eject`
 
-For testers, getting the latest version is simple.
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-Simply navigate to the [releases](https://github.com/akhargha/pki-chrome/releases) tab.
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-If you want the latest in development version, look for the latest release with the `Pre-release` label.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-![image](./docs/prerelexample.png)
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-The rest of the installation is the same as stated above in [General Users](#general-users)
+## Learn More
 
-## BUILDING
-### Requirements
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-Since this is a javascript project, you'll need node.js installed. 
-
-This is essential to running webpack, which will compile the extension.
-
-You can find nodejs at [this link](https://nodejs.org/en). 
-
-I recommend installing the latest version, which at the time of writing is `Node.js v20.14.0`
-
-### Installing
-
-After cloning the github repo to your respective folder, and installing Node.js, you first want to install all the necessary modules.
-
-You may do this by calling `npm install` in your the base directory.
-
-After that, compiling the program is as simple as running `npm run build` to build a production version of the extension.
-
-**developers may want to build the dev version instead using `npm run dev`!**
-
-You should be all set after that.
-
-### Loading the Extension
-
-Go to 'Extension' in Chrome-
-![Screenshot 2024-05-22 at 7 48 54 AM](https://github.com/akhargha/pki-chrome/assets/118499953/70add5d8-d1ca-4e07-907f-a6a9dd850e68)
-
-Finally, select the `dist` directory (or whatever directory your manifest is in) as your target folder.
+To learn React, check out the [React documentation](https://reactjs.org/).
