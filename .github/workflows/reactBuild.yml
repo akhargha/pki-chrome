@@ -3,7 +3,7 @@ name: Create Main Release
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   release:
@@ -30,14 +30,14 @@ jobs:
           npx craco --version
 
       - name: Run GITHUB_BUILD
-        run: node updater.js ${{ env.TAG }}-beta && npx craco build
+        run: node updater.js ${{ env.TAG }} && npx craco build
 
       - name: Bump version and create a tag
         id: tag
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-          git checkout dev
+          git checkout main
           git tag $TAG
           git push origin $TAG
 
@@ -47,10 +47,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.TAG }}-beta
-          release_name: React ${{ env.TAG }}-beta
+          tag_name: ${{ env.TAG }}
+          release_name: React ${{ env.TAG }}
           draft: false
-          prerelease: true
+          prerelease: false
 
       - name: ZIP up everything
         run: |

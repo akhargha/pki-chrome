@@ -120,8 +120,9 @@ export function customAlert3Prompts (
   const checkboxContainer = document.createElement('div')
   checkboxContainer.style.marginBottom = '20px'
   checkboxContainer.style.display = 'flex'
-  checkboxContainer.style.flexDirection = 'column'
+  checkboxContainer.style.flexDirection = 'row'
   checkboxContainer.style.alignItems = 'flex-start'
+  checkboxContainer.style.justifyContent = 'center'
   checkboxContainer.append(d)
   checkboxContainer.append(d2)
 

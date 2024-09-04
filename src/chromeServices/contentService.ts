@@ -453,8 +453,7 @@ function main () {
             'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
           );
         }
-      } else {
-        if (!ignoreList.includes(shortenedDomain)) {
+      } else if (!ignoreList.includes(shortenedDomain) || shortenedDomain.includes('mobyphish')) {
           //check for password fields for unsaved sites
           chrome.storage.local.get(
             { autoSearchEnabled: true },
@@ -517,7 +516,6 @@ function main () {
             },
           );
         }
-      }
     },
   );
 }
@@ -541,7 +539,7 @@ function doCheckPassFields (node: Document) {
   if (passwordFields.length > 0) {
     // You can perform additional actions here, such as logging or alerting
     console.log('OK WAIIIT');
-    for (const field in passwordFields) {
+    for (const field of passwordFields) {
       (field as unknown as Element).setAttribute('_pki_HasChecked', 'true');
     }
 
@@ -550,12 +548,12 @@ function doCheckPassFields (node: Document) {
   }
 
   const inputs = node.getElementsByTagName('input');
-  for (const I in inputs) {
+  for (const I of inputs) {
     const input = I as unknown as HTMLInputElement;
     if ((input as HTMLInputElement).type === 'password') {
       const checked = input.getAttribute('_pki_HasChecked');
       if (checked !== undefined) continue;
-      for (const I in inputs) {
+      for (const I of inputs) {
         // reloop through and set all of them to true, we only want to warn once for every detection.
         const input = I as unknown as HTMLInputElement;
         if ((input as HTMLInputElement).type === 'password') {
