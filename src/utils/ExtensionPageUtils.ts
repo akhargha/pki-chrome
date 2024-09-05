@@ -69,7 +69,7 @@ export function sendUserActionInfo(
       comment = `Reported phishing on site ${reportedSite} by ${currentSite}`;
     }
 
-    let points = group ? -1 : 0;
+    const points = group ? -1 : 0;
 
     if (event_number === 7) {
       chrome.storage.local.get({ websiteList: {} }, function (items) {
@@ -132,7 +132,7 @@ export function localSendUserActionInfo(
       comment = `Reported phishing on site ${reportedSite} by ${currentSite}`;
     }
 
-    let points = group ? -1 : 0;
+    const points = group ? -1 : 0;
 
     if (event_number === 7) {
       // Special handling for event 7 - save sensitive site info
