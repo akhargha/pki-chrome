@@ -1,11 +1,8 @@
 import { iMsgReqType } from '../types/MessageTypes';
 import { ChromeCookie } from '../types/Cookies';
-import { grabMainUrl } from '../utils/fetchUtils';
 
 function fetchAndHandleCookies(callback: (user_id: string, isActive: boolean, group: number) => void) {
   const url = new URL(window.location.href);
-  const webDomain = url.hostname;
-  const shortenedDomain = grabMainUrl(url);
 
   let user_id = '123456';
   let isActive = true;
