@@ -39,7 +39,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
         break;
       case 'use_extension':
         //convert to boolean, is string.
-        isActive = cookie.value === 'True' ? true : false;
+        isActive = cookie.value === 'False' ? false : true;
         console.log('Found extension access. Enabled: ', isActive);
 
         break;

@@ -97,7 +97,7 @@ export function localSendUserActionInfo(
   }
 
   chrome.cookies.get({ url: 'https://extension.mobyphish.com', name: 'user_category' }, function (cookie) {
-    const points = cookie && cookie.value === 'long_term' ? -1 : 0;
+    const points = cookie && cookie.value === 'long_term' ? 0 : -1;
 
     if (event_number === 7) {
       // Special handling for event 7 - save sensitive site info
