@@ -7,7 +7,7 @@ import { SiteListingButton } from './SiteListingButton';
 import { iMsgReq, iMsgReqType } from '../types/MessageTypes';
 import { MoreSiteInfo } from './MoreSiteInfo';
 import { Spring, SpringValue, animated } from 'react-spring';
-import { fetchCertificateChain, grabMainUrl } from '../utils/fetchUtils';
+import { fetchCertificateChain, grabMainUrl, sendWebsitesToDatabase } from '../utils/fetchUtils';
 import { localSendUserActionInfo } from '../utils/ExtensionPageUtils';
 
 interface SensitiveSiteControlsProps {
@@ -198,6 +198,7 @@ class SensitiveSiteControls extends Component<
 
                           localSendUserActionInfo(userid, 4);
                           localSendUserActionInfo(userid, 7);
+                          sendWebsitesToDatabase([webDomain]);
                         },
                       );
                     }}

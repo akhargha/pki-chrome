@@ -1,6 +1,6 @@
 import { URL } from 'url';
 
-export function fetchCertificateChain (webDomain: string) {
+export function fetchCertificateChain(webDomain: string) {
   // Remove "www." from the beginning of the domain
   const shortenedDomain = webDomain.replace(/^www\./, '');
   console.log(
@@ -22,7 +22,7 @@ export function fetchCertificateChain (webDomain: string) {
       throw new Error('Failed to fetch certificate chain');
     });
 }
-export function compareCertificateChains (
+export function compareCertificateChains(
   chain1: { [x: string]: any },
   chain2: { [x: string]: any },
 ) {
@@ -51,7 +51,7 @@ export function compareCertificateChains (
   return true;
 }
 
-export function compareObjects (
+export function compareObjects(
   obj1: { [x: string]: any },
   obj2: { [x: string]: any },
 ) {
@@ -70,7 +70,28 @@ export function compareObjects (
 
   return true;
 }
-export function fetchTestWebsites () {
+
+export function sendWebsitesToDatabase(websites: any[]) {
+  const apiUrl = 'https://extension.mobyphish.com/websites'; // todo - what is field called
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  return fetch(apiUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(websites),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Websites sent to database:', data);
+    })
+    .catch(error => {
+      console.error('Error sending websites to database:', error);
+    });
+}
+
+export function fetchTestWebsites() {
   return fetch(`https://extension.mobyphish.com/websites`)
     .then(response => response.json())
     .then(data => {
@@ -81,7 +102,7 @@ export function fetchTestWebsites () {
     });
 }
 
-export function grabMainUrl (urlObj: URL) {
+export function grabMainUrl(urlObj: URL) {
   // List of common second-level domains for country code and US TLDs
   const secondLevelDomains = new Set([
     'ac.uk',
