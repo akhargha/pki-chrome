@@ -166,7 +166,6 @@ class App extends Component<object, AppState> {
       payload.tabId = tabId as number;
       payload.faviconImage = favicon ? favicon : '';
       checkList(shortenedDomain).then(result => {
-        console.warn(result);
         if (result === checkListReturn.Safe) {
           // removeView()
           // document.getElementById('all-set').style.display = 'block'

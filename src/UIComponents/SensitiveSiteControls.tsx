@@ -125,7 +125,8 @@ class SensitiveSiteControls extends Component<
                     onBlur={event => {
                       let s = event.target.value;
                       if (!s.startsWith("http")) {
-                        s = "https" + s;
+                        console.log(s);
+                        s = "https://" + s;
                         const url = new URL(s);
                         const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
 
