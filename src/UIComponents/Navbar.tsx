@@ -13,6 +13,7 @@ interface NavbarProps {
 interface NavbarState {
   burgerOpen: boolean;
   animationDone: boolean;
+  points: number | null;
 }
 class Navbar extends Component<NavbarProps, NavbarState> {
   constructor(props: NavbarProps) {
@@ -21,10 +22,19 @@ class Navbar extends Component<NavbarProps, NavbarState> {
     // const props = useSpring({ opacity: 1, from: { opacity: 0 } })
     this.state = {
       burgerOpen: false,
-
-      animationDone: true
+      animationDone: true,
+      points: null
     };
   }
+  componentDidMount() {
+    chrome.storage.local.get({ _pki_userData: { group: null } }, (data) => {
+      const group = data._pki_userData.group;
+      const points = group === 1 ? 0 : -1;
+      console.log('points', points);
+      this.setState({ points });
+    });
+  }
+
   handleAnimationRest = () => {
     this.setState({ animationDone: true });
   };
@@ -38,9 +48,13 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           </a>
           {/* <!--POINTS--> */}
           {
-            this.props.points !== -1 && (
+            this.state.points !== -1 ? (
               <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
-                Points:{this.props.points}
+                Points: <span>{this.state.points}</span>
+              </h2>
+            ) : (
+              <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
+                Points: <span>N/A</span>
               </h2>
             )
           }
