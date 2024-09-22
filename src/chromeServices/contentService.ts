@@ -58,14 +58,12 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
           TEST_ExtensionActive: isActive,
           group: group,
         },
-        long_term: false,
-        long_term_group: null,
       },
       d => {
         const data = d._pki_userData;
         //if user is diff from last user then reset points
         if (data.user_id !== user_id) {
-          if (d.long_term && d.long_term_group === 1) {
+          if (d.group === 1) {
             chrome.storage.local.set({
               _pki_userData: {
                 user_id: user_id,

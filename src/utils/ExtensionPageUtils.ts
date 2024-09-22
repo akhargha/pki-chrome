@@ -40,31 +40,37 @@ export function sendUserActionInfo(
   }
 
   chrome.cookies.get({ url: 'https://extension.mobyphish.com', name: 'user_category' }, function (cookie) {
-    const points = cookie && cookie.value === 'long_term' ? 0 : -1;
-    if (event_number === 7) {
-      // Special handling for event 7 - save sensitive site info
-      chrome.storage.local.get({ websiteList: {} }, function (items) {
-        const websiteList = items.websiteList;
-        const sensitiveWebsites = [];
-        for (const domain in websiteList) {
-          if (websiteList[domain].isSensitive) {
-            sensitiveWebsites.push(domain);
-          }
-        }
-        const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
+    // Retrieve the group value from chrome.storage.local
+    chrome.storage.local.get({ _pki_userData: { group: null } }, function (data) {
+      const group = data._pki_userData.group;
+      const points = (group === 1) ? 0 : -1; // Set points based on group
+      console.log('points', points);
 
-        chrome.runtime.sendMessage({
-          type: iMsgReqType.sendUserActionInfo,
-          user_id: user_id,
-          timestamp: timestamp,
-          event: event_number,
-          comment: sensitiveListComment,
-          points: points,
+      if (event_number === 7) {
+        // Special handling for event 7 - save sensitive site info
+        chrome.storage.local.get({ websiteList: {} }, function (items) {
+          const websiteList = items.websiteList;
+          const sensitiveWebsites = [];
+          for (const domain in websiteList) {
+            if (websiteList[domain].isSensitive) {
+              sensitiveWebsites.push(domain);
+            }
+          }
+          const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
+
+          chrome.runtime.sendMessage({
+            type: iMsgReqType.sendUserActionInfo,
+            user_id: user_id,
+            timestamp: timestamp,
+            event: event_number,
+            comment: sensitiveListComment,
+            points: points, // Send points based on group
+          });
         });
-      });
-    } else {
-      sendMessage(points);
-    }
+      } else {
+        sendMessage(points); // Send points based on group
+      }
+    });
   });
 }
 
