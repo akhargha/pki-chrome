@@ -127,12 +127,15 @@ class SensitiveSiteControls extends Component<
                       if (!s.startsWith("http")) {
                         console.log(s);
                         s = "https://" + s;
+                      }
+                      try {
                         const url = new URL(s);
-                        const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
-
+                        const shortenedDomain = grabMainUrl(url);
                         this.setState({
                           sensitiveInput: shortenedDomain,
                         });
+                      } catch (error) {
+                        alert("Invalid URL: " + s);
                       }
 
                     }}
