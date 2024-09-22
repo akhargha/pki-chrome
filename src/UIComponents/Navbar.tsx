@@ -38,7 +38,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           </a>
           {/* <!--POINTS--> */}
           {
-            this.props.points != -1 && (
+            this.props.points !== -1 && (
               <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
                 Points:{this.props.points}
               </h2>
