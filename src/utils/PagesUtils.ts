@@ -1,4 +1,4 @@
-export function customAlert3Prompts (
+export function customAlert3Prompts(
   title: string | null,
   text: string | null,
   checkbox1Data: {
@@ -43,20 +43,21 @@ export function customAlert3Prompts (
 
   // Create modal
   const modal = document.createElement('div')
-  modal.style.position = 'fixed'
-  modal.style.top = '50%'
-  modal.style.left = '50%'
-  modal.style.transform = 'translate(-50%, -50%)'
-  modal.style.backgroundColor = 'white'
-  modal.style.padding = '40px'
-  modal.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.5)'
-  modal.style.zIndex = '1000'
-  modal.style.textAlign = 'center'
-  modal.style.opacity = '0'
-  modal.style.transition = 'opacity 0.5s, transform 0.5s'
-  modal.style.transform = 'translate(-50%, -60%)'
-  modal.style.borderRadius = '15px'
-  modal.style.width = '50%'
+  modal.style.cssText = `
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -60%) !important;
+  background-color: white !important;
+  padding: 40px !important;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5) !important;
+  z-index: 1000 !important;
+  text-align: center !important;
+  opacity: 0 !important;
+  transition: opacity 0.5s, transform 0.5s !important;
+  border-radius: 15px !important;
+  width: 50% !important;
+`
   modal.id = '_pkiPopup'
   document.body.appendChild(modal)
 
@@ -75,16 +76,24 @@ export function customAlert3Prompts (
   // Add title to modal
   const modalTitle = document.createElement('h2')
   modalTitle.textContent = title
-  modalTitle.style.color = 'black'
-  modalTitle.style.marginBottom = '10px'
+  modalTitle.style.cssText = `
+  color: black !important;
+  margin-bottom: 10px !important;`
+  // modalTitle.style.color = 'black'
+  // modalTitle.style.marginBottom = '10px'
   modal.appendChild(modalTitle)
 
   // Add text to modal
   const modalText = document.createElement('p')
   modalText.textContent = text
-  modalText.style.color = 'black'
-  modalText.style.fontSize = '18px'
-  modalText.style.marginBottom = '20px'
+  modalText.style.cssText = `
+    color: black !important;
+    font-size: 18px !important;
+    margin-bottom: 20px !important;
+  `
+  // modalText.style.color = 'black'
+  // modalText.style.fontSize = '18px'
+  // modalText.style.marginBottom = '20px'
   modal.appendChild(modalText)
 
   // Add checkboxes to modal
@@ -98,9 +107,16 @@ export function customAlert3Prompts (
   const label1 = document.createElement('label')
   label1.htmlFor = '_pkiPopupCheckbox1'
   label1.textContent = checkbox1Data.text
-  label1.style.color = 'black'
-  label1.style.marginRight = '10px'
-  label1.style.flexBasis = '50%'
+  label1.style.cssText = `
+    flex-basis: 50% !important;
+    color: black !important;
+    margin-right: 10px !important;
+    visibility: inherit !important;
+  `
+  // label1.style.color = 'black'
+  // label1.style.marginRight = '10px'
+  // label1.style.flexBasis = '50%'
+  // label1.style.visibility = 'inherit'
   d.appendChild(checkbox1)
   d.appendChild(label1)
 
@@ -110,19 +126,31 @@ export function customAlert3Prompts (
   checkbox2.id = '_pkiPopupCheckbox2'
   checkbox2.style.flexBasis = '50%'
   const label2 = document.createElement('label')
-  label2.style.color = 'black'
   label2.htmlFor = '_pkiPopupCheckbox2'
   label2.textContent = checkbox2Data.text
-  label2.style.flexBasis = '50%'
+  label2.style.cssText = `
+    flex-basis: 50% !important;
+    color: black !important;
+    visibility: inherit !important;
+  `
+  // label2.style.color = 'black'
+  // label2.style.flexBasis = '50%'
+  // label2.style.visibility = 'inherit'
   d2.appendChild(checkbox2)
   d2.appendChild(label2)
-
   const checkboxContainer = document.createElement('div')
-  checkboxContainer.style.marginBottom = '20px'
-  checkboxContainer.style.display = 'flex'
-  checkboxContainer.style.flexDirection = 'row'
-  checkboxContainer.style.alignItems = 'flex-start'
-  checkboxContainer.style.justifyContent = 'center'
+  checkboxContainer.style.cssText = `
+    margin-bottom: 20px !important;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+  `
+  // checkboxContainer.style.marginBottom = '20px'
+  // checkboxContainer.style.display = 'flex'
+  // checkboxContainer.style.flexDirection = 'row'
+  // checkboxContainer.style.alignItems = 'flex-start'
+  // checkboxContainer.style.justifyContent = 'center'
   checkboxContainer.append(d)
   checkboxContainer.append(d2)
 
@@ -174,7 +202,7 @@ export function customAlert3Prompts (
   )
 }
 
-export function customAlertUpdatePrompt (
+export function customAlertUpdatePrompt(
   title: string | null,
   text: string | null,
   // checkbox1Data: {
@@ -310,7 +338,7 @@ export function customAlertUpdatePrompt (
 }
 
 // Function to darken color on hover
-function shadeColor (color: string, percent: number) {
+function shadeColor(color: string, percent: number) {
   const num = parseInt(color.replace('#', ''), 16),
     amt = Math.round(2.55 * percent),
     R = (num >> 16) + amt,
