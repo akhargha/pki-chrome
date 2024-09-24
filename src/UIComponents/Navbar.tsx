@@ -54,6 +54,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
       const userData = data._pki_userData || {};
       const group = userData.group !== undefined ? userData.group : this.state.group;
       const points = group === 1 ? (data.Points || 0) : -1;
+      console.log("data points: ", points, "group: ", group)
       this.setState({ points, group });
     });
   };

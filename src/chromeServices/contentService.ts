@@ -63,7 +63,9 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
         const data = d._pki_userData;
         //if user is diff from last user then reset points
         if (data.user_id !== user_id) {
-          if (d.group === 1) {
+          console.log('Resetting points for different user', group, user_id);
+          if (group === 1) {
+            console.log("first case")
             chrome.storage.local.set({
               _pki_userData: {
                 user_id: user_id,
@@ -73,6 +75,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
               Points: 0,
             });
           } else {
+            console.log("second case")
             chrome.storage.local.set({
               _pki_userData: {
                 user_id: user_id,
@@ -83,17 +86,20 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
             });
           }
         } else {
+          console.log("third case")
           chrome.storage.local.set({
             _pki_userData: {
               user_id: user_id,
               TEST_ExtensionActive: isActive,
               group: group,
             },
+            Points: 0,
           });
         }
       },
     );
   } else {
+    console.log('No user_id cookie found, disabling extension');
     chrome.storage.local.set({
       _pki_userData: {
         user_id: user_id,
