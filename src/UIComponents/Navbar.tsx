@@ -13,7 +13,8 @@ interface NavbarProps {
 interface NavbarState {
   burgerOpen: boolean;
   animationDone: boolean;
-  points: number | null;
+  points: number;
+  group: number;
 }
 class Navbar extends Component<NavbarProps, NavbarState> {
   constructor(props: NavbarProps) {
@@ -23,21 +24,39 @@ class Navbar extends Component<NavbarProps, NavbarState> {
     this.state = {
       burgerOpen: false,
       animationDone: true,
-      points: this.props.points === -1 ? null : this.props.points,
+      points: props.points,
+      group: props.group
     };
   }
   componentDidMount() {
-    if (this.props.points === -1) {
-      chrome.storage.local.get({ _pki_userData: { group: null } }, (data) => {
-        const group = data._pki_userData.group;
-        const points = group === 1 ? 0 : -1;
-        console.log('points from storage', points);
-        this.setState({ points });
-      });
-    } else {
-      this.setState({ points: this.props.points });
-    }
+    this.updatePointsFromStorage();
+    chrome.storage.onChanged.addListener(this.handleStorageChange);
   }
+
+  componentWillUnmount() {
+    chrome.storage.onChanged.removeListener(this.handleStorageChange);
+  }
+
+  handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
+    if (areaName === 'local' && changes.Points) {
+      this.setState({ points: changes.Points.newValue });
+    }
+    if (areaName === 'local' && changes._pki_userData) {
+      const newUserData = changes._pki_userData.newValue;
+      if (newUserData && newUserData.group !== undefined) {
+        this.setState({ group: newUserData.group });
+      }
+    }
+  };
+
+  updatePointsFromStorage = () => {
+    chrome.storage.local.get(['_pki_userData', 'Points'], (data) => {
+      const userData = data._pki_userData || {};
+      const group = userData.group !== undefined ? userData.group : this.state.group;
+      const points = group === 1 ? (data.Points || 0) : -1;
+      this.setState({ points, group });
+    });
+  };
 
   handleAnimationRest = () => {
     this.setState({ animationDone: true });
