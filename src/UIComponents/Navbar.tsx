@@ -73,13 +73,13 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           {/* <!--POINTS--> */}
           {
             this.state.points !== -1 ? (
-              <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
+              <h2 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
                 Points: <span>{this.state.points}</span>
               </h2>
             ) : (
-              <h2 style={{ marginLeft: '3em', marginTop: '0.8em' }} id='points'>
+              <h3 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
                 Points: <span>N/A</span>
-              </h2>
+              </h3>
             )
           }
 
@@ -101,7 +101,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
               this.setState({ burgerOpen: !original, animationDone: false });
             }}
             style={{
-              marginLeft: '55%',
+              marginLeft: '35%',
               justifyContent: 'right',
               cursor: 'pointer',
               width: '5vh', // Adjust the width to match the button size
