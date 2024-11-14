@@ -17,7 +17,15 @@ const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
 
 let blockerClicked = false;
 
+let longTerm = false; // Default to false if no value is set
+
 let user_id = '123456';
+chrome.storage.local.get('_pki_userData', data => {
+  const storedUserId = data._pki_userData?.user_id;
+  user_id = storedUserId || '123456'; // Default to '123456' if no user_id is stored
+  // Now proceed with the rest of your code, using `user_id`
+});
+
 let isActive = true;
 let group = 0;
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
@@ -32,6 +40,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   } // we dont have the required data, do nothing as of right now...
 
   cookies.forEach((cookie: ChromeCookie) => {
+    console.log("COOKIE:", cookie.name);
     switch (cookie.name) {
       case 'user_id':
         user_id = cookie.value;
@@ -46,6 +55,10 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
       case 'long_term_group':
         group = parseInt(cookie.value) ? parseInt(cookie.value) : 0;
         break;
+      case 'long_term':
+        longTerm = cookie.value === 'True';
+        console.log('Found long_term. Value: ', longTerm);
+        break;
       default:
         break;
     }
@@ -57,6 +70,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
           user_id: user_id,
           TEST_ExtensionActive: isActive,
           group: group,
+          longTerm: longTerm,
         },
       },
       d => {
@@ -71,6 +85,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
                 user_id: user_id,
                 TEST_ExtensionActive: isActive,
                 group: group,
+                longTerm: longTerm,
               },
               Points: 0,
             });
@@ -81,6 +96,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
                 user_id: user_id,
                 TEST_ExtensionActive: isActive,
                 group: group,
+                longTerm: longTerm,
               },
               Points: -1,
             });
@@ -92,6 +108,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
               user_id: user_id,
               TEST_ExtensionActive: isActive,
               group: group,
+              longTerm: longTerm,
             },
             Points: 0,
           });
@@ -105,6 +122,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
         user_id: user_id,
         TEST_ExtensionActive: isActive,
         group: group,
+        longTerm: longTerm,
       },
     });
   }
@@ -557,7 +575,7 @@ function doCheckPassFields(node: Document) {
   const passwordFields = node.querySelectorAll(
     'input[type="password"]:not([_pki_HasChecked="true"])',
   );
-  console.log('OUR FIELDS:', passwordFields);
+  // console.log('OUR FIELDS:', passwordFields);
   if (passwordFields.length > 0) {
     // You can perform additional actions here, such as logging or alerting
     console.log('OK WAIIIT');

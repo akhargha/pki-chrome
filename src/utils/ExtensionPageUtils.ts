@@ -1,13 +1,38 @@
 import { iMsgReqType } from '../types/MessageTypes';
 
-export function sendUserActionInfo(
+async function fetchPoints(): Promise<number> {
+  try {
+    // Retrieve userId from Chrome storage
+    const userId = await new Promise<string | undefined>((resolve) => {
+      chrome.storage.local.get('_pki_userData', (data) => {
+        resolve(data._pki_userData?.user_id);
+      });
+    });
+
+    if (!userId) {
+      console.error("User ID not found in storage.");
+      return -1; // Return -1 if userId is not found
+    }
+
+    // Fetch points from server using the retrieved userId
+    const response = await fetch(`https://mobyphish.com/user_points/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch points');
+
+    const data = await response.json();
+    return data.points ?? -1; // Use -1 if points data is missing
+  } catch (error) {
+    console.error("Error fetching points from server:", error);
+    return -1; // Default to -1 on error
+  }
+}
+
+export async function sendUserActionInfo(
   user_id: string,
   event_number: number,
   reportedSite = '',
   currentSite = '',
 ) {
   const timestamp = Date.now();
-
   const eventComments = {
     1: 'Interact with Moby-protected website without opening extension',
     2: 'Open popup on Moby-protected site',
@@ -28,60 +53,48 @@ export function sendUserActionInfo(
     comment = `Reported phishing on site ${reportedSite} by ${currentSite}`;
   }
 
-  function sendMessage(points: number) {
+  const points = await fetchPoints(); // Fetch points from server
+
+  if (event_number === 7) {
+    // Special handling for event 7 - save sensitive site info
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+      const websiteList = items.websiteList;
+      const sensitiveWebsites = [];
+      for (const domain in websiteList) {
+        if (websiteList[domain].isSensitive) {
+          sensitiveWebsites.push(domain);
+        }
+      }
+      const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
+
+      chrome.runtime.sendMessage({
+        type: iMsgReqType.sendUserActionInfo,
+        user_id: user_id,
+        timestamp: timestamp,
+        event: event_number,
+        comment: sensitiveListComment,
+        points: points, // Send points from server response
+      });
+    });
+  } else {
     chrome.runtime.sendMessage({
       type: iMsgReqType.sendUserActionInfo,
       user_id: user_id,
       timestamp: timestamp,
       event: event_number,
       comment: comment,
-      points: points,
+      points: points, // Send points from server response
     });
   }
-
-  chrome.cookies.get({ url: 'https://extension.mobyphish.com', name: 'user_category' }, function (cookie) {
-    // Retrieve the group value from chrome.storage.local
-    chrome.storage.local.get({ _pki_userData: { group: null } }, function (data) {
-      const group = data._pki_userData.group;
-      const points = (group === 1) ? 0 : -1; // Set points based on group
-      console.log('points', points);
-
-      if (event_number === 7) {
-        // Special handling for event 7 - save sensitive site info
-        chrome.storage.local.get({ websiteList: {} }, function (items) {
-          const websiteList = items.websiteList;
-          const sensitiveWebsites = [];
-          for (const domain in websiteList) {
-            if (websiteList[domain].isSensitive) {
-              sensitiveWebsites.push(domain);
-            }
-          }
-          const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
-
-          chrome.runtime.sendMessage({
-            type: iMsgReqType.sendUserActionInfo,
-            user_id: user_id,
-            timestamp: timestamp,
-            event: event_number,
-            comment: sensitiveListComment,
-            points: points, // Send points based on group
-          });
-        });
-      } else {
-        sendMessage(points); // Send points based on group
-      }
-    });
-  });
 }
 
-export function localSendUserActionInfo(
+export async function localSendUserActionInfo(
   user_id: string,
   event_number: number,
   reportedSite = '',
   currentSite = '',
 ) {
   const timestamp = Date.now();
-
   const eventComments = {
     1: 'Interact with Moby-protected website without opening extension',
     2: 'Open popup on Moby-protected site',
@@ -102,36 +115,34 @@ export function localSendUserActionInfo(
     comment = `Reported phishing on site ${reportedSite} by ${currentSite}`;
   }
 
-  chrome.cookies.get({ url: 'https://extension.mobyphish.com', name: 'user_category' }, function (cookie) {
-    const points = cookie && cookie.value === 'long_term' ? 0 : -1;
-    console.log("what are points here?", points);
+  const points = await fetchPoints(); // Fetch points from server
+  console.log("Points fetched:", points);
 
-    if (event_number === 7) {
-      // Special handling for event 7 - save sensitive site info
-      chrome.storage.local.get({ websiteList: {}, Points: 0 }, function (items) {
-        const websiteList = items.websiteList;
-        const sensitiveWebsites = [];
-        for (const domain in websiteList) {
-          if (websiteList[domain].isSensitive) {
-            sensitiveWebsites.push(domain);
-          }
+  if (event_number === 7) {
+    // Special handling for event 7 - save sensitive site info
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+      const websiteList = items.websiteList;
+      const sensitiveWebsites = [];
+      for (const domain in websiteList) {
+        if (websiteList[domain].isSensitive) {
+          sensitiveWebsites.push(domain);
         }
-        const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
+      }
+      const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
 
-        fetch(
-          `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}/?points=${points}`,
-        )
-          .catch(reason => {
-            console.warn('Failed to upload data: ', reason);
-          });
-      });
-    } else {
       fetch(
-        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${comment}/${points}`,
+        `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}/?points=${points}`,
       )
         .catch(reason => {
           console.warn('Failed to upload data: ', reason);
         });
-    }
-  });
+    });
+  } else {
+    fetch(
+      `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${comment}/${points}`,
+    )
+      .catch(reason => {
+        console.warn('Failed to upload data: ', reason);
+      });
+  }
 }
