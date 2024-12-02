@@ -10,6 +10,13 @@ export async function AddPoints(pointsToAdd = 1) {
         await axios.post(`https://mobyphish.com/user_points/${userId}`, {
           points: pointsToAdd,
         });
+
+        // Update points locally in storage
+        const newPoints = (data.Points || 0) + pointsToAdd;
+        chrome.storage.local.set({ Points: newPoints }, () => {
+          console.log(`Updated local points to ${newPoints}`);
+        });
+        
         console.log(`Successfully added ${pointsToAdd} points for user ${userId}`);
       } else {
         console.error('User ID not found in storage.');
