@@ -84,7 +84,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
             lastVisit: currentTime,
             faviconUrl: tab.favIconUrl as string,
           };
-          sessionList[webDomain] = true;
+
+          // Only add to session list if it's not the test domain
+          if (webDomain !== 'acct.ilogicalloanssavings.mobyphish.com') {
+            sessionList[webDomain] = true;
+          }
+
           console.log('Ok go go');
 
           await chrome.storage.local.set({
@@ -97,7 +102,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
             .sendMessage({
               type: iMsgReqType.siteDataRefresh,
             })
-            .then(v => {})
+            .then(v => { })
             .catch(e => console.warn(e));
           console.log('Website Saved as Sensitive', webDomain);
           console.log('Website added to session list', webDomain);
@@ -131,7 +136,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         .catch(reason => {
           console.warn('Failed to upload data: ', reason);
         })
-        .finally(() => {});
+        .finally(() => { });
       break;
     case iMsgReqType.fetchTestWebsites:
       sendResponse({ websites: [] });

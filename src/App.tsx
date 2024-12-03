@@ -185,7 +185,7 @@ class App extends Component<object, AppState> {
                   // chrome.storage.local.set({ points: pointsLocal }, function () {
                   //   console.log(pointsLocal);
                   // });
-                  
+
                   AddPoints(); //TODO: feedback that user interacted with extension when it was blocked
                   console.log("added points");
                 }
