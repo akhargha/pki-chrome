@@ -47,8 +47,8 @@ class Navbar extends Component<NavbarProps, NavbarState> {
   fetchPoints = async (userId: string) => {
     try {
       const response = await axios.get(`https://mobyphish.com/user_points/${userId}`);
-      const points = response.data.points;
-      this.setState({ points }); // Update points in state
+      const points1 = response.data.points;
+      this.setState({ points: points1 }); // Update points in state
     } catch (error) {
       console.error("Error fetching points from server:", error);
       this.setState({ points: -1 }); // Default if fetch fails
@@ -97,7 +97,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
       const newUserData = changes._pki_userData.newValue;
       if (newUserData && newUserData.user_id) {
         this.fetchPoints(newUserData.user_id); // Fetch new points if user_id changes
-        this.setState({ group: newUserData.group, longTerm: newUserData.longTerm });
+        this.setState({ group: newUserData.group, longTerm: newUserData.longTerm, points: newUserData.Points });
       }
     }
   };
@@ -118,7 +118,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           {
             this.state.group === 1 && this.state.longTerm ? (
               <h2 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
-                Points: <span>{this.state.points}</span>
+                Points: <span>{this.props.points}</span>
               </h2>
             ) : (
               <h3 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>

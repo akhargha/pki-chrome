@@ -101,6 +101,7 @@ class App extends Component<object, AppState> {
             this.setState({
               pointsLocal: change.newValue
             });
+            console.log(`Updated pointsLocal to ${change.newValue}`);
           }
 
           //user info changed
