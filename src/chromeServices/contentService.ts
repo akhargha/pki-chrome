@@ -28,6 +28,8 @@ chrome.storage.local.get('_pki_userData', data => {
 
 let isActive = true;
 let group = 0;
+let extensionCheck2Value = "1"; // Default value for extension_check2
+
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   const cookies: ChromeCookie[] = c;
 
@@ -42,6 +44,10 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   cookies.forEach((cookie: ChromeCookie) => {
     console.log("COOKIE:", cookie.name);
     switch (cookie.name) {
+      case 'extension_check1': //get extension check cookie from site
+        extensionCheck2Value = cookie.value; // Copy the value of extension_check1
+        console.log('Found extension_check1. Value: ', extensionCheck2Value);
+        break;
       case 'user_id':
         user_id = cookie.value;
         console.log('Found cookie', user_id);
@@ -63,6 +69,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
         break;
     }
   });
+
   if (user_id) {
     chrome.storage.local.get(
       {

@@ -2,21 +2,27 @@ import axios from 'axios';
 
 export async function AddPoints(pointsToAdd = 1) {
   try {
-    chrome.storage.local.get(['_pki_userData', 'Points'], async (data) => {
+    chrome.storage.local.get(['_pki_userData'], async (data) => {
       const userId = data._pki_userData?.user_id; // Use optional chaining to prevent errors if _pki_userData is undefined
 
       if (userId && data._pki_userData.group === 1) {
-        // Only make the request if userId is available
+        // Retrieve current points from the server
+        const response = await axios.get(`https://mobyphish.com/user_points/${userId}`);
+        const currentPoints = response.data.points || 0; // Default to 0 if points are undefined
+
+        // Add points to the current server points
+        const updatedPoints = currentPoints + pointsToAdd;
+
+        // Update points on the server
         await axios.post(`https://mobyphish.com/user_points/${userId}`, {
           points: pointsToAdd,
         });
 
         // Update points locally in storage
-        const newPoints = (data.Points || 0) + pointsToAdd;
-        chrome.storage.local.set({ Points: newPoints }, () => {
-          console.log(`Updated local points to ${newPoints}`);
+        chrome.storage.local.set({ Points: updatedPoints }, () => {
+          console.log(`Updated local points to ${updatedPoints}`);
         });
-        
+
         console.log(`Successfully added ${pointsToAdd} points for user ${userId}`);
       } else {
         console.error('User ID not found in storage.');
@@ -26,14 +32,3 @@ export async function AddPoints(pointsToAdd = 1) {
     console.error('Error adding points:', error);
   }
 }
-
-
-
-
-// NOTE: no longer subtracting points
-// export function SubtractPoints () {
-//   chrome.storage.local.get({ Points: 0 }, d => {
-//     const res = d.Points - 1;
-//     chrome.storage.local.set({ Points: res >= 0 ? res : 0 });
-//   });
-// }
