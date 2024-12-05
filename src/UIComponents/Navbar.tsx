@@ -49,6 +49,11 @@ class Navbar extends Component<NavbarProps, NavbarState> {
       const response = await axios.get(`https://mobyphish.com/user_points/${userId}`);
       const points1 = response.data.points;
       this.setState({ points: points1 }); // Update points in state
+
+      // Also update 'Points' in chrome.storage
+      chrome.storage.local.set({ Points: points1 }, () => {
+        console.log(`Updated Points in local storage to ${points1}`);
+      });
     } catch (error) {
       console.error("Error fetching points from server:", error);
       this.setState({ points: -1 }); // Default if fetch fails
@@ -92,12 +97,24 @@ class Navbar extends Component<NavbarProps, NavbarState> {
   };
 
   // Listen for changes in storage to update points, group, or longTerm
-  handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
-    if (areaName === 'local' && changes._pki_userData) {
-      const newUserData = changes._pki_userData.newValue;
-      if (newUserData && newUserData.user_id) {
-        this.fetchPoints(newUserData.user_id); // Fetch new points if user_id changes
-        this.setState({ group: newUserData.group, longTerm: newUserData.longTerm, points: newUserData.Points });
+  handleStorageChange = (
+    changes: { [key: string]: chrome.storage.StorageChange },
+    areaName: string
+  ) => {
+    if (areaName === 'local') {
+      if (changes._pki_userData) {
+        const newUserData = changes._pki_userData.newValue;
+        if (newUserData && newUserData.user_id) {
+          this.fetchPoints(newUserData.user_id); // Fetch new points if user_id changes
+          this.setState({
+            group: newUserData.group,
+            longTerm: newUserData.longTerm,
+          });
+        }
+      }
+      if (changes.Points) {
+        const newPoints = changes.Points.newValue;
+        this.setState({ points: newPoints });
       }
     }
   };
@@ -118,7 +135,7 @@ class Navbar extends Component<NavbarProps, NavbarState> {
           {
             this.state.group === 1 && this.state.longTerm ? (
               <h2 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
-                Points: <span>{this.props.points}</span>
+                Points: <span>{this.state.points}</span>
               </h2>
             ) : (
               <h3 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
