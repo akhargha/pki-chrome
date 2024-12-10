@@ -114,6 +114,25 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
   }
 });
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'setCookie') {
+    const { url, name, value } = message.payload;
+    chrome.cookies.set({ url, name, value, path: '/' }, (cookie) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error setting cookie:', chrome.runtime.lastError.message);
+        sendResponse({ success: false, error: chrome.runtime.lastError.message });
+      } else {
+        console.log('Cookie set successfully:', cookie);
+        sendResponse({ success: true, cookie });
+      }
+    });
+
+    // Keep the message channel open for async response
+    return true;
+  }
+});
+
+
 //other events that are synchronous. these can get a response back.
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const data = request as iMsgReq;
