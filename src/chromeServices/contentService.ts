@@ -28,7 +28,6 @@ chrome.storage.local.get('_pki_userData', data => {
 
 let isActive = true;
 let group = 0;
-let extensionCheck2Value = "1"; // Default value for extension_check2
 
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   const cookies: ChromeCookie[] = c;
@@ -45,8 +44,14 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
     console.log("COOKIE:", cookie.name);
     switch (cookie.name) {
       case 'extension_check1': //get extension check cookie from site
-        extensionCheck2Value = cookie.value; // Copy the value of extension_check1
-        console.log('Found extension_check1. Value: ', extensionCheck2Value);
+        chrome.cookies.set({
+          url: "https://mobyphish.com",
+          name: "extension_check2",
+          value: cookie.value, // Use the value of `extension_check1`
+          path: "/", // Make it accessible to all paths
+        }, () => {
+          console.log("Cookie extension_check2 set by the extension");
+        })
         break;
       case 'user_id':
         user_id = cookie.value;
