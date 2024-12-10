@@ -51,7 +51,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
           path: "/", // Make it accessible to all paths
         }, () => {
           console.log("Cookie extension_check2 set by the extension");
-        })
+        });
         break;
       case 'user_id':
         user_id = cookie.value;
