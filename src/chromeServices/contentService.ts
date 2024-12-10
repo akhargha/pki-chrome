@@ -44,13 +44,18 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
     console.log("COOKIE:", cookie.name);
     switch (cookie.name) {
       case 'extension_check1': //get extension check cookie from site
+        console.log("attempting session save in cooke");
         chrome.cookies.set({
           url: "https://mobyphish.com",
           name: "extension_check2",
           value: cookie.value, // Use the value of `extension_check1`
           path: "/", // Make it accessible to all paths
-        }, () => {
-          console.log("Cookie extension_check2 set by the extension");
+        }, (result) => {
+          if (chrome.runtime.lastError) {
+            console.error("Error setting extension_check2:", chrome.runtime.lastError.message);
+          } else {
+            console.log("Cookie extension_check2 successfully set:", result);
+          }
         });
         break;
       case 'user_id':
