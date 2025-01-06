@@ -168,6 +168,7 @@ class App extends Component<object, AppState> {
       payload.faviconImage = favicon ? favicon : '';
       checkList(shortenedDomain).then(result => {
         if (result === checkListReturn.Safe) {
+          console.log("NEW CHECK 1");
           // removeView()
           // document.getElementById('all-set').style.display = 'block'
 
@@ -176,9 +177,11 @@ class App extends Component<object, AppState> {
           chrome.storage.local.get({ sessionList: {} }, function (items) {
             const sessionList = items.sessionList;
             if (!sessionList[shortenedDomain]) {
+              console.log("NEW CHECK 2");
               chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
                 console.log("Our resp", response, response.clicked);
                 if (response && !response.clicked) {
+                  console.log("NEW CHECK 3");
                   // document.getElementById(
                   //   'points-feedback-click-when-blocked'
                   // ).style.display = 'block';

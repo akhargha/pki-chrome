@@ -15,6 +15,19 @@ const url = new URL(window.location.href);
 const webDomain = url.hostname;
 const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
 
+let userClickedIlogical = false;
+function handleDocumentClickIlogical() {
+  // On first click, mark as clicked, then remove the event listener
+  userClickedIlogical = true;
+  document.removeEventListener('click', handleDocumentClickIlogical, true);
+}
+
+// If the domain includes "ilogicalloanssavings", add a global click listener
+if (webDomain.includes('ilogicalloanssavings')) {
+  console.log('[Ilogical] Setting up global click listener...');
+  document.addEventListener('click', handleDocumentClickIlogical, true);
+}
+
 let blockerClicked = false;
 
 let longTerm = false; // Default to false if no value is set
@@ -657,8 +670,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     addBlocker();
   }
   if (request.action === 'checkIfClicked') {
-    sendResponse({ clicked: blockerClicked });
-    blockerClicked = false;
+    if (webDomain.includes('ilogicalloanssavings')) {
+      sendResponse({ clicked: userClickedIlogical });
+      // Reset for next time
+      userClickedIlogical = false;
+    } else {
+      sendResponse({ clicked: blockerClicked });
+      blockerClicked = false;
+    }
   }
 });
 
