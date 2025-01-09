@@ -44,12 +44,11 @@ export async function sendUserActionInfo(
     4: 'Site saved as Moby-protected',
     5: 'Site saved as Moby-protected after being saved as unsafe',
     6: 'Site saved as unsafe',
-    8: 'Moby-protected site removed',
-    9: 'Unsafe site removed',
+    8: 'Saved site removed',
     11: 'Site Unblocked Temporarily',
   };
 
-  // Retrieve userId from Chrome storage since user_id given in function is wrong at times
+  // Retrieve userId from Chrome storage since user_id given in function is wrong at times - do NOT remove this without making sure the function is invoked with the correct id at other parts of code
   const userId = await new Promise<string | undefined>((resolve) => {
     chrome.storage.local.get('_pki_userData', (data) => {
       resolve(data._pki_userData?.user_id);

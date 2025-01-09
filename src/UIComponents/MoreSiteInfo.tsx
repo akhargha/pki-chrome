@@ -5,6 +5,7 @@ import {
   WebsiteListEntryLogType
 } from '../utils/LocalStorage'
 import { iMsgReqType } from '../types/MessageTypes'
+import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 
 interface MoreSiteInfoProps {
   isVisible: boolean
@@ -19,15 +20,15 @@ export class MoreSiteInfo extends Component<
   MoreSiteInfoProps,
   MoreSiteInfoState
 > {
-  constructor (p: MoreSiteInfoProps, s: MoreSiteInfoState) {
+  constructor(p: MoreSiteInfoProps, s: MoreSiteInfoState) {
     super(p, s)
 
     this.state = {
       animationDone: true
     }
   }
-  componentDidMount (): void {}
-  render () {
+  componentDidMount(): void { }
+  render() {
     if (this.props.data === undefined) return
     const data = this.props.data as WebsiteListEntry
     return (
@@ -122,7 +123,9 @@ export class MoreSiteInfo extends Component<
                             closer(websiteList)
                             chrome.runtime.sendMessage({
                               type: iMsgReqType.siteDataRefresh
-                            })
+                            });
+                            sendUserActionInfo("abcd", 8); // placeholder userid that will be overridden
+
                           }
                         )
                       }
