@@ -1,6 +1,5 @@
 import { iMsgReqType } from '../types/MessageTypes';
 import {
-  WebsiteListEntry,
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
 
