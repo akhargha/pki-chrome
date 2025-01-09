@@ -15,6 +15,8 @@ import {
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
 
+import axios from 'axios';
+
 chrome.runtime.onStartup.addListener(() => {
   chrome.storage.local.set({ sessionList: {}, tabDatabase: {} }, () => {
     console.log('Cleared session list and tab database on chrome startup');
@@ -155,16 +157,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
       return true;
     case iMsgReqType.sendUserActionInfo:
-      console.log("SENDING DATA:", data.user_id, data.event, data.timestamp, data.comment);
-      fetch(
-        `https://extension.mobyphish.com/user_data/${data.user_id}/${data.timestamp}/${data.event}/${data.comment}`,
-      )
-        .catch(reason => {
-          console.log("FAILED sending data", reason);
-          console.warn('Failed to upload data: ', reason);
+      // Retrieve 'Points' from Chrome storage
+      chrome.storage.local.get('Points', (result) => {
+        const points = result.Points || -1; // Default to -1 if Points is not available
+        console.log(`Retrieved points: ${points}`);
+
+        console.log("SENDING DATA:", data.user_id, data.event, data.timestamp, data.comment);
+
+        // Construct the request body
+        const requestBody = {
+          user_id: data.user_id,
+          timestamp: data.timestamp,
+          event: data.event,
+          comments: data.comment,
+          points: points,
+        };
+
+        // Make the POST request to the backend
+        fetch('https://extension.mobyphish.com/user_data/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Extension-ID': '2T7jU3Hr4yC8', // Include the CSRF token in the headers
+          },
+          body: JSON.stringify(requestBody),
         })
-        .finally(() => { });
+          .then((response) => {
+            if (!response.ok) {
+              // Attempt to get the raw response text (e.g., HTML error page)
+              return response.text().then((rawResponse) => {
+                console.error(`Error response received:`, rawResponse);
+                throw new Error(`Server responded with status ${response.status}`);
+              });
+            }
+            return response.json(); // Parse the successful response as JSON
+          })
+          .then((responseData) => {
+            console.log('Data successfully sent to backend:', responseData);
+          })
+          .catch((error) => {
+            console.error("Failed to upload data:", error);
+          });
+      });
       break;
+
     case iMsgReqType.fetchTestWebsites:
       sendResponse({ websites: [] });
       // fetchTestWebsites()
