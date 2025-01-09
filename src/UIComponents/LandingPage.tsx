@@ -379,6 +379,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 chrome.tabs.sendMessage(this.props.tabId, {
                   action: 'removeBlocker',
                 });
+                sendUserActionInfo("abcd", 11); // placeholder userid that will be overridden
               }}
             >
               I want to risk my online security <br />
