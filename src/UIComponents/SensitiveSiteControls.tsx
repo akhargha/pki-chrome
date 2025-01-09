@@ -241,17 +241,23 @@ class SensitiveSiteControls extends Component<
                     type='text'
                     placeholder='Enter unsafe site domain'
                     onBlur={event => {
-                      let s = event.target.value;
+                      let s = event.target.value.trim();
+
+                      // If user didn't type http/https, prepend https://
                       if (!s.startsWith("http")) {
                         s = "https://" + s;
-                        const url = new URL(s);
-                        const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
+                      }
 
+                      try {
+                        // Always parse the URL and set blockedInput
+                        const url = new URL(s);
+                        const shortenedDomain = grabMainUrl(url);
                         this.setState({
                           blockedInput: shortenedDomain,
                         });
+                      } catch (error) {
+                        alert("Invalid URL: " + s);
                       }
-
                     }}
                   />
                 </div>
