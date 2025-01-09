@@ -64,14 +64,18 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
             sessionList: {},
           });
 
-          const userid = (
-            await chrome.storage.local.get({
-              _pki_userData: {
-                user_id: 'abcd',
-                TEST_ExtensionActive: true,
-              },
-            })
-          )._pki_userData.user_id;
+          // Retrieve userId from Chrome storage
+          const userId = await new Promise<string | undefined>((resolve) => {
+            chrome.storage.local.get('_pki_userData', (data) => {
+              resolve(data._pki_userData?.user_id);
+            });
+          });
+
+          if (!userId) {
+            console.error("User ID not found in storage.");
+            return -1; // Return -1 if userId is not found
+          }
+
           const websiteList: { [key: string]: WebsiteListEntry } =
             localStorageData.websiteList;
           const sessionList: { [key: string]: boolean } =
@@ -107,8 +111,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
           console.log('Website Saved as Sensitive', webDomain);
           console.log('Website added to session list', webDomain);
 
-          localSendUserActionInfo(userid, 4);
-          localSendUserActionInfo(userid, 7);
+          if (webDomain !== 'acct.ilogicalloanssavings.mobyphish.com') {
+            localSendUserActionInfo(userId, 4);
+            localSendUserActionInfo(userId, 7);
+          }
         },
       );
   }
@@ -149,10 +155,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
       return true;
     case iMsgReqType.sendUserActionInfo:
+      console.log("SENDING DATA:", data.user_id, data.event, data.timestamp, data.comment);
       fetch(
         `https://extension.mobyphish.com/user_data/${data.user_id}/${data.timestamp}/${data.event}/${data.comment}`,
       )
         .catch(reason => {
+          console.log("FAILED sending data", reason);
           console.warn('Failed to upload data: ', reason);
         })
         .finally(() => { });

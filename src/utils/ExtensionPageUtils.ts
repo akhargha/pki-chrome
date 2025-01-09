@@ -1,4 +1,8 @@
 import { iMsgReqType } from '../types/MessageTypes';
+import {
+  WebsiteListEntry,
+  WebsiteListEntryLogType,
+} from '../utils/LocalStorage';
 
 async function fetchPoints(): Promise<number> {
   try {
@@ -45,8 +49,21 @@ export async function sendUserActionInfo(
     11: 'Site Unblocked Temporarily',
   };
 
+  // Retrieve userId from Chrome storage since user_id given in function is wrong at times
+  const userId = await new Promise<string | undefined>((resolve) => {
+    chrome.storage.local.get('_pki_userData', (data) => {
+      resolve(data._pki_userData?.user_id);
+    });
+  });
+
+  if (!userId) {
+    console.error("User ID not found in storage.");
+    return -1; // Return -1 if userId is not found
+  }
+
   let comment =
     eventComments[event_number as keyof typeof eventComments] || 'Unknown event';
+
 
   // Handling event 10 for reporting phishing
   if (event_number === 10) {
@@ -61,25 +78,28 @@ export async function sendUserActionInfo(
       const websiteList = items.websiteList;
       const sensitiveWebsites = [];
       for (const domain in websiteList) {
-        if (websiteList[domain].isSensitive) {
+        if (websiteList[domain].LogType === WebsiteListEntryLogType.PROTECTED) {
           sensitiveWebsites.push(domain);
         }
       }
-      const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
+      const comment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
+
+      console.log("LOG SENT:", event_number);
 
       chrome.runtime.sendMessage({
         type: iMsgReqType.sendUserActionInfo,
-        user_id: user_id,
+        user_id: userId, // override function user_id with userId that we retrieve
         timestamp: timestamp,
         event: event_number,
-        comment: sensitiveListComment,
+        comment: comment,
         points: points, // Send points from server response
       });
     });
   } else {
+    console.log("LOG SENT:", event_number);
     chrome.runtime.sendMessage({
       type: iMsgReqType.sendUserActionInfo,
-      user_id: user_id,
+      user_id: userId, // override function user_id with userId that we retrieve
       timestamp: timestamp,
       event: event_number,
       comment: comment,
@@ -130,6 +150,7 @@ export async function localSendUserActionInfo(
       }
       const sensitiveListComment = 'List of Sensitive Websites: ' + sensitiveWebsites.join(', ');
 
+      console.log("local LOG SENT:", event_number);
       fetch(
         `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${sensitiveListComment}/?points=${points}`,
       )
@@ -138,6 +159,7 @@ export async function localSendUserActionInfo(
         });
     });
   } else {
+    console.log("local LOG SENT:", event_number);
     fetch(
       `https://extension.mobyphish.com/user_data/${user_id}/${timestamp}/${event_number}/${comment}/${points}`,
     )
