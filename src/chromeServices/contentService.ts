@@ -85,13 +85,13 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
             type: 'setCookie',
             payload: {
               url: 'https://mobyphish.com',
-              name: 'extension_check2',
+              name: 'extension_version',
               value: cookie.value, // Use the value of `extension_check1`
             },
           },
           (response) => {
             if (response && response.success) {
-              console.log('Cookie extension_check2 set successfully:', response.cookie);
+              console.log('Cookie extension_version set successfully:', response.cookie);
             } else {
               console.error('Failed to set cookie:', response?.error);
             }
