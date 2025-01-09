@@ -9,7 +9,7 @@ import {
   iMsgReqType,
 } from '../types/MessageTypes';
 import { getTabData } from '../utils/ChromeQueryUtils';
-import { localSendUserActionInfo } from '../utils/ExtensionPageUtils';
+import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 import {
   WebsiteListEntry,
   WebsiteListEntryLogType,
@@ -112,8 +112,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
           console.log('Website added to session list', webDomain);
 
           if (webDomain !== 'acct.ilogicalloanssavings.mobyphish.com') {
-            localSendUserActionInfo(userId, 4);
-            localSendUserActionInfo(userId, 7);
+            sendUserActionInfo(userId, 4);
+            sendUserActionInfo(userId, 7);
           }
         },
       );

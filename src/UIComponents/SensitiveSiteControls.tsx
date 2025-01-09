@@ -8,7 +8,7 @@ import { iMsgReq, iMsgReqType } from '../types/MessageTypes';
 import { MoreSiteInfo } from './MoreSiteInfo';
 import { Spring, SpringValue, animated } from 'react-spring';
 import { fetchCertificateChain, grabMainUrl, sendWebsitesToDatabase } from '../utils/fetchUtils';
-import { localSendUserActionInfo } from '../utils/ExtensionPageUtils';
+import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 
 interface SensitiveSiteControlsProps {
   isVisible: boolean;
@@ -199,8 +199,8 @@ class SensitiveSiteControls extends Component<
                             .then(() => { })
                             .catch(e => console.warn(e));
 
-                          localSendUserActionInfo(userid, 4);
-                          localSendUserActionInfo(userid, 7);
+                          sendUserActionInfo(userid, 4);
+                          sendUserActionInfo(userid, 7);
                           sendWebsitesToDatabase([webDomain]);
                         },
                       );
@@ -314,8 +314,8 @@ class SensitiveSiteControls extends Component<
                             .then(() => { })
                             .catch(e => console.warn(e));
 
-                          localSendUserActionInfo(userid, 4);
-                          localSendUserActionInfo(userid, 7);
+                          sendUserActionInfo(userid, 4);
+                          sendUserActionInfo(userid, 7);
                         },
                       );
                     }}

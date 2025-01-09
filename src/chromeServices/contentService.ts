@@ -15,10 +15,32 @@ const url = new URL(window.location.href);
 const webDomain = url.hostname;
 const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
 
+let userId = await new Promise<string | undefined>((resolve) => {
+  chrome.storage.local.get('_pki_userData', (data) => {
+    resolve(data._pki_userData?.user_id);
+  });
+});
+
+if (!userId) {
+  userId = "-1";
+}
+
 let userClickedIlogical = false;
 function handleDocumentClickIlogical() {
   // On first click, mark as clicked, then remove the event listener
   userClickedIlogical = true;
+
+  const timestamp = Date.now();
+  const event = '1';
+  const comment = 'Interact with ilogical site without opening extension';
+  chrome.runtime.sendMessage({
+    type: iMsgReqType.sendUserActionInfo,
+    user_id: userId,         // uses your globally set user_id
+    timestamp: timestamp,
+    event: event,
+    comment: comment,
+  });
+
   document.removeEventListener('click', handleDocumentClickIlogical, true);
 }
 
