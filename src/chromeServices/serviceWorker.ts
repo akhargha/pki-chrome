@@ -15,8 +15,6 @@ import {
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
 
-import axios from 'axios';
-
 chrome.runtime.onStartup.addListener(() => {
   chrome.storage.local.set({ sessionList: {}, tabDatabase: {} }, () => {
     console.log('Cleared session list and tab database on chrome startup');
