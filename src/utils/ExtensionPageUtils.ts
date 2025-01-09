@@ -95,7 +95,32 @@ export async function sendUserActionInfo(
         points: points, // Send points from server response
       });
     });
-  } else {
+  }
+  else if (event_number === 17) {
+    // Special handling for event 17 - save unsafe site info
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+      const websiteList = items.websiteList;
+      const unsafeSites = [];
+      for (const domain in websiteList) {
+        if (websiteList[domain].LogType === WebsiteListEntryLogType.BLOCKED) {
+          unsafeSites.push(domain);
+        }
+      }
+      const comment = 'List of Unsafe Websites: ' + unsafeSites.join(', ');
+
+      console.log("LOG SENT:", event_number);
+
+      chrome.runtime.sendMessage({
+        type: iMsgReqType.sendUserActionInfo,
+        user_id: userId, // override function user_id with userId that we retrieve
+        timestamp: timestamp,
+        event: event_number,
+        comment: comment,
+        points: points, // Send points from server response
+      });
+    });
+  }
+  else {
     console.log("LOG SENT:", event_number);
     chrome.runtime.sendMessage({
       type: iMsgReqType.sendUserActionInfo,

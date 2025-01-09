@@ -320,8 +320,8 @@ class SensitiveSiteControls extends Component<
                             .then(() => { })
                             .catch(e => console.warn(e));
 
-                          sendUserActionInfo(userid, 4);
-                          sendUserActionInfo(userid, 7);
+                          sendUserActionInfo(userid, 6);
+                          sendUserActionInfo(userid, 17);
                         },
                       );
                     }}
