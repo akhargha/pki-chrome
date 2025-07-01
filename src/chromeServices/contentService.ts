@@ -15,15 +15,17 @@ const url = new URL(window.location.href);
 const webDomain = url.hostname;
 const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
 
-let userId = await new Promise<string | undefined>((resolve) => {
-  chrome.storage.local.get('_pki_userData', (data) => {
-    resolve(data._pki_userData?.user_id);
-  });
-});
+// let userId = await new Promise<string | undefined>((resolve) => {
+//   chrome.storage.local.get('_pki_userData', (data) => {
+//     resolve(data._pki_userData?.user_id);
+//   });
+// });
 
-if (!userId) {
-  userId = "-1";
-}
+const userId: string = require('../version').default.user_id;
+
+// if (!userId) {
+//   userId = "-1";
+// }
 
 let userClickedIlogical = false;
 function handleDocumentClickIlogical() {
@@ -53,13 +55,9 @@ if (webDomain.includes('ilogicalloanssavings')) {
 let blockerClicked = false;
 
 let longTerm = false; // Default to false if no value is set
+const user_id: string = require('../version').default.user_id;
 
-let user_id = '123456';
-chrome.storage.local.get('_pki_userData', data => {
-  const storedUserId = data._pki_userData?.user_id;
-  user_id = storedUserId || '123456'; // Default to '123456' if no user_id is stored
-  // Now proceed with the rest of your code, using `user_id`
-});
+
 
 let isActive = true;
 let group = 0;
@@ -98,10 +96,6 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
           }
         );
         break;
-      case 'user_id':
-        user_id = cookie.value;
-        console.log('Found cookie', user_id);
-        break;
       case 'use_extension':
         //convert to boolean, is string.
         isActive = cookie.value === 'False' ? false : true;
@@ -136,7 +130,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
         if (data.user_id !== user_id) {
           console.log('Resetting points for different user', group, user_id);
           if (group === 1) {
-            console.log("first case")
+            console.log("first case");
             chrome.storage.local.set({
               _pki_userData: {
                 user_id: user_id,
@@ -147,7 +141,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
               Points: 0,
             });
           } else {
-            console.log("second case")
+            console.log("second case");
             chrome.storage.local.set({
               _pki_userData: {
                 user_id: user_id,
@@ -159,7 +153,7 @@ chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
             });
           }
         } else {
-          console.log("third case")
+          console.log("third case");
           chrome.storage.local.set({
             _pki_userData: {
               user_id: user_id,
@@ -296,9 +290,9 @@ function main() {
     //session list is the list of sites that we have visitied in this session, so no reverification is needed.
     { websiteList: {}, sessionList: {}, ignoreList: [] },
     function (items) {
-      const websiteList: { [key: string]: WebsiteListEntry } =
+      const websiteList: { [key: string]: WebsiteListEntry; } =
         items.websiteList;
-      const sessionList: { [key: string]: boolean } = items.sessionList;
+      const sessionList: { [key: string]: boolean; } = items.sessionList;
       const ignoreList: string[] = items.ignoreList;
       if (shortenedDomain === 'acct.ilogicalloanssavings.mobyphish.com') {
         const domain = webDomain.replace(/^www\./, ''); // only for our site, we want to get the whole thing.
@@ -704,8 +698,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 function compareCertificateChains(
-  chain1: { [x: string]: any },
-  chain2: { [x: string]: any },
+  chain1: { [x: string]: any; },
+  chain2: { [x: string]: any; },
 ) {
   if (Object.keys(chain1).length !== Object.keys(chain2).length) {
     return false;
@@ -733,8 +727,8 @@ function compareCertificateChains(
 }
 
 function compareObjects(
-  obj1: { [x: string]: any },
-  obj2: { [x: string]: any },
+  obj1: { [x: string]: any; },
+  obj2: { [x: string]: any; },
 ) {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);

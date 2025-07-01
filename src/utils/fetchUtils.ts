@@ -4,10 +4,10 @@ export function fetchCertificateChain(webDomain: string) {
   // Remove "www." from the beginning of the domain
   const shortenedDomain = webDomain.replace(/^www\./, '');
   console.log(
-    `https://extension.mobyphish.com/certificate_chain/${shortenedDomain}`,
+    `localhost:5001/certificate_chain/${shortenedDomain}`,
   );
   return fetch(
-    `https://extension.mobyphish.com/certificate_chain/${shortenedDomain}`,
+    `localhost:5001/certificate_chain/${shortenedDomain}`,
   )
     .then(response => response.json())
     .then(data => {
@@ -23,8 +23,8 @@ export function fetchCertificateChain(webDomain: string) {
     });
 }
 export function compareCertificateChains(
-  chain1: { [x: string]: any },
-  chain2: { [x: string]: any },
+  chain1: { [x: string]: any; },
+  chain2: { [x: string]: any; },
 ) {
   if (Object.keys(chain1).length !== Object.keys(chain2).length) {
     return false;
@@ -52,8 +52,8 @@ export function compareCertificateChains(
 }
 
 export function compareObjects(
-  obj1: { [x: string]: any },
-  obj2: { [x: string]: any },
+  obj1: { [x: string]: any; },
+  obj2: { [x: string]: any; },
 ) {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);

@@ -2,13 +2,14 @@ import { iMsgReqType } from '../types/MessageTypes';
 import {
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
+const user_id: string = require('../version').default.user_id;
 
 async function fetchPoints(): Promise<number> {
   try {
     // Retrieve userId from Chrome storage
     const userId = await new Promise<string | undefined>((resolve) => {
       chrome.storage.local.get('_pki_userData', (data) => {
-        resolve(data._pki_userData?.user_id);
+        resolve(user_id);
       });
     });
 
@@ -48,11 +49,13 @@ export async function sendUserActionInfo(
   };
 
   // Retrieve userId from Chrome storage since user_id given in function is wrong at times - do NOT remove this without making sure the function is invoked with the correct id at other parts of code
-  const userId = await new Promise<string | undefined>((resolve) => {
-    chrome.storage.local.get('_pki_userData', (data) => {
-      resolve(data._pki_userData?.user_id);
-    });
-  });
+
+  const userId = user_id;
+  // const userId = await new Promise<string | undefined>((resolve) => {
+  //   chrome.storage.local.get('_pki_userData', (data) => {
+  //     resolve(user_id);
+  //   });
+  // });
 
   if (!userId) {
     console.error("User ID not found in storage.");

@@ -34,7 +34,8 @@
   },
   "scripts": {
     "start": "cross-env NODE_ENV=development INLINE_RUNTIME_CHUNK=false node updater.js dev && craco start",
-    "dev": "cross-env  INLINE_RUNTIME_CHUNK=false node updater.js dev && craco build",
+    "dev": "cross-env INLINE_RUNTIME_CHUNK=false node updater.js dev && craco build",
+    "build_batch": "cross-env INLINE_RUNTIME_CHUNK=false BUILD_PATH=./builds/%npm_config_user_id% && craco build",
     "build": "cross-env INLINE_RUNTIME_CHUNK=false && craco build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

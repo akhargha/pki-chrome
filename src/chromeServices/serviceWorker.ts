@@ -76,9 +76,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
             return -1; // Return -1 if userId is not found
           }
 
-          const websiteList: { [key: string]: WebsiteListEntry } =
+          const websiteList: { [key: string]: WebsiteListEntry; } =
             localStorageData.websiteList;
-          const sessionList: { [key: string]: boolean } =
+          const sessionList: { [key: string]: boolean; } =
             localStorageData.sessionList;
 
           websiteList[webDomain] = {
@@ -166,13 +166,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const requestBody = {
           user_id: data.user_id,
           timestamp: data.timestamp,
-          event: data.event,
-          comments: data.comment,
-          points: points,
+          text: `Event Id ${data.event}: ${data.comment}`
         };
 
         // Make the POST request to the backend
-        fetch('https://extension.mobyphish.com/user_data/', {
+        fetch('https://replace_with_backend/log/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -1,9 +1,10 @@
 import axios from 'axios';
+const user_id: string = require('../version').default.user_id;
 
 export async function AddPoints(pointsToAdd = 1) {
   try {
     chrome.storage.local.get(['_pki_userData'], async (data) => {
-      const userId = data._pki_userData?.user_id; // Use optional chaining to prevent errors if _pki_userData is undefined
+      const userId = user_id; // Use optional chaining to prevent errors if _pki_userData is undefined
 
       if (userId && data._pki_userData.group === 1) {
         // Retrieve current points from the server

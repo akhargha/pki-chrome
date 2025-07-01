@@ -46,12 +46,14 @@ interface AppState {
 
   settings: ExtensionSettings;
 }
+const user_id: string = require('./version').default.user_id;
+
 class App extends Component<object, AppState> {
   constructor() {
     const state = {
       viewing: ViewState.Landing,
       pointsLocal: 0,
-      user_id: 'abcd',
+      user_id: user_id,
       SHOULD_EXTENSION_BE_ACTIVE: true,
       group: 0,
       websiteUrl: '',
@@ -109,7 +111,7 @@ class App extends Component<object, AppState> {
             //this needs to be fixed to incorporate logouts
             if (!change.newValue) return;
             this.setState({
-              user_id: change.newValue.user_id,
+              // user_id: change.newValue.user_id,
               SHOULD_EXTENSION_BE_ACTIVE:
                 change.newValue.TEST_ExtensionActive !== undefined
                   ? change.newValue.TEST_ExtensionActive
@@ -125,7 +127,6 @@ class App extends Component<object, AppState> {
 
   componentDidMount(): void {
     let pointsLocal = this.state.pointsLocal;
-    let user_id = this.state.user_id;
     //this is what we upload via setState at the end of this function.
     const payload: {
       faviconImage: string;
@@ -238,7 +239,7 @@ class App extends Component<object, AppState> {
             {
               websiteList: {},
               _pki_userData: {
-                user_id: 'abcd',
+                // user_id: 'abcd',
                 TEST_ExtensionActive: true,
                 group: 0,
               },
@@ -250,7 +251,6 @@ class App extends Component<object, AppState> {
             },
             d => {
               const data = d._pki_userData;
-              user_id = data.user_id;
               const b = data.TEST_ExtensionActive;
               const g = d._pki_Test_Data;
               const t = {

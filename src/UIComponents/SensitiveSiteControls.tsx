@@ -20,6 +20,7 @@ interface SensitiveSiteControlsState {
   sensitiveInput: string;
   blockedInput: string;
 }
+const user_id: string = require('../version').default.user_id;
 
 class SensitiveSiteControls extends Component<
   SensitiveSiteControlsProps,
@@ -160,14 +161,7 @@ class SensitiveSiteControls extends Component<
                               websiteList: {},
                               sessionList: {},
                             });
-                          const userid = (
-                            await chrome.storage.local.get({
-                              _pki_userData: {
-                                user_id: 'abcd',
-                                TEST_ExtensionActive: true,
-                              },
-                            })
-                          )._pki_userData.user_id;
+                          const userid = user_id;
                           const websiteList: {
                             [key: string]: WebsiteListEntry;
                           } = localStorageData.websiteList;
@@ -281,14 +275,7 @@ class SensitiveSiteControls extends Component<
                               sessionList: {},
                             });
 
-                          const userid = (
-                            await chrome.storage.local.get({
-                              _pki_userData: {
-                                user_id: 'abcd',
-                                TEST_ExtensionActive: true,
-                              },
-                            })
-                          )._pki_userData.user_id;
+                          const userid = user_id;
                           const websiteList: {
                             [key: string]: WebsiteListEntry;
                           } = localStorageData.websiteList;
