@@ -309,7 +309,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   }
                 }}
               >
-                Report
+                Report Info Change
               </button>
             </div>
           </>
