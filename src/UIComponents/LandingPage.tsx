@@ -277,6 +277,41 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 Report
               </button>
             </div>
+
+            <div className='block'>
+              <button
+                className='button is-rounded is-danger is-clipped'
+                id='unsafe-save-btn'
+                style={{ marginLeft: '100px' }}
+                onClick={() => {
+                  if (selectedSiteToReport) {
+                    chrome.tabs.query(
+                      { active: true, currentWindow: true },
+                      function (tabs) {
+                        const url = tabs[0].url;
+                        const urlObj = new URL(url as string);
+                        const currentSite = grabMainUrl(urlObj);
+                        if (currentSite && selectedSiteToReport) {
+                          //send site info changed event to logs
+                          sendUserActionInfo(
+                            user_id,
+                            12,
+                            selectedSiteToReport,
+                            currentSite,
+                          );
+                        } else {
+                          console.warn(
+                            'Error: No current site or no site selected to report.',
+                          );
+                        }
+                      },
+                    );
+                  }
+                }}
+              >
+                Report
+              </button>
+            </div>
           </>
         ) : undefined}
 
