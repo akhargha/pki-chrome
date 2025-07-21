@@ -1,0 +1,93 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Reporting Extension UI</title>
+  <style>
+    /* === Color Palette ===
+       • Primary: #3A86FF (blue)
+       • Secondary: #8338EC (purple)
+       • Accent: #FFBE0B (yellow)
+       • Background: #F0F0F0
+       • Text: #333333
+    */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F0F0;
+      color: #333333;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .report-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+
+    .report-container button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .report-info-btn {
+      background: #3A86FF;
+      color: white;
+    }
+
+    .report-info-btn:hover {
+      background: #265ecf;
+    }
+
+    .report-unrec-btn {
+      background: #8338EC;
+      color: white;
+    }
+
+    .report-unrec-btn:hover {
+      background: #5c23a1;
+    }
+
+    .moby-checkbox {
+      margin: 15px 0;
+    }
+
+    #feedback {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #333333;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="report-container">
+    <button class="report-info-btn" id="btn-info">Report Information Change</button>
+    <button class="report-unrec-btn" id="btn-unrec">Unrecognized Website</button>
+    <div class="moby-checkbox">
+      <input type="checkbox" id="chk-moby">
+      <label for="chk-moby">Was MobyWeb used?</label>
+    </div>
+    <div id="feedback"></div>
+  </div>
+
+  <!-- Load the external script -->
+  <script src="script.js"></script>
+</body>
+
+</html>

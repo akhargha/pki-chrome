@@ -1,36 +1,36 @@
-import { Component } from 'react'
-import { Spring, SpringValue, animated } from 'react-spring'
+import { Component } from 'react';
+import { Spring, SpringValue, animated } from 'react-spring';
 import {
   WebsiteListEntry,
   WebsiteListEntryLogType
-} from '../utils/LocalStorage'
-import { iMsgReqType } from '../types/MessageTypes'
+} from '../utils/LocalStorage';
+import { iMsgReqType } from '../types/MessageTypes';
 import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 
 interface MoreSiteInfoProps {
-  isVisible: boolean
-  data?: WebsiteListEntry
-  webUrl?: string
-  closeFunc: (newWebData?: { [key: string]: WebsiteListEntry }) => void
+  isVisible: boolean;
+  data?: WebsiteListEntry;
+  webUrl?: string;
+  closeFunc: (newWebData?: { [key: string]: WebsiteListEntry; }) => void;
 }
 interface MoreSiteInfoState {
-  animationDone: boolean
+  animationDone: boolean;
 }
 export class MoreSiteInfo extends Component<
   MoreSiteInfoProps,
   MoreSiteInfoState
 > {
   constructor(p: MoreSiteInfoProps, s: MoreSiteInfoState) {
-    super(p, s)
+    super(p, s);
 
     this.state = {
       animationDone: true
-    }
+    };
   }
   componentDidMount(): void { }
   render() {
-    if (this.props.data === undefined) return
-    const data = this.props.data as WebsiteListEntry
+    if (this.props.data === undefined) return;
+    const data = this.props.data as WebsiteListEntry;
     return (
       <div
         style={{
@@ -54,16 +54,16 @@ export class MoreSiteInfo extends Component<
             height: this.props.isVisible ? '65vh' : '25vh'
           }}
           onStart={() => {
-            this.setState({ animationDone: false })
+            this.setState({ animationDone: false });
           }}
           onRest={() => {
-            this.setState({ animationDone: true })
+            this.setState({ animationDone: true });
           }}
         >
           {(properties: {
-            transparency: SpringValue<string>
-            width: SpringValue<string>
-            height: SpringValue<string>
+            transparency: SpringValue<string>;
+            width: SpringValue<string>;
+            height: SpringValue<string>;
           }) => (
             <animated.div
               style={{
@@ -103,16 +103,16 @@ export class MoreSiteInfo extends Component<
                 <button
                   className='forget-button'
                   onClick={() => {
-                    const url = this.props.webUrl as string
-                    const closer = this.props.closeFunc
+                    const url = this.props.webUrl as string;
+                    const closer = this.props.closeFunc;
                     chrome.storage.local.get(
                       { websiteList: {}, sessionList: {} },
                       function (items) {
-                        const websiteList = items.websiteList
-                        const sessionList = items.sessionList
+                        const websiteList = items.websiteList;
+                        const sessionList = items.sessionList;
 
-                        websiteList[url] = undefined
-                        sessionList[url] = undefined
+                        websiteList[url] = undefined;
+                        sessionList[url] = undefined;
 
                         chrome.storage.local.set(
                           {
@@ -120,16 +120,16 @@ export class MoreSiteInfo extends Component<
                             sessionList
                           },
                           () => {
-                            closer(websiteList)
+                            closer(websiteList);
                             chrome.runtime.sendMessage({
                               type: iMsgReqType.siteDataRefresh
                             });
                             sendUserActionInfo("abcd", 8); // placeholder userid that will be overridden
 
                           }
-                        )
+                        );
                       }
-                    )
+                    );
                   }}
                 >
                   Forget Site
@@ -145,6 +145,6 @@ export class MoreSiteInfo extends Component<
           )}
         </Spring>
       </div>
-    )
+    );
   }
 }

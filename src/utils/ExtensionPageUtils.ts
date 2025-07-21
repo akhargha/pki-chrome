@@ -31,7 +31,7 @@ async function fetchPoints(): Promise<number> {
 }
 
 export async function sendUserActionInfo(
-  user_id: string,
+  _user_id: string,
   event_number: number,
   reportedSite = '',
   currentSite = '',

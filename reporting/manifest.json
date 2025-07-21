@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Moby Phish (REACT)",
+  "name": "Study Reporting Tool",
   "version": "2.0",
   "description": "Moby Phish is a browser extension that intelligently safeguards users from phishing sites by performing real-time certificate checks and providing proactive notifications, ensuring secure and informed browsing experiences.",
   "permissions": ["activeTab", "storage", "scripting", "tabs", "background", "cookies", "http://localhost/*"],
@@ -12,16 +12,7 @@
       "default_title": "Open the popup"
   },
   "icons": {
-    "128": "icons/fish-emoji.png"
-  },
-  "content_scripts": [
-   {
-      "matches": ["<all_urls>"],
-      "js": ["./static/js/contentService.js"]
-   }
-  ],
-
-  "background": {
-    "service_worker": "./static/js/serviceWorker.js"
+    "128": "icons/report.png"
   }
+
 }
