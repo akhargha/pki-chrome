@@ -13,13 +13,13 @@ function get12HourTimestamp () {
 }
 
 function sendReport (eventType) {
-  const mobyUsed = document.getElementById('chk-moby').checked;
+  // const mobyUsed = document.getElementById('chk-moby').checked;
   const websiteUrl = window.location.href; // ← grab current URL
 
   const requestBody = {
     user_id: 'user_1',
     timestamp: new Date(),
-    text: `Event: ${eventType} | moby used: ${mobyUsed} | website: ${websiteUrl}`,
+    text: `Event: ${eventType} | website: ${websiteUrl}`,
   };
   fetch('https://localhost:5001/log/', {
     method: 'POST',
