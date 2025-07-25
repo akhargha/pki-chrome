@@ -9,6 +9,7 @@ import { fetchCertificateChain, grabMainUrl } from '../utils/fetchUtils';
 import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 import { iMsgReqType } from '../types/MessageTypes';
 import { getTabData } from '../utils/ChromeQueryUtils';
+import { WebsiteListDefaults } from '../utils/Defaults';
 interface LandingPageProps {
   isVisible: boolean;
   webUrl: string;
@@ -66,7 +67,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               verify you are visiting the correct website.
             </p>
             <br />
-            <h2
+            {false ? (<><h2
               className='subtitle'
               id='choose-option'
               style={{ textAlign: 'center' }}
@@ -74,97 +75,97 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               Choose an option below:
             </h2>
 
-            <div className='block'>
-              <button
-                className='button is-rounded is-info is-fullwidth'
-                id='sensitive-save-btn'
-                style={{ minHeight: '3em' }}
-                onClick={async () => {
-                  localStorage.get(
-                    { websiteList: {}, sessionList: {} },
-                    async i => {
-                      const websiteList: { [key: string]: WebsiteListEntry; } =
-                        i.websiteList;
-                      const sessionList: { [key: string]: boolean; } =
-                        i.sessionList;
+              <div className='block'>
+                <button
+                  className='button is-rounded is-info is-fullwidth'
+                  id='sensitive-save-btn'
+                  style={{ minHeight: '3em' }}
+                  onClick={async () => {
+                    localStorage.get(
+                      { websiteList: WebsiteListDefaults, sessionList: {} },
+                      async i => {
+                        const websiteList: { [key: string]: WebsiteListEntry; } =
+                          i.websiteList;
+                        const sessionList: { [key: string]: boolean; } =
+                          i.sessionList;
 
-                      const webDomain = this.props.webUrl;
-                      const tabId = this.props.tabId;
-                      const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
+                        const webDomain = this.props.webUrl;
+                        const tabId = this.props.tabId;
+                        const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
 
-                      const currentTime = new Date(
-                        currentTimeInMs,
-                      ).toLocaleString();
-                      const iconurl = (await getTabData()).favIconUrl;
-                      fetchCertificateChain(webDomain)
-                        .then(certificateChain => {
-                          websiteList[webDomain] = {
-                            LogType: WebsiteListEntryLogType.PROTECTED,
-                            certChain: certificateChain,
-                            addedAt: currentTime,
-                            lastVisit: currentTime,
-                            faviconUrl: iconurl as string,
-                          };
-                          sessionList[webDomain] = true;
+                        const currentTime = new Date(
+                          currentTimeInMs,
+                        ).toLocaleString();
+                        const iconurl = (await getTabData()).favIconUrl;
+                        fetchCertificateChain(webDomain)
+                          .then(certificateChain => {
+                            websiteList[webDomain] = {
+                              LogType: WebsiteListEntryLogType.PROTECTED,
+                              certChain: certificateChain,
+                              addedAt: currentTime,
+                              lastVisit: currentTime,
+                              faviconUrl: iconurl as string,
+                            };
+                            sessionList[webDomain] = true;
 
-                          chrome.storage.local.set(
-                            {
-                              websiteList: websiteList,
-                              sessionList: sessionList,
-                            },
-                            function () {
-                              console.log(
-                                'Website Saved as Sensitive',
-                                webDomain,
-                              );
-                              console.log(
-                                'Website added to session list',
-                                webDomain,
-                              );
-                              chrome.runtime.sendMessage({
-                                type: iMsgReqType.siteDataRefresh,
-                              });
-                              chrome.tabs.sendMessage(
-                                tabId,
-                                {
-                                  action: 'removeBlocker',
-                                },
-                                () => {
-                                  console.log('done removed');
-                                },
-                              ); //send message to unblock
-                            },
-                          );
-                          // removeView()
-                          // document.getElementById('added-to-trusted').style.display =
-                          //   'block'
+                            chrome.storage.local.set(
+                              {
+                                websiteList: websiteList,
+                                sessionList: sessionList,
+                              },
+                              function () {
+                                console.log(
+                                  'Website Saved as Sensitive',
+                                  webDomain,
+                                );
+                                console.log(
+                                  'Website added to session list',
+                                  webDomain,
+                                );
+                                chrome.runtime.sendMessage({
+                                  type: iMsgReqType.siteDataRefresh,
+                                });
+                                chrome.tabs.sendMessage(
+                                  tabId,
+                                  {
+                                    action: 'removeBlocker',
+                                  },
+                                  () => {
+                                    console.log('done removed');
+                                  },
+                                ); //send message to unblock
+                              },
+                            );
+                            // removeView()
+                            // document.getElementById('added-to-trusted').style.display =
+                            //   'block'
 
-                          sendUserActionInfo(user_id, 4);
-                          sendUserActionInfo(user_id, 7);
-                          return true;
-                        })
-                        .catch(error => {
-                          console.warn(
-                            'Error fetching certificate chain:',
-                            error,
-                          );
-                          // console.log('checking local vers')
-                          // localFetchCertChain(webDomain)
-                          //   .then(data => {
-                          //     console.log(data)
-                          //   })
-                          //   .catch(e => {
-                          //     console.warn('Failed to get local version', e)
-                          //   })
-                          // Handle the error, e.g., display an error message to the user
-                        });
-                    },
-                  );
-                }}
-              >
-                Save new Moby-protected site
-              </button>
-            </div>
+                            sendUserActionInfo(user_id, 4);
+                            sendUserActionInfo(user_id, 7);
+                            return true;
+                          })
+                          .catch(error => {
+                            console.warn(
+                              'Error fetching certificate chain:',
+                              error,
+                            );
+                            // console.log('checking local vers')
+                            // localFetchCertChain(webDomain)
+                            //   .then(data => {
+                            //     console.log(data)
+                            //   })
+                            //   .catch(e => {
+                            //     console.warn('Failed to get local version', e)
+                            //   })
+                            // Handle the error, e.g., display an error message to the user
+                          });
+                      },
+                    );
+                  }}
+                >
+                  Save new Moby-protected site
+                </button>
+              </div></>) : undefined}
             {
               //this should be false so it can be hidden since we are using a different reporting layout
             }
@@ -223,7 +224,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                           const favicon = tabs[0].favIconUrl;
                           if (currentSite && selectedSiteToReport) {
                             chrome.storage.local.get(
-                              { websiteList: {} },
+                              { websiteList: WebsiteListDefaults },
                               function (items) {
                                 const websiteList: {
                                   [key: string]: WebsiteListEntry;

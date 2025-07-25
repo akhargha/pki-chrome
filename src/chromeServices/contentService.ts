@@ -9,6 +9,7 @@ import {
 } from '../utils/PagesUtils';
 import { GitHubRelease, grabMainUrl } from '../utils/fetchUtils';
 import { ChromeCookie } from '../types/Cookies';
+import { WebsiteListDefaults } from '../utils/Defaults';
 
 //CONTENT SCRIPTS ARE SCRIPTS RAN IN THE CONTEXT OF THE WEBPAGES. THEY ARE WHAT HAS ACCESS TO THE DOM AND ALL IT'S ELEMENTS
 const url = new URL(window.location.href);
@@ -288,7 +289,7 @@ function main() {
   chrome.storage.local.get(
     //websiteList is the list of sites we have saved as safe or unsafe
     //session list is the list of sites that we have visitied in this session, so no reverification is needed.
-    { websiteList: {}, sessionList: {}, ignoreList: [] },
+    { websiteList: WebsiteListDefaults, sessionList: {}, ignoreList: [] },
     function (items) {
       const websiteList: { [key: string]: WebsiteListEntry; } =
         items.websiteList;
@@ -554,6 +555,8 @@ function main() {
                 'input[type="password"]',
               );
               if (passwordFields.length > 0) {
+                return;
+                //disable alert props, we do not want functionality for adding new sites.
                 customAlert3Prompts(
                   'MobyPhish Info',
                   'Moby thinks this page contains password fields, so it recommends to protect it.',

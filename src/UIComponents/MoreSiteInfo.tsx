@@ -6,6 +6,7 @@ import {
 } from '../utils/LocalStorage';
 import { iMsgReqType } from '../types/MessageTypes';
 import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
+import { WebsiteListDefaults } from '../utils/Defaults';
 
 interface MoreSiteInfoProps {
   isVisible: boolean;
@@ -106,7 +107,7 @@ export class MoreSiteInfo extends Component<
                     const url = this.props.webUrl as string;
                     const closer = this.props.closeFunc;
                     chrome.storage.local.get(
-                      { websiteList: {}, sessionList: {} },
+                      { websiteList: WebsiteListDefaults, sessionList: {} },
                       function (items) {
                         const websiteList = items.websiteList;
                         const sessionList = items.sessionList;

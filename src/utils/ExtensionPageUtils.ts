@@ -2,6 +2,7 @@ import { iMsgReqType } from '../types/MessageTypes';
 import {
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
+import { WebsiteListDefaults } from './Defaults';
 const user_id: string = require('../version').default.user_id;
 
 async function fetchPoints(): Promise<number> {
@@ -76,7 +77,7 @@ export async function sendUserActionInfo(
 
   if (event_number === 7) {
     // Special handling for event 7 - save sensitive site info
-    chrome.storage.local.get({ websiteList: {} }, function (items) {
+    chrome.storage.local.get({ websiteList: WebsiteListDefaults }, function (items) {
       const websiteList = items.websiteList;
       const sensitiveWebsites = [];
       for (const domain in websiteList) {
@@ -100,7 +101,7 @@ export async function sendUserActionInfo(
   }
   else if (event_number === 17) {
     // Special handling for event 17 - save unsafe site info
-    chrome.storage.local.get({ websiteList: {} }, function (items) {
+    chrome.storage.local.get({ websiteList: WebsiteListDefaults }, function (items) {
       const websiteList = items.websiteList;
       const unsafeSites = [];
       for (const domain in websiteList) {

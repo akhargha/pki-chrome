@@ -14,6 +14,7 @@ import {
   WebsiteListEntry,
   WebsiteListEntryLogType,
 } from '../utils/LocalStorage';
+import { WebsiteListDefaults } from '../utils/Defaults';
 
 chrome.runtime.onStartup.addListener(() => {
   chrome.storage.local.set({ sessionList: {}, tabDatabase: {} }, () => {
@@ -60,7 +61,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
           const currentTime = new Date(currentTimeInMs).toLocaleString(); // Convert to local date and time string
 
           const localStorageData = await chrome.storage.local.get({
-            websiteList: {},
+            websiteList: WebsiteListDefaults,
             sessionList: {},
           });
 

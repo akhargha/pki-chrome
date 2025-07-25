@@ -9,6 +9,7 @@ import { MoreSiteInfo } from './MoreSiteInfo';
 import { Spring, SpringValue, animated } from 'react-spring';
 import { fetchCertificateChain, grabMainUrl, sendWebsitesToDatabase } from '../utils/fetchUtils';
 import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
+import { WebsiteListDefaults } from '../utils/Defaults';
 
 interface SensitiveSiteControlsProps {
   isVisible: boolean;
@@ -47,7 +48,7 @@ class SensitiveSiteControls extends Component<
           chrome.storage.local.get(
             //websiteList is the list of sites we have saved as safe or unsafe
             //session list is the list of sites that we have visitied in this session, so no reverification is needed.
-            { websiteList: {}, sessionList: {} },
+            { websiteList: WebsiteListDefaults, sessionList: {} },
             function (items) {
               // ss({ websiteData: websiteList })
             },
@@ -158,7 +159,7 @@ class SensitiveSiteControls extends Component<
 
                           const localStorageData =
                             await chrome.storage.local.get({
-                              websiteList: {},
+                              websiteList: WebsiteListDefaults,
                               sessionList: {},
                             });
                           const userid = user_id;
@@ -271,7 +272,7 @@ class SensitiveSiteControls extends Component<
 
                           const localStorageData =
                             await chrome.storage.local.get({
-                              websiteList: {},
+                              websiteList: WebsiteListDefaults,
                               sessionList: {},
                             });
 

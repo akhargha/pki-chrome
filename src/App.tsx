@@ -17,6 +17,7 @@ import {
   grabMainUrl,
 } from './utils/fetchUtils';
 import { AddPoints } from './utils/PointsUtil';
+import { WebsiteListDefaults } from './utils/Defaults';
 
 const enum ViewState {
   Landing,
@@ -61,7 +62,7 @@ class App extends Component<object, AppState> {
       tabId: 0,
 
       currentSiteCert: {},
-      websiteList: {},
+      websiteList: WebsiteListDefaults,
       sessionList: {},
 
       settings: {
@@ -237,7 +238,7 @@ class App extends Component<object, AppState> {
           }
           chrome.storage.local.get(
             {
-              websiteList: {},
+              websiteList: WebsiteListDefaults,
               _pki_userData: {
                 // user_id: 'abcd',
                 TEST_ExtensionActive: true,
@@ -361,7 +362,7 @@ class App extends Component<object, AppState> {
     };
     chrome.storage.local.get({ autoSearchEnabled: true }, func);
 
-    chrome.storage.local.get({ websiteList: {} }, data => {
+    chrome.storage.local.get({ websiteList: WebsiteListDefaults }, data => {
       this.setState({ websiteList: data.websiteList });
     });
   }
