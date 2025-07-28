@@ -1,4 +1,7 @@
 
+# Initial setup
+Run `npm install` to install all node dependencies.
+
 # To build extensions for study in bulk:
 
  1. python Builder.py [amount]
