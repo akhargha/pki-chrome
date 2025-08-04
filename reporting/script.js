@@ -46,8 +46,8 @@ function sendReport (eventType) {
 
 document
   .getElementById('btn-info')
-  .addEventListener('click', () => sendReport('reportInformationChange'));
+  .addEventListener('click', () => sendReport('Reported Website Change'));
 
-document
-  .getElementById('btn-unrec')
-  .addEventListener('click', () => sendReport('unrecognizedWebsite'));
+document.getElementById('btn-unrec').addEventListener('click', () => {
+  window.close();
+});
