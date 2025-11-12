@@ -62,7 +62,7 @@ class App extends Component<object, AppState> {
       tabId: 0,
 
       currentSiteCert: {},
-      websiteList: WebsiteListDefaults,
+      websiteList: {},
       sessionList: {},
 
       settings: {
@@ -170,7 +170,6 @@ class App extends Component<object, AppState> {
       payload.faviconImage = favicon ? favicon : '';
       checkList(shortenedDomain).then(result => {
         if (result === checkListReturn.Safe) {
-          console.log("NEW CHECK 1");
           // removeView()
           // document.getElementById('all-set').style.display = 'block'
 
@@ -179,11 +178,8 @@ class App extends Component<object, AppState> {
           chrome.storage.local.get({ sessionList: {} }, function (items) {
             const sessionList = items.sessionList;
             if (!sessionList[shortenedDomain]) {
-              console.log("NEW CHECK 2");
               chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
-                console.log("Our resp", response, response.clicked);
                 if (response && !response.clicked) {
-                  console.log("NEW CHECK 3");
                   // document.getElementById(
                   //   'points-feedback-click-when-blocked'
                   // ).style.display = 'block';
@@ -193,7 +189,6 @@ class App extends Component<object, AppState> {
                   // });
 
                   AddPoints(); //TODO: feedback that user interacted with extension when it was blocked
-                  console.log("added points");
                 }
               });
             }
@@ -238,7 +233,7 @@ class App extends Component<object, AppState> {
           }
           chrome.storage.local.get(
             {
-              websiteList: WebsiteListDefaults,
+              websiteList: {},
               _pki_userData: {
                 // user_id: 'abcd',
                 TEST_ExtensionActive: true,
@@ -362,7 +357,7 @@ class App extends Component<object, AppState> {
     };
     chrome.storage.local.get({ autoSearchEnabled: true }, func);
 
-    chrome.storage.local.get({ websiteList: WebsiteListDefaults }, data => {
+    chrome.storage.local.get({ websiteList: {} }, data => {
       this.setState({ websiteList: data.websiteList });
     });
   }

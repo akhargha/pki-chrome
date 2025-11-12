@@ -67,7 +67,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               verify you are visiting the correct website.
             </p>
             <br />
-            {false ? (<><h2
+            {true ? (<><h2
               className='subtitle'
               id='choose-option'
               style={{ textAlign: 'center' }}
@@ -82,7 +82,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   style={{ minHeight: '3em' }}
                   onClick={async () => {
                     localStorage.get(
-                      { websiteList: WebsiteListDefaults, sessionList: {} },
+                      { websiteList: {}, sessionList: {} },
                       async i => {
                         const websiteList: { [key: string]: WebsiteListEntry; } =
                           i.websiteList;
@@ -169,7 +169,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             {
               //this should be false so it can be hidden since we are using a different reporting layout
             }
-            {false ? (<>
+            {true ? (<>
               <div className='block' id='report-phish-prompt-text'>
                 <h3 className='subtitle' style={{ textAlign: 'center' }}>
                   If you thought this was one of your Moby-protected sites, choose that
@@ -224,7 +224,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                           const favicon = tabs[0].favIconUrl;
                           if (currentSite && selectedSiteToReport) {
                             chrome.storage.local.get(
-                              { websiteList: WebsiteListDefaults },
+                              { websiteList: {} },
                               function (items) {
                                 const websiteList: {
                                   [key: string]: WebsiteListEntry;

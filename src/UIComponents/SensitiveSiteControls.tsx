@@ -48,7 +48,7 @@ class SensitiveSiteControls extends Component<
           chrome.storage.local.get(
             //websiteList is the list of sites we have saved as safe or unsafe
             //session list is the list of sites that we have visitied in this session, so no reverification is needed.
-            { websiteList: WebsiteListDefaults, sessionList: {} },
+            { websiteList: {}, sessionList: {} },
             function (items) {
               // ss({ websiteData: websiteList })
             },
@@ -159,7 +159,7 @@ class SensitiveSiteControls extends Component<
 
                           const localStorageData =
                             await chrome.storage.local.get({
-                              websiteList: WebsiteListDefaults,
+                              websiteList: {},
                               sessionList: {},
                             });
                           const userid = user_id;
@@ -272,7 +272,7 @@ class SensitiveSiteControls extends Component<
 
                           const localStorageData =
                             await chrome.storage.local.get({
-                              websiteList: WebsiteListDefaults,
+                              websiteList: {},
                               sessionList: {},
                             });
 

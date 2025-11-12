@@ -27,7 +27,7 @@ export interface WebsiteListEntry {
 }
 export function checkList(webDomain: string): Promise<checkListReturn> {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get({ websiteList: WebsiteListDefaults }, function (items) {
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
       const websiteList = items.websiteList;
       if (websiteList.hasOwnProperty(webDomain)) {
         if (

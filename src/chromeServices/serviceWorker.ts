@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
           const currentTime = new Date(currentTimeInMs).toLocaleString(); // Convert to local date and time string
 
           const localStorageData = await chrome.storage.local.get({
-            websiteList: WebsiteListDefaults,
+            websiteList: {},
             sessionList: {},
           });
 

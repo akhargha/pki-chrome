@@ -107,7 +107,7 @@ export class MoreSiteInfo extends Component<
                     const url = this.props.webUrl as string;
                     const closer = this.props.closeFunc;
                     chrome.storage.local.get(
-                      { websiteList: WebsiteListDefaults, sessionList: {} },
+                      { websiteList: {}, sessionList: {} },
                       function (items) {
                         const websiteList = items.websiteList;
                         const sessionList = items.sessionList;

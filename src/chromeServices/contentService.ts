@@ -289,7 +289,7 @@ function main() {
   chrome.storage.local.get(
     //websiteList is the list of sites we have saved as safe or unsafe
     //session list is the list of sites that we have visitied in this session, so no reverification is needed.
-    { websiteList: WebsiteListDefaults, sessionList: {}, ignoreList: [] },
+    { websiteList: {}, sessionList: {}, ignoreList: [] },
     function (items) {
       const websiteList: { [key: string]: WebsiteListEntry; } =
         items.websiteList;
