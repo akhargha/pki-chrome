@@ -38,8 +38,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
     const user_id = this.props.user_id;
 
     const data = this.props.websiteData[this.props.webUrl];
-
     let selectedSiteToReport: string | undefined = undefined;
+
     console.warn(this.props.websiteData, data, this.props.webUrl);
     return (
       <div style={{ display: this.props.isVisible ? 'block' : 'none' }}>
@@ -169,154 +169,230 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             {
               //this should be false so it can be hidden since we are using a different reporting layout
             }
-            {true ? (<>
-              <div className='block' id='report-phish-prompt-text'>
-                <h3 className='subtitle' style={{ textAlign: 'center' }}>
-                  If you thought this was one of your Moby-protected sites, choose that
-                  site below:{' '}
-                </h3>
-              </div>
-              <div id='sensitive-sites-dropdown-container'>
+            <div className='block'>
+              <button
+                className='button is-rounded is-danger is-fullwidth'
+                id='mark-unsafe-btn'
+                style={{ minHeight: '3em', marginTop: '10px' }}
+                onClick={() => {
+                  chrome.tabs.query(
+                    { active: true, currentWindow: true },
+                    function (tabs) {
+                      const url = tabs[0].url;
+                      const urlObj = new URL(url as string);
+                      const currentSite = grabMainUrl(urlObj);
+                      const currentTabId = tabs[0].id;
+                      const favicon = tabs[0].favIconUrl;
+                      if (currentSite) {
+                        chrome.storage.local.get(
+                          { websiteList: {} },
+                          function (items) {
+                            const websiteList: {
+                              [key: string]: WebsiteListEntry;
+                            } = items.websiteList;
+                            const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
+                            const localTimeString = new Date(
+                              currentTimeInMs,
+                            ).toLocaleString(); // Convert to local date and time string
 
-                <div
-                  className='select is-rounded is-danger'
-                  id='sensitive-sites-dropdown-container'
-                  style={{ marginLeft: '25px', marginBottom: '10px', width: 'auto', overflowX: 'hidden', wordWrap: 'break-word', maxWidth: '75vw' }}
-                >
-                  <select
-                    id='sensitive-sites-dropdown'
-                    onChange={event => {
-                      const selectedOption = event.target.value;
-                      if (selectedOption === '') {
-                        selectedSiteToReport = undefined;
-                      } else {
-                        selectedSiteToReport = selectedOption;
-                      }
-                      console.log('Selected option:', selectedOption);
-                    }}
-                  >
-                    {/* Options will be dynamically added here */}
-                    <option>Select the Moby-protected Site</option>
-                    {Object.keys(this.props.websiteData).map(key =>
-                      this.props.websiteData[key].LogType ===
-                        WebsiteListEntryLogType.PROTECTED ? (
-                        <option value={key} key={key}>{key}</option>
-                      ) : undefined,
-                    )}
-                  </select>
-                </div>
-              </div>
-
-              <div className='block'>
-                <button
-                  className='button is-rounded is-danger is-clipped'
-                  id='unsafe-save-btn'
-                  style={{ marginLeft: '100px' }}
-                  onClick={() => {
-                    if (selectedSiteToReport) {
-                      chrome.tabs.query(
-                        { active: true, currentWindow: true },
-                        function (tabs) {
-                          const url = tabs[0].url;
-                          const urlObj = new URL(url as string);
-                          const currentSite = grabMainUrl(urlObj);
-                          const currentTabId = tabs[0].id;
-                          const favicon = tabs[0].favIconUrl;
-                          if (currentSite && selectedSiteToReport) {
-                            chrome.storage.local.get(
-                              { websiteList: {} },
-                              function (items) {
-                                const websiteList: {
-                                  [key: string]: WebsiteListEntry;
-                                } = items.websiteList;
-                                const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
-                                const localTimeString = new Date(
-                                  currentTimeInMs,
-                                ).toLocaleString(); // Convert to local date and time string
-
-                                websiteList[currentSite] = {
-                                  LogType: WebsiteListEntryLogType.BLOCKED,
-                                  certChain: undefined,
-                                  addedAt: localTimeString,
-                                  lastVisit: localTimeString,
-                                  faviconUrl: favicon as string,
-                                }; // Mark the current site as unsafe
-                                chrome.storage.local.set(
-                                  { websiteList: websiteList },
-                                  function () {
-                                    console.log(
-                                      'Current website marked as blocked:',
-                                      currentSite,
-                                    );
-                                    // displayUnsafeSites()
-                                  },
-                                );
-                                chrome.tabs.sendMessage(currentTabId as number, {
-                                  action: 'addBlocker',
-                                });
-                                // Log the selected site with the current site
-                                sendUserActionInfo(
-                                  user_id,
-                                  10,
-                                  selectedSiteToReport,
+                            websiteList[currentSite] = {
+                              LogType: WebsiteListEntryLogType.BLOCKED,
+                              certChain: undefined,
+                              addedAt: localTimeString,
+                              lastVisit: localTimeString,
+                              faviconUrl: favicon as string,
+                            }; // Mark the current site as unsafe
+                            chrome.storage.local.set(
+                              { websiteList: websiteList },
+                              function () {
+                                console.log(
+                                  'Current website marked as blocked:',
                                   currentSite,
                                 );
+                                // displayUnsafeSites()
                               },
                             );
-                            // removeView()
-                            // document.getElementById(
-                            //   'added-to-untrust'
-                            // ).style.display = 'block'
-                            // document.getElementById('unblock-once').style.display =
-                            //   'block'
-                          } else {
-                            console.warn(
-                              'Error: No current site or no site selected to report.',
-                            );
-                          }
-                        },
-                      );
-                    }
-                  }}
-                >
-                  Report
-                </button>
-              </div>
-
-              <div className='block'>
-                <button
-                  className='button is-rounded is-danger is-clipped'
-                  id='unsafe-save-btn'
-                  style={{ marginLeft: '100px' }}
-                  onClick={() => {
-                    if (selectedSiteToReport) {
-                      chrome.tabs.query(
-                        { active: true, currentWindow: true },
-                        function (tabs) {
-                          const url = tabs[0].url;
-                          const urlObj = new URL(url as string);
-                          const currentSite = grabMainUrl(urlObj);
-                          if (currentSite && selectedSiteToReport) {
-                            //send site info changed event to logs
+                            chrome.tabs.sendMessage(currentTabId as number, {
+                              action: 'addBlocker',
+                            });
                             sendUserActionInfo(
                               user_id,
-                              12,
-                              selectedSiteToReport,
+                              6,
+                              currentSite,
                               currentSite,
                             );
-                          } else {
-                            console.warn(
-                              'Error: No current site or no site selected to report.',
-                            );
-                          }
-                        },
-                      );
+                          },
+                        );
+                      } else {
+                        console.warn('Error: No current site to report.');
+                      }
+                    },
+                  );
+                }}
+              >
+                Mark this site as unsafe
+              </button>
+            </div>
+
+            <div className='block' id='report-phish-prompt-text'>
+              <h3 className='subtitle' style={{ textAlign: 'center' }}>
+                If you thought this was one of your Moby-protected sites, choose that
+                site below:{' '}
+              </h3>
+            </div>
+            <div id='sensitive-sites-dropdown-container'>
+              <div
+                className='select is-rounded is-danger'
+                id='sensitive-sites-dropdown-container'
+                style={{ marginLeft: '25px', marginBottom: '10px', width: 'auto', overflowX: 'hidden', wordWrap: 'break-word', maxWidth: '75vw' }}
+              >
+                <select
+                  id='sensitive-sites-dropdown'
+                  defaultValue=''
+                  onChange={event => {
+                    const selectedOption = event.target.value;
+                    if (selectedOption === '') {
+                      selectedSiteToReport = undefined;
+                    } else {
+                      selectedSiteToReport = selectedOption;
                     }
+                    console.log('Selected option:', selectedOption);
                   }}
                 >
-                  Report Info Change
-                </button>
-              </div></>) : undefined}
+                  <option value=''>Select the Moby-protected Site</option>
+                  {Object.keys(this.props.websiteData).map(key =>
+                    this.props.websiteData[key].LogType ===
+                      WebsiteListEntryLogType.PROTECTED ? (
+                      <option value={key} key={key}>{key}</option>
+                    ) : undefined,
+                  )}
+                </select>
+              </div>
+            </div>
+
+            <div className='block'>
+              <button
+                className='button is-rounded is-danger is-clipped'
+                id='unsafe-save-btn'
+                style={{ marginLeft: '100px' }}
+                onClick={() => {
+                  if (!selectedSiteToReport) {
+                    console.warn(
+                      'Error: Please choose what you want to report before continuing.',
+                    );
+                    return;
+                  }
+                  const siteToReport = selectedSiteToReport;
+                  chrome.tabs.query(
+                    { active: true, currentWindow: true },
+                    function (tabs) {
+                      const url = tabs[0].url;
+                      const urlObj = new URL(url as string);
+                      const currentSite = grabMainUrl(urlObj);
+                      const currentTabId = tabs[0].id;
+                      const favicon = tabs[0].favIconUrl;
+                      if (currentSite) {
+                        chrome.storage.local.get(
+                          { websiteList: {} },
+                          function (items) {
+                            const websiteList: {
+                              [key: string]: WebsiteListEntry;
+                            } = items.websiteList;
+                            const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
+                            const localTimeString = new Date(
+                              currentTimeInMs,
+                            ).toLocaleString(); // Convert to local date and time string
+
+                            websiteList[currentSite] = {
+                              LogType: WebsiteListEntryLogType.BLOCKED,
+                              certChain: undefined,
+                              addedAt: localTimeString,
+                              lastVisit: localTimeString,
+                              faviconUrl: favicon as string,
+                            }; // Mark the current site as unsafe
+                            chrome.storage.local.set(
+                              { websiteList: websiteList },
+                              function () {
+                                console.log(
+                                  'Current website marked as blocked:',
+                                  currentSite,
+                                );
+                                // displayUnsafeSites()
+                              },
+                            );
+                            chrome.tabs.sendMessage(currentTabId as number, {
+                              action: 'addBlocker',
+                            });
+                            // Log the selected site with the current site
+                            sendUserActionInfo(
+                              user_id,
+                              6,
+                              currentSite,
+                              currentSite,
+                            );
+                            fetch('http://localhost:5001/complete-task', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                site_url: siteToReport,
+                                elapsed_ms: Math.floor(Math.random() * 10000),
+                                completion_type: 'reported_phishing',
+                              }),
+                            }).catch(e =>
+                              console.warn('complete-task call failed', e),
+                            );
+                          },
+                        );
+                      } else {
+                        console.warn('Error: No current site to report.');
+                      }
+                    },
+                  );
+                }}
+              >
+                Report
+              </button>
+            </div>
+
+            <div className='block'>
+              <button
+                className='button is-rounded is-danger is-clipped'
+                id='unsafe-save-btn'
+                style={{ marginLeft: '100px' }}
+                onClick={() => {
+                  if (!selectedSiteToReport) {
+                    console.warn(
+                      'Error: Please select the specific Moby-protected site before reporting an info change.',
+                    );
+                    return;
+                  }
+                  const siteToReport = selectedSiteToReport;
+                  chrome.tabs.query(
+                    { active: true, currentWindow: true },
+                    function (tabs) {
+                      const url = tabs[0].url;
+                      const urlObj = new URL(url as string);
+                      const currentSite = grabMainUrl(urlObj);
+                      if (currentSite) {
+                        //send site info changed event to logs
+                        sendUserActionInfo(
+                          user_id,
+                          12,
+                          siteToReport,
+                          currentSite,
+                        );
+                      } else {
+                        console.warn(
+                          'Error: No current site available to report.',
+                        );
+                      }
+                    },
+                  );
+                }}
+              >
+                Report Info Change
+              </button>
+            </div>
           </>
         ) : undefined}
 

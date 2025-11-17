@@ -171,7 +171,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         };
 
         // Make the POST request to the backend
-        fetch('https://localhost:5001/log/', {
+        fetch('http://localhost:5001/log', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ export function fetchCertificateChain(webDomain: string) {
     `localhost:5001/certificate_chain/${shortenedDomain}`,
   );
   return fetch(
-    `localhost:5001/certificate_chain/${shortenedDomain}`,
+    `http://localhost:5001/certificate_chain/${shortenedDomain}`,
   )
     .then(response => response.json())
     .then(data => {

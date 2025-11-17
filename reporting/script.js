@@ -21,7 +21,7 @@ function sendReport (eventType) {
     timestamp: new Date(),
     text: `Event: ${eventType} | website: ${websiteUrl}`,
   };
-  fetch('https://localhost:5001/log/', {
+  fetch('http://localhost:5001/log', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
