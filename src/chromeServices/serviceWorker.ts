@@ -140,6 +140,38 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
+// ----------------------------------------------------
+// NEW LISTENER: Clears session data when the last window closes
+// ----------------------------------------------------
+
+// Check if any browser windows are open.
+function areWindowsOpen() {
+  return new Promise<boolean>(resolve => {
+    chrome.windows.getAll({ populate: false }, windows => {
+      // Check if the array of windows is empty (no windows open)
+      resolve(windows.length > 0);
+    });
+  });
+}
+chrome.windows.onRemoved.addListener(async (windowId) => {
+  const isAnyWindowOpen = await areWindowsOpen();
+
+  if (!isAnyWindowOpen) {
+    // If we reach here, the last browser window has been closed.
+    console.log('Last browser window closed. Clearing session-specific data.');
+
+    // Clear your session-specific storage items
+    chrome.storage.local.set({ sessionList: {}, tabDatabase: {} }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Error clearing storage on session end:', chrome.runtime.lastError.message);
+      } else {
+        console.log('Session list and tab database cleared upon last window closure.');
+      }
+    });
+  }
+});
+
+
 //other events that are synchronous. these can get a response back.
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const data = request as iMsgReq;
@@ -171,7 +203,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         };
 
         // Make the POST request to the backend
-        fetch('http://localhost:5001/log', {
+        fetch('https://study-api.com/log', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

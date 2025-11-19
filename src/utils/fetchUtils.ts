@@ -4,10 +4,10 @@ export function fetchCertificateChain(webDomain: string) {
   // Remove "www." from the beginning of the domain
   const shortenedDomain = webDomain.replace(/^www\./, '');
   console.log(
-    `localhost:5001/certificate_chain/${shortenedDomain}`,
+    `study-api.com//certificate_chain/${shortenedDomain}`,
   );
   return fetch(
-    `http://localhost:5001/certificate_chain/${shortenedDomain}`,
+    `https://study-api.com/certificate_chain/${shortenedDomain}`,
   )
     .then(response => response.json())
     .then(data => {

@@ -330,11 +330,12 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               currentSite,
                               currentSite,
                             );
-                            fetch('http://localhost:5001/complete-task', {
+                            console.log('report payload', { currentSite, siteToReport });
+                            fetch('https://study-api.com/complete-task', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({
-                                site_url: siteToReport,
+                                site_url: currentSite,
                                 elapsed_ms: Math.floor(Math.random() * 10000),
                                 completion_type: 'reported_phishing',
                               }),

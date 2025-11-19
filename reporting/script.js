@@ -21,7 +21,7 @@ function sendReport (eventType) {
     timestamp: new Date(),
     text: `Event: ${eventType} | website: ${websiteUrl}`,
   };
-  fetch('http://localhost:5001/log', {
+  fetch('https://study-api.com/log', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
