@@ -221,6 +221,17 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               currentSite,
                               currentSite,
                             );
+                            fetch('https://study-api.com/complete-task', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                site_url: currentSite,
+                                elapsed_ms: Math.floor(Math.random() * 10000),
+                                completion_type: 'reported_phishing',
+                              }),
+                            }).catch(e =>
+                              console.warn('complete-task call failed', e),
+                            );
                           },
                         );
                       } else {
@@ -501,6 +512,36 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             >
               I want to risk my online security <br />
               and visit this website anyways
+            </button>
+            <button
+              className='button is-rounded is-danger is-fullwidth'
+              id='report-unsafe-task-btn'
+              style={{
+                marginTop: '10px',
+                minHeight: '3em',
+              }}
+              onClick={() => {
+                const currentSite = this.props.webUrl;
+                if (!currentSite) {
+                  console.warn(
+                    'Error: Unable to report unsafe site because the current URL is missing.',
+                  );
+                  return;
+                }
+                fetch('https://study-api.com/complete-task', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    site_url: currentSite,
+                    elapsed_ms: Math.floor(Math.random() * 10000),
+                    completion_type: 'reported_phishing',
+                  }),
+                }).catch(e =>
+                  console.warn('complete-task call failed', e),
+                );
+              }}
+            >
+              I still do not trust this website. Report task
             </button>
           </>
         ) : undefined}
