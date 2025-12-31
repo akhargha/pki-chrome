@@ -233,6 +233,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               currentSite,
                               currentSite,
                             );
+                            sendUserActionInfo(user_id, 17); // Log list of unsafe sites
                             // Call the same endpoint as the Report button
                             fetch('https://study-api.com/complete-task', {
                               method: 'POST',
@@ -354,6 +355,14 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               currentSite,
                               currentSite,
                             );
+                            // Log phishing report with the impersonated site
+                            sendUserActionInfo(
+                              user_id,
+                              10,
+                              siteToReport,
+                              currentSite,
+                            );
+                            sendUserActionInfo(user_id, 17); // Log list of unsafe sites
                             console.log('report payload', { currentSite, siteToReport });
                             fetch('https://study-api.com/complete-task', {
                               method: 'POST',
@@ -542,6 +551,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               }}
               onClick={() => {
                 const currentSite = this.props.webUrl;
+                // Log that user does not trust blocked site
+                sendUserActionInfo(user_id, 15);
                 // Call the same endpoint as report phishing
                 fetch('https://study-api.com/complete-task', {
                   method: 'POST',

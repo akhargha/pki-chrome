@@ -426,11 +426,17 @@ class App extends Component<object, AppState> {
               <Navbar
                 toggleSensitiveSiteControls={() => {
                   const current = this.state.viewing;
+                  const newView = current === ViewState.Landing
+                    ? ViewState.SensitiveSiteControls
+                    : ViewState.Landing;
+                  
+                  // Log when user opens the edit site list view
+                  if (newView === ViewState.SensitiveSiteControls) {
+                    sendUserActionInfo(user_id, 16);
+                  }
+                  
                   this.setState({
-                    viewing:
-                      current === ViewState.Landing
-                        ? ViewState.SensitiveSiteControls
-                        : ViewState.Landing,
+                    viewing: newView,
                   });
                 }}
                 viewState={this.state.viewing}

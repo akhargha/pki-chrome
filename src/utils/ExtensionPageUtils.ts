@@ -49,7 +49,9 @@ export async function sendUserActionInfo(
     11: 'Unsafe site unblocked temporarily',
     12: "Site info changed",
     13: "User trusts site despite certificate change",
-    14: "User does not trust site due to certificate change, cannot complete task"
+    14: "User does not trust site due to certificate change, cannot complete task",
+    15: "User does not trust blocked site, cannot complete task",
+    16: "User opened edit site list view",
   };
 
   // Retrieve userId from Chrome storage since user_id given in function is wrong at times - do NOT remove this without making sure the function is invoked with the correct id at other parts of code

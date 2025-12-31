@@ -169,6 +169,9 @@ class SensitiveSiteControls extends Component<
                           const sessionList: { [key: string]: boolean; } =
                             localStorageData.sessionList;
 
+                          // Check if site was previously blocked
+                          const wasPreviouslyBlocked = websiteList[webDomain]?.LogType === WebsiteListEntryLogType.BLOCKED;
+
                           websiteList[webDomain] = {
                             LogType: WebsiteListEntryLogType.PROTECTED,
                             certChain: certificateChain,
@@ -194,7 +197,12 @@ class SensitiveSiteControls extends Component<
                             .then(() => { })
                             .catch(e => console.warn(e));
 
-                          sendUserActionInfo(userid, 4);
+                          // Use event 5 if converting from blocked, otherwise event 4
+                          if (wasPreviouslyBlocked) {
+                            sendUserActionInfo(userid, 5);
+                          } else {
+                            sendUserActionInfo(userid, 4);
+                          }
                           sendUserActionInfo(userid, 7);
                           sendWebsitesToDatabase([webDomain]);
                         },
