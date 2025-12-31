@@ -93,7 +93,7 @@ export class MoreSiteInfo extends Component<
                       {
                         // you can only set the site as the first two enums.
                         data.LogType === WebsiteListEntryLogType.PROTECTED
-                          ? 'protected'
+                          ? 'known'
                           : 'blocked'
                       }
                     </p>

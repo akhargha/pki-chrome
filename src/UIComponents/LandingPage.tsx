@@ -10,6 +10,18 @@ import { sendUserActionInfo } from '../utils/ExtensionPageUtils';
 import { iMsgReqType } from '../types/MessageTypes';
 import { getTabData } from '../utils/ChromeQueryUtils';
 import { WebsiteListDefaults } from '../utils/Defaults';
+
+// Helper function to extract just the site name from a domain (e.g., "google.com" -> "google")
+function getSiteName(domain: string): string {
+  // Remove common prefixes like www.
+  const name = domain.replace(/^www\./, '');
+  // Get the part before the first dot (the site name)
+  const parts = name.split('.');
+  if (parts.length > 0) {
+    return parts[0];
+  }
+  return name;
+}
 interface LandingPageProps {
   isVisible: boolean;
   webUrl: string;
@@ -62,9 +74,9 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   maxHeight: '20px',
                 }}
               />
-              We do <strong>not</strong> recognize this site. If you think you
-              are visiting a Moby-protected site, please recheck your source and
-              verify you are visiting the correct website.
+              We do <strong>not</strong> recognize this website. If you were trying to
+              visit a known site, please recheck how you got here and make sure
+              this is the correct website.
             </p>
             <br />
             {true ? (<><h2
@@ -163,7 +175,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     );
                   }}
                 >
-                  Save new Moby-protected site
+                  Save new known site
                 </button>
               </div></>) : undefined}
             {
@@ -221,6 +233,18 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               currentSite,
                               currentSite,
                             );
+                            // Call the same endpoint as the Report button
+                            fetch('https://study-api.com/complete-task', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                site_url: currentSite,
+                                elapsed_ms: Math.floor(Math.random() * 10000),
+                                completion_type: 'reported_phishing',
+                              }),
+                            }).catch(e =>
+                              console.warn('complete-task call failed', e),
+                            );
                           },
                         );
                       } else {
@@ -230,13 +254,13 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   );
                 }}
               >
-                Mark this site as unsafe
+                Block this site
               </button>
             </div>
 
             <div className='block' id='report-phish-prompt-text'>
               <h3 className='subtitle' style={{ textAlign: 'center' }}>
-                If you thought this was one of your Moby-protected sites, choose that
+                If you thought this was one of your saved known sites, choose that
                 site below:{' '}
               </h3>
             </div>
@@ -259,11 +283,11 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     console.log('Selected option:', selectedOption);
                   }}
                 >
-                  <option value=''>Select the Moby-protected Site</option>
+                  <option value=''>Select the known site</option>
                   {Object.keys(this.props.websiteData).map(key =>
                     this.props.websiteData[key].LogType ===
                       WebsiteListEntryLogType.PROTECTED ? (
-                      <option value={key} key={key}>{key}</option>
+                      <option value={key} key={key}>{getSiteName(key)}</option>
                     ) : undefined,
                   )}
                 </select>
@@ -355,6 +379,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               </button>
             </div>
 
+            {/* Report Info Change button - commented out for now, may be needed in the future
             <div className='block'>
               <button
                 className='button is-rounded is-danger is-clipped'
@@ -394,6 +419,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 Report Info Change
               </button>
             </div>
+            */}
           </>
         ) : undefined}
 
@@ -420,7 +446,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     : 'none',
               }}
             >
-              You are protected!
+              This is one of your known sites. You can continue safely.
             </h2>
             <h2
               className='subtitle'
@@ -501,6 +527,43 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             >
               I want to risk my online security <br />
               and visit this website anyways
+            </button>
+
+            <button
+              className='button is-rounded is-danger is-fullwidth'
+              id='cannot-complete-task'
+              style={{
+                display:
+                  data.LogType === WebsiteListEntryLogType.BLOCKED
+                    ? ''
+                    : 'none',
+                minHeight: '4em',
+                marginTop: '10px',
+              }}
+              onClick={() => {
+                const currentSite = this.props.webUrl;
+                // Call the same endpoint as report phishing
+                fetch('https://study-api.com/complete-task', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    site_url: currentSite,
+                    elapsed_ms: Math.floor(Math.random() * 10000),
+                    completion_type: 'reported_phishing',
+                  }),
+                })
+                  .then(() => {
+                    alert('Thank you! Please go back to your email for the next task.');
+                  })
+                  .catch(e => {
+                    console.warn('complete-task call failed', e);
+                    // Still show the message even if the call fails
+                    alert('Thank you! Please go back to your email for the next task.');
+                  });
+              }}
+            >
+              I still do not trust this website. <br />
+              I cannot complete the task.
             </button>
           </>
         ) : undefined}

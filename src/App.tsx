@@ -19,6 +19,18 @@ import {
 import { AddPoints } from './utils/PointsUtil';
 import { WebsiteListDefaults } from './utils/Defaults';
 
+// Helper function to extract just the site name from a domain (e.g., "google.com" -> "google")
+function getSiteName(domain: string): string {
+  // Remove common prefixes like www.
+  const name = domain.replace(/^www\./, '');
+  // Get the part before the first dot (the site name)
+  const parts = name.split('.');
+  if (parts.length > 0) {
+    return parts[0];
+  }
+  return name;
+}
+
 const enum ViewState {
   Landing,
   SensitiveSiteControls,
@@ -423,7 +435,7 @@ class App extends Component<object, AppState> {
               </div>
 
               {/* <!--URL--> */}
-              <p id='url-container'>{this.state.websiteUrl}</p>
+              <p id='url-container'>{getSiteName(this.state.websiteUrl)}</p>
               <br />
 
               {/* <!--Info Text--> */}

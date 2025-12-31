@@ -123,7 +123,7 @@ class SensitiveSiteControls extends Component<
                   <input
                     className='input'
                     type='text'
-                    placeholder='Enter site domain to protect'
+                    placeholder='Enter new known site'
                     onBlur={event => {
                       let s = event.target.value;
                       if (!s.startsWith("http")) {
@@ -234,7 +234,7 @@ class SensitiveSiteControls extends Component<
                   <input
                     className='input'
                     type='text'
-                    placeholder='Enter unsafe site domain'
+                    placeholder='Enter site to block'
                     onBlur={event => {
                       let s = event.target.value.trim();
 
