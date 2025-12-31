@@ -329,7 +329,7 @@ function main() {
                       ) {
                         console.log('Certificate chain matches');
                         addBlocker(
-                          'You have marked this site to be Moby-protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
+                          'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
                         );
                       } else {
                         console.log('Certificate chain does not match');
@@ -491,7 +491,7 @@ function main() {
                   ) {
                     console.log('Certificate chain matches');
                     addBlocker(
-                      'You have marked this site to be Moby-protected. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
+                      'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
                     );
                   } else {
                     console.log('Certificate chain does not match');
@@ -527,7 +527,7 @@ function main() {
           //       if (passwordFields.length > 0) {
           //         // Add blocker todo: fix this
           //         addBlocker(
-          //           'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.'
+          //           'This site is blocked. Please click the MobyWeb extension before continuing to stay safe.'
           //         )
           //       }
           //     }
@@ -537,7 +537,7 @@ function main() {
 
           //instead. just block the site regardless of passwords.
           addBlocker(
-            'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
+            'This site is blocked. Please click the MobyWeb extension before continuing to stay safe.',
           );
         }
       } else if (!ignoreList.includes(shortenedDomain)) {
@@ -750,7 +750,7 @@ function compareObjects(
 }
 
 function addBlocker(
-  message = 'This site is marked as blocked. Please click on the extension before proceeding to prevent yourself from cyber attacks.',
+  message = 'This site is blocked. Please click the MobyWeb extension before continuing to stay safe.',
 ) {
   const find = document.getElementById('myBlockerDiv');
   if (find) {

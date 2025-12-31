@@ -131,18 +131,8 @@ class Navbar extends Component<NavbarProps, NavbarState> {
             <span style={{ fontSize: '2em' }}>🐟</span>
           </a>
 
-          {/* <!-- Display points if group is 1 and longTerm is true --> */}
-          {
-            this.state.group === 1 && this.state.longTerm ? (
-              <h2 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
-                Points: <span>{this.state.points}</span>
-              </h2>
-            ) : (
-              <h3 style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }} id='points'>
-                Points: <span>N/A</span>
-              </h3>
-            )
-          }
+          {/* Placeholder to maintain layout orientation */}
+          <span style={{ marginLeft: '3em', marginTop: '0.8em', display: 'flex' }}>.................</span>
 
           <img
             src='./icons/gear-solid.svg'
