@@ -207,9 +207,8 @@ class App extends Component<object, AppState> {
             sessionList[shortenedDomain] = true;
             chrome.storage.local.set({ sessionList: sessionList }, function () {
               console.log('Website added to session list', shortenedDomain);
-              chrome.tabs.sendMessage(tabs[0].id as number, {
-                action: 'removeBlocker',
-              }); //send message to unblock
+              // Note: Blocker removal moved to certificate comparison logic
+              // Only remove blocker when certificate chains match
             });
           });
 
@@ -296,7 +295,10 @@ class App extends Component<object, AppState> {
                         console.log("COMPARE", cert, cert, d.websiteList[shortenedDomain]);
 
                         if (compareCertificateChains(cert, realCert)) {
-                          //does match do nothing
+                          // Certificate chains match - remove blocker
+                          chrome.tabs.sendMessage(tabs[0].id as number, {
+                            action: 'removeBlocker',
+                          });
                         } else {
                           t.doShowCertChangedButton = true;
                         }
@@ -313,7 +315,10 @@ class App extends Component<object, AppState> {
                       console.log("COMPARE", cert, savedCertificateChain, d.websiteList[shortenedDomain]);
 
                       if (compareCertificateChains(cert, savedCertificateChain)) {
-                        //does match do nothing
+                        // Certificate chains match - remove blocker
+                        chrome.tabs.sendMessage(tabs[0].id as number, {
+                          action: 'removeBlocker',
+                        });
                       } else {
                         t.doShowCertChangedButton = true;
                       }
@@ -324,11 +329,33 @@ class App extends Component<object, AppState> {
                     }
                   });
                 } else {
-                  setter(t);
-
-                  sendUserActionInfo(user_id, 3);
+                  // For all other saved sites, fetch and compare certificate chains
+                  const savedCertificateChain = d.websiteList[shortenedDomain].certChain;
+                  fetchCertificateChain(shortenedDomain).then(currentCert => {
+                    if (compareCertificateChains(currentCert, savedCertificateChain)) {
+                      // Certificate chains match - remove blocker
+                      chrome.tabs.sendMessage(tabs[0].id as number, {
+                        action: 'removeBlocker',
+                      });
+                    } else {
+                      // Certificate chains don't match - keep blocker, show warning
+                      t.doShowCertChangedButton = true;
+                    }
+                    setter(t);
+                    sendUserActionInfo(user_id, 3);
+                  }).catch(err => {
+                    console.error("Error fetching certificate chain:", err);
+                    // On error, treat as potential security issue - keep blocker
+                    t.doShowCertChangedButton = true;
+                    setter(t);
+                    sendUserActionInfo(user_id, 3);
+                  });
                 }
               } else {
+                // Site not in websiteList but marked as Safe - remove blocker
+                chrome.tabs.sendMessage(tabs[0].id as number, {
+                  action: 'removeBlocker',
+                });
                 setter(t);
 
                 sendUserActionInfo(user_id, 3);

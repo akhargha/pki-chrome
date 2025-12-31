@@ -335,7 +335,7 @@ function main() {
                         console.log('Certificate chain does not match');
                         //DO OTHER STUFF HERE
                         addBlocker(
-                          'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                          'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
                         );
                       }
                     } else {
@@ -363,7 +363,7 @@ function main() {
                           console.log('Certificate chain does not match');
                           //DO OTHER STUFF HERE
                           addBlocker(
-                            'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                            'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
                           );
                         },
                       );
@@ -392,7 +392,7 @@ function main() {
               );
               // If there's an error fetching the certificate chain, add blocker
               addBlocker(
-                'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
               );
             }
           },
@@ -449,7 +449,7 @@ function main() {
                             console.log('Certificate chain does not match');
                             //DO OTHER STUFF HERE
                             addBlocker(
-                              'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                              'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
                             );
                           }
                         } else if (response.error) {
@@ -459,7 +459,7 @@ function main() {
                           );
                           // If there's an error fetching the certificate chain, add blocker
                           addBlocker(
-                            'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                            'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
                           );
                         }
                       },
@@ -497,7 +497,7 @@ function main() {
                     console.log('Certificate chain does not match');
                     //DO OTHER STUFF HERE
                     addBlocker(
-                      'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                      'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
                     );
                   }
                 } else if (response.error) {
@@ -507,7 +507,7 @@ function main() {
                   );
                   // If there's an error fetching the certificate chain, add blocker
                   addBlocker(
-                    'Some security information about this site has been changed! This is usually an indicator of an attack. Please click on the extension to proceed.',
+                    'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
                   );
                 }
               },

@@ -583,9 +583,9 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               id='cert-info-change'
             >
               Some security information about this site has been changed! This
-              is usually an indicator of an attack. Please proceed carefully, and refrain from submitting any credentials. The blocker has been removed.
+              may be an indicator of an attack. Please proceed carefully, and refrain from submitting any credentials.
             </h2>
-            {/* <button
+            <button
               className='button is-rounded is-info is-fullwidth'
               id='trust-on-change'
               style={{
@@ -594,11 +594,91 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     this.props.showchanged === true
                     ? ''
                     : 'none',
+                minHeight: '4em',
+                marginTop: '10px',
+              }}
+              onClick={() => {
+                const webDomain = this.props.webUrl;
+                const tabId = this.props.tabId;
+                // Fetch new certificate and update the saved site
+                fetchCertificateChain(webDomain)
+                  .then(newCertificateChain => {
+                    chrome.storage.local.get(
+                      { websiteList: {}, sessionList: {} },
+                      (items) => {
+                        const websiteList: { [key: string]: WebsiteListEntry } = items.websiteList;
+                        const sessionList: { [key: string]: boolean } = items.sessionList;
+                        
+                        if (websiteList[webDomain]) {
+                          // Update the certificate chain
+                          websiteList[webDomain].certChain = newCertificateChain;
+                          websiteList[webDomain].lastVisit = new Date().toLocaleString();
+                          sessionList[webDomain] = true;
+                          
+                          chrome.storage.local.set(
+                            { websiteList, sessionList },
+                            () => {
+                              console.log('Certificate chain updated for', webDomain);
+                              // Remove the blocker
+                              chrome.tabs.sendMessage(tabId, { action: 'removeBlocker' });
+                              chrome.runtime.sendMessage({ type: iMsgReqType.siteDataRefresh });
+                              // Log the event
+                              sendUserActionInfo(user_id, 13);
+                              alert('Certificate updated. You can proceed with browsing.');
+                            }
+                          );
+                        }
+                      }
+                    );
+                  })
+                  .catch(err => {
+                    console.error('Error fetching new certificate chain:', err);
+                    alert('Error updating certificate. Please try again.');
+                  });
               }}
             >
-              I still trust this website
-            </button> */}
-
+              I still trust this website. <br />
+              Do not show me this warning.
+            </button>
+            <button
+              className='button is-rounded is-danger is-fullwidth'
+              id='cannot-complete-task-cert-change'
+              style={{
+                display:
+                  data.LogType === WebsiteListEntryLogType.PROTECTED &&
+                    this.props.showchanged === true
+                    ? ''
+                    : 'none',
+                minHeight: '4em',
+                marginTop: '10px',
+              }}
+              onClick={() => {
+                const currentSite = this.props.webUrl;
+                // Log the event
+                sendUserActionInfo(user_id, 14);
+                // Call complete-task API with report phishing
+                fetch('https://study-api.com/complete-task', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    site_url: currentSite,
+                    elapsed_ms: Math.floor(Math.random() * 10000),
+                    completion_type: 'reported_phishing',
+                  }),
+                })
+                  .then(() => {
+                    alert('Thank you! Please go back to your email for the next task.');
+                  })
+                  .catch(e => {
+                    console.warn('complete-task call failed', e);
+                    // Still show the message even if the call fails
+                    alert('Thank you! Please go back to your email for the next task.');
+                  });
+              }}
+            >
+              I do not trust this website. <br />
+              I cannot complete my task.
+            </button>
           </>
         ) : undefined}
 
