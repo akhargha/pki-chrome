@@ -241,7 +241,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               body: JSON.stringify({
                                 site_url: currentSite,
                                 elapsed_ms: Math.floor(Math.random() * 10000),
-                                completion_type: 'reported_phishing',
+                                completion_type: 'report_extension',
                               }),
                             }).catch(e =>
                               console.warn('complete-task call failed', e),
@@ -370,7 +370,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               body: JSON.stringify({
                                 site_url: currentSite,
                                 elapsed_ms: Math.floor(Math.random() * 10000),
-                                completion_type: 'reported_phishing',
+                                completion_type: 'report_extension',
                               }),
                             }).catch(e =>
                               console.warn('complete-task call failed', e),
@@ -560,7 +560,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   body: JSON.stringify({
                     site_url: currentSite,
                     elapsed_ms: Math.floor(Math.random() * 10000),
-                    completion_type: 'reported_phishing',
+                    completion_type: 'report_extension',
                   }),
                 })
                   .then(() => {
@@ -619,13 +619,13 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                       (items) => {
                         const websiteList: { [key: string]: WebsiteListEntry } = items.websiteList;
                         const sessionList: { [key: string]: boolean } = items.sessionList;
-                        
+
                         if (websiteList[webDomain]) {
                           // Update the certificate chain
                           websiteList[webDomain].certChain = newCertificateChain;
                           websiteList[webDomain].lastVisit = new Date().toLocaleString();
                           sessionList[webDomain] = true;
-                          
+
                           chrome.storage.local.set(
                             { websiteList, sessionList },
                             () => {
@@ -674,7 +674,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   body: JSON.stringify({
                     site_url: currentSite,
                     elapsed_ms: Math.floor(Math.random() * 10000),
-                    completion_type: 'reported_phishing',
+                    completion_type: 'report_extension',
                   }),
                 })
                   .then(() => {
