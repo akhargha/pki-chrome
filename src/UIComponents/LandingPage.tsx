@@ -11,16 +11,9 @@ import { iMsgReqType } from '../types/MessageTypes';
 import { getTabData } from '../utils/ChromeQueryUtils';
 import { WebsiteListDefaults } from '../utils/Defaults';
 
-// Helper function to extract just the site name from a domain (e.g., "google.com" -> "google")
+// Helper function to show domain with TLD (e.g., "www.google.com" -> "google.com")
 function getSiteName(domain: string): string {
-  // Remove common prefixes like www.
-  const name = domain.replace(/^www\./, '');
-  // Get the part before the first dot (the site name)
-  const parts = name.split('.');
-  if (parts.length > 0) {
-    return parts[0];
-  }
-  return name;
+  return domain.replace(/^www\./, '');
 }
 
 function getAssignmentIdFromPath(pathname: string): number | undefined {
@@ -551,7 +544,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             </h3>
 
             <button
-              className='button is-rounded is-info is-fullwidth'
+              className='button is-rounded is-danger is-fullwidth'
               id='unblock-once'
               style={{
                 display:
@@ -583,7 +576,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             </button>
 
             <button
-              className='button is-rounded is-danger is-fullwidth'
+              className='button is-rounded is-info is-fullwidth'
               id='cannot-complete-task'
               style={{
                 display:

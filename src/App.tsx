@@ -19,16 +19,9 @@ import {
 import { AddPoints } from './utils/PointsUtil';
 import { WebsiteListDefaults } from './utils/Defaults';
 
-// Helper function to extract just the site name from a domain (e.g., "google.com" -> "google")
+// Helper function to show domain with TLD (e.g., "www.google.com" -> "google.com")
 function getSiteName(domain: string): string {
-  // Remove common prefixes like www.
-  const name = domain.replace(/^www\./, '');
-  // Get the part before the first dot (the site name)
-  const parts = name.split('.');
-  if (parts.length > 0) {
-    return parts[0];
-  }
-  return name;
+  return domain.replace(/^www\./, '');
 }
 
 const enum ViewState {
@@ -429,12 +422,12 @@ class App extends Component<object, AppState> {
                   const newView = current === ViewState.Landing
                     ? ViewState.SensitiveSiteControls
                     : ViewState.Landing;
-                  
+
                   // Log when user opens the edit site list view
                   if (newView === ViewState.SensitiveSiteControls) {
                     sendUserActionInfo(user_id, 16);
                   }
-                  
+
                   this.setState({
                     viewing: newView,
                   });
