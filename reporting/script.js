@@ -59,17 +59,11 @@ function sendReport (eventType) {
       body: JSON.stringify(requestBody),
     })
       .then(response => {
-        const feedbackEl = document.getElementById('feedback');
-        feedbackEl.textContent = `Sent report at ${get12HourTimestamp()}`;
-        feedbackEl.style.opacity = '1';
-        setTimeout(() => (feedbackEl.style.opacity = '0'), 5000);
+        alert('Your report has been recorded. Proceed to the next task.');
       })
       .catch(err => {
         console.error('Error sending report:', err);
-        const feedbackEl = document.getElementById('feedback');
-        feedbackEl.textContent = `Sent report at ${get12HourTimestamp()}`;
-        feedbackEl.style.opacity = '1';
-        setTimeout(() => (feedbackEl.style.opacity = '0'), 5000);
+        alert('Your report has been recorded. Proceed to the next task.');
       });
 
     // Also notify the study backend that a task has been completed.
