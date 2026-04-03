@@ -12,6 +12,18 @@ function get12HourTimestamp () {
   return `${h}:${m}:${s} ${ampm}`;
 }
 
+function getAssignmentIdFromUrl (urlString) {
+  try {
+    const parsed = new URL(urlString);
+    const match = parsed.pathname.match(/\/a\/(\d+)/);
+    if (!match) return undefined;
+    const id = Number(match[1]);
+    return Number.isFinite(id) ? id : undefined;
+  } catch (e) {
+    return undefined;
+  }
+}
+
 function sendReport (eventType) {
   // const mobyUsed = document.getElementById('chk-moby').checked;
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -25,6 +37,11 @@ function sendReport (eventType) {
       normalizedSite = parsed.hostname;
     } catch (e) {
       // Fallback to the original string if URL parsing fails.
+    }
+
+    const assignment_id = getAssignmentIdFromUrl(websiteUrl);
+    if (!assignment_id) {
+      console.warn('Could not parse assignment_id from tab URL');
     }
 
     const requestBody = {
@@ -55,17 +72,19 @@ function sendReport (eventType) {
         setTimeout(() => (feedbackEl.style.opacity = '0'), 5000);
       });
 
-    // Also notify the study backend that a task has been completed,
-    // mirroring the behavior used in the main MobyPhish extension.
-    fetch('https://study-api.com/complete-task', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        site_url: normalizedSite,
-        elapsed_ms: Math.floor(Math.random() * 10000),
-        completion_type: 'report_extension',
-      }),
-    }).catch(e => console.warn('complete-task call failed', e));
+    // Also notify the study backend that a task has been completed.
+    if (assignment_id) {
+      fetch('https://study-api.com/api/record-complete-assignment-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          assignment_id,
+          completion_type: 'report_extension',
+          // Backend validates `website` against task.site_url if provided.
+          website: normalizedSite,
+        }),
+      }).catch(e => console.warn('record-complete-assignment-event call failed', e));
+    }
   });
 }
 

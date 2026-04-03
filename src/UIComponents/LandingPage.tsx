@@ -22,6 +22,15 @@ function getSiteName(domain: string): string {
   }
   return name;
 }
+
+function getAssignmentIdFromPath(pathname: string): number | undefined {
+  // Study tasks are routed like /a/<id> (site code derives it from this path).
+  const match = pathname.match(/\/a\/(\d+)/);
+  if (!match) return undefined;
+  const id = Number(match[1]);
+  if (!Number.isFinite(id)) return undefined;
+  return id;
+}
 interface LandingPageProps {
   isVisible: boolean;
   webUrl: string;
@@ -234,17 +243,34 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                               currentSite,
                             );
                             sendUserActionInfo(user_id, 17); // Log list of unsafe sites
-                            // Call the same endpoint as the Report button
-                            fetch('https://study-api.com/complete-task', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                site_url: currentSite,
-                                elapsed_ms: Math.floor(Math.random() * 10000),
-                                completion_type: 'report_extension',
-                              }),
-                            }).catch(e =>
-                              console.warn('complete-task call failed', e),
+                            // Record task completion for the current /a/<id> page.
+                            const assignment_id =
+                              getAssignmentIdFromPath(urlObj.pathname);
+                            if (!assignment_id) {
+                              console.warn(
+                                'Could not parse assignment_id from tab URL path',
+                                urlObj.pathname,
+                              );
+                              return;
+                            }
+
+                            fetch(
+                              'https://study-api.com/api/record-complete-assignment-event',
+                              {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  assignment_id,
+                                  completion_type: 'report_extension',
+                                  // Backend validates `website` against task.site_url if provided.
+                                  website: currentSite,
+                                }),
+                              },
+                            ).catch(e =>
+                              console.warn(
+                                'record-complete-assignment-event call failed',
+                                e,
+                              ),
                             );
                           },
                         );
@@ -364,16 +390,34 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                             );
                             sendUserActionInfo(user_id, 17); // Log list of unsafe sites
                             console.log('report payload', { currentSite, siteToReport });
-                            fetch('https://study-api.com/complete-task', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                site_url: currentSite,
-                                elapsed_ms: Math.floor(Math.random() * 10000),
-                                completion_type: 'report_extension',
-                              }),
-                            }).catch(e =>
-                              console.warn('complete-task call failed', e),
+                            // Record task completion for the current /a/<id> page.
+                            const assignment_id =
+                              getAssignmentIdFromPath(urlObj.pathname);
+                            if (!assignment_id) {
+                              console.warn(
+                                'Could not parse assignment_id from tab URL path',
+                                urlObj.pathname,
+                              );
+                              return;
+                            }
+
+                            fetch(
+                              'https://study-api.com/api/record-complete-assignment-event',
+                              {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  assignment_id,
+                                  completion_type: 'report_extension',
+                                  // Backend validates `website` against task.site_url if provided.
+                                  website: currentSite,
+                                }),
+                              },
+                            ).catch(e =>
+                              console.warn(
+                                'record-complete-assignment-event call failed',
+                                e,
+                              ),
                             );
                           },
                         );
@@ -553,24 +597,51 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 const currentSite = this.props.webUrl;
                 // Log that user does not trust blocked site
                 sendUserActionInfo(user_id, 15);
-                // Call the same endpoint as report phishing
-                fetch('https://study-api.com/complete-task', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    site_url: currentSite,
-                    elapsed_ms: Math.floor(Math.random() * 10000),
-                    completion_type: 'report_extension',
-                  }),
-                })
-                  .then(() => {
+                // Record task completion for the current /a/<id> page.
+                chrome.tabs.get(this.props.tabId, tab => {
+                  const tabUrl = tab?.url;
+                  if (!tabUrl) {
+                    console.warn('No tab URL available to parse assignment_id');
                     alert('Thank you! Please go back to your email for the next task.');
+                    return;
+                  }
+
+                  let assignment_id: number | undefined;
+                  try {
+                    const urlObj = new URL(tabUrl);
+                    assignment_id = getAssignmentIdFromPath(urlObj.pathname);
+                  } catch (e) {
+                    console.warn('Failed to parse assignment_id from tab URL', e);
+                  }
+
+                  if (!assignment_id) {
+                    console.warn('Could not parse assignment_id from tab URL path');
+                    alert('Thank you! Please go back to your email for the next task.');
+                    return;
+                  }
+
+                  fetch('https://study-api.com/api/record-complete-assignment-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      assignment_id,
+                      completion_type: 'report_extension',
+                      // Backend validates `website` against task.site_url if provided.
+                      website: currentSite,
+                    }),
                   })
-                  .catch(e => {
-                    console.warn('complete-task call failed', e);
-                    // Still show the message even if the call fails
-                    alert('Thank you! Please go back to your email for the next task.');
-                  });
+                    .then(() => {
+                      alert('Thank you! Please go back to your email for the next task.');
+                    })
+                    .catch(e => {
+                      console.warn(
+                        'record-complete-assignment-event call failed',
+                        e,
+                      );
+                      // Still show the message even if the call fails
+                      alert('Thank you! Please go back to your email for the next task.');
+                    });
+                });
               }}
             >
               I still do not trust this website. <br />
@@ -667,24 +738,51 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 const currentSite = this.props.webUrl;
                 // Log the event
                 sendUserActionInfo(user_id, 14);
-                // Call complete-task API with report phishing
-                fetch('https://study-api.com/complete-task', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    site_url: currentSite,
-                    elapsed_ms: Math.floor(Math.random() * 10000),
-                    completion_type: 'report_extension',
-                  }),
-                })
-                  .then(() => {
+                // Record task completion for the current /a/<id> page.
+                chrome.tabs.get(this.props.tabId, tab => {
+                  const tabUrl = tab?.url;
+                  if (!tabUrl) {
+                    console.warn('No tab URL available to parse assignment_id');
                     alert('Thank you! Please go back to your email for the next task.');
+                    return;
+                  }
+
+                  let assignment_id: number | undefined;
+                  try {
+                    const urlObj = new URL(tabUrl);
+                    assignment_id = getAssignmentIdFromPath(urlObj.pathname);
+                  } catch (e) {
+                    console.warn('Failed to parse assignment_id from tab URL', e);
+                  }
+
+                  if (!assignment_id) {
+                    console.warn('Could not parse assignment_id from tab URL path');
+                    alert('Thank you! Please go back to your email for the next task.');
+                    return;
+                  }
+
+                  fetch('https://study-api.com/api/record-complete-assignment-event', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      assignment_id,
+                      completion_type: 'report_extension',
+                      // Backend validates `website` against task.site_url if provided.
+                      website: currentSite,
+                    }),
                   })
-                  .catch(e => {
-                    console.warn('complete-task call failed', e);
-                    // Still show the message even if the call fails
-                    alert('Thank you! Please go back to your email for the next task.');
-                  });
+                    .then(() => {
+                      alert('Thank you! Please go back to your email for the next task.');
+                    })
+                    .catch(e => {
+                      console.warn(
+                        'record-complete-assignment-event call failed',
+                        e,
+                      );
+                      // Still show the message even if the call fails
+                      alert('Thank you! Please go back to your email for the next task.');
+                    });
+                });
               }}
             >
               I do not trust this website. <br />
