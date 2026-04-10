@@ -77,6 +77,7 @@ export class MoreSiteInfo extends Component<
               <div className='site-info'>
                 <div className='favicon'>
                   <img
+                    className='favicon-img'
                     src={
                       data.faviconUrl === ''
                         ? 'https://via.placeholder.com/50'

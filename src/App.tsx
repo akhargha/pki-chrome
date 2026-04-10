@@ -457,7 +457,11 @@ class App extends Component<object, AppState> {
               {/* <!--Top Bar--> */}
               {/* <!--Favicon--> */}
               <div id='favicon-container'>
-                <img src={this.state.faviconImage} alt='Favicon' />
+                <img
+                  className='favicon-img'
+                  src={this.state.faviconImage}
+                  alt='Favicon'
+                />
               </div>
 
               {/* <!--URL--> */}
