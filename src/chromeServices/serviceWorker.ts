@@ -178,14 +178,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   switch (data.type) {
     case iMsgReqType.fetchCertificateChain:
-      fetchCertificateChain(data.webDomain as string)
-        .then(certChain => {
-          sendResponse({ success: true, certificateChain: certChain });
-        })
-        .catch(error => {
-          console.warn(`Error fetching certificate chain: ${error}`);
-          sendResponse({ success: false, errorMessage: error.message });
+      try {
+        const webDomain = (data.webDomain as string | undefined)?.trim();
+        if (!webDomain) {
+          sendResponse({
+            success: false,
+            error: 'Missing webDomain in fetchCertificateChain request',
+            errorMessage: 'Missing webDomain in fetchCertificateChain request',
+          });
+          return true;
+        }
+
+        fetchCertificateChain(webDomain)
+          .then(certChain => {
+            sendResponse({ success: true, certificateChain: certChain });
+          })
+          .catch(error => {
+            console.warn(`Error fetching certificate chain: ${error}`);
+            sendResponse({
+              success: false,
+              error: error.message,
+              errorMessage: error.message,
+            });
+          });
+      } catch (error: any) {
+        console.warn('Unexpected error in fetchCertificateChain handler:', error);
+        sendResponse({
+          success: false,
+          error: error?.message || 'Unexpected error in fetchCertificateChain handler',
+          errorMessage: error?.message || 'Unexpected error in fetchCertificateChain handler',
         });
+      }
       return true;
     case iMsgReqType.sendUserActionInfo:
       // Retrieve 'Points' from Chrome storage

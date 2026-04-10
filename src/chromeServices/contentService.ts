@@ -7,7 +7,11 @@ import {
   customAlert3Prompts,
   customAlertUpdatePrompt,
 } from '../utils/PagesUtils';
-import { GitHubRelease, grabMainUrl } from '../utils/fetchUtils';
+import {
+  fetchCertificateChain,
+  GitHubRelease,
+  grabMainUrl,
+} from '../utils/fetchUtils';
 import { ChromeCookie } from '../types/Cookies';
 import { WebsiteListDefaults } from '../utils/Defaults';
 
@@ -54,6 +58,8 @@ if (webDomain.includes('ilogicalloanssavings')) {
 }
 
 let blockerClicked = false;
+const CERT_CHANGED_BLOCKER_MESSAGE =
+  'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.';
 
 let longTerm = false; // Default to false if no value is set
 const user_id: string = require('../version').default.user_id;
@@ -62,6 +68,91 @@ const user_id: string = require('../version').default.user_id;
 
 let isActive = true;
 let group = 0;
+
+function responseHasCertError(response: any): boolean {
+  return Boolean(
+    response?.error || response?.errorMessage || response?.success === false,
+  );
+}
+
+function getCertErrorMessage(response: any): string {
+  return (response?.error || response?.errorMessage || 'Unknown error') as string;
+}
+
+function verifyProtectedSiteCertificateDirectFetch(
+  domain: string,
+  savedCertificateChain: { [x: string]: any },
+  onMatch?: () => void,
+) {
+  fetchCertificateChain(domain)
+    .then(currentCert => {
+      if (compareCertificateChains(currentCert, savedCertificateChain)) {
+        console.log('Certificate chain matches (direct fetch fallback)');
+        if (onMatch) onMatch();
+      } else {
+        console.log('Certificate chain does not match (direct fetch fallback)');
+        addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+      }
+    })
+    .catch(error => {
+      console.error('Direct certificate fetch fallback failed:', error);
+      addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+    });
+}
+
+function verifyProtectedSiteCertificate(
+  domain: string,
+  savedCertificateChain: { [x: string]: any },
+  onMatch?: () => void,
+) {
+  chrome.runtime.sendMessage(
+    {
+      type: iMsgReqType.fetchCertificateChain,
+      webDomain: domain,
+    },
+    function (response) {
+      if (chrome.runtime.lastError) {
+        console.error(
+          'Runtime error while fetching certificate chain:',
+          chrome.runtime.lastError.message,
+        );
+        verifyProtectedSiteCertificateDirectFetch(
+          domain,
+          savedCertificateChain,
+          onMatch,
+        );
+        return;
+      }
+
+      if (!response) {
+        console.error('No response received while fetching certificate chain');
+        verifyProtectedSiteCertificateDirectFetch(
+          domain,
+          savedCertificateChain,
+          onMatch,
+        );
+        return;
+      }
+
+      if (response?.certificateChain) {
+        if (compareCertificateChains(response.certificateChain, savedCertificateChain)) {
+          console.log('Certificate chain matches');
+          if (onMatch) onMatch();
+        } else {
+          console.log('Certificate chain does not match');
+          addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        }
+      } else if (responseHasCertError(response)) {
+        console.error('Error fetching certificate chain:', getCertErrorMessage(response));
+        addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+      } else {
+        // Defensive fallback: if we cannot validate the cert state, block by default.
+        console.warn('Unexpected certificate response shape', response);
+        addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+      }
+    },
+  );
+}
 
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
   const cookies: ChromeCookie[] = c;
@@ -385,14 +476,14 @@ function main() {
                   webDomain: shortenedDomain, // random prefix for lets encrypt
                 });
               }
-            } else if (response.error) {
+            } else if (responseHasCertError(response)) {
               console.error(
                 'Error fetching certificate chain:',
-                response.error,
+                getCertErrorMessage(response),
               );
               // If there's an error fetching the certificate chain, add blocker
               addBlocker(
-                'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
+                CERT_CHANGED_BLOCKER_MESSAGE,
               );
             }
           },
@@ -420,96 +511,16 @@ function main() {
             console.log('in session list');
             // If in session list, remove blocker if it exists
             removeBlocker();
-
-            // Check if site is test site
-            chrome.runtime.sendMessage(
-              { type: iMsgReqType.fetchTestWebsites },
-              function (response) {
-                if (response && response.websites) {
-                  const testWebsites = response.websites;
-                  if (testWebsites.includes(shortenedDomain)) {
-                    //if site is test site then check cert
-                    const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
-                    chrome.runtime.sendMessage(
-                      {
-                        type: iMsgReqType.fetchCertificateChain,
-                        webDomain: shortenedDomain,
-                      },
-                      function (response) {
-                        if (response.certificateChain) {
-                          const savedCertificateChain = siteData.certChain;
-                          if (
-                            compareCertificateChains(
-                              response.certificateChain,
-                              savedCertificateChain,
-                            )
-                          ) {
-                            console.log('Certificate chain matches');
-                          } else {
-                            console.log('Certificate chain does not match');
-                            //DO OTHER STUFF HERE
-                            addBlocker(
-                              'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
-                            );
-                          }
-                        } else if (response.error) {
-                          console.error(
-                            'Error fetching certificate chain:',
-                            response.error,
-                          );
-                          // If there's an error fetching the certificate chain, add blocker
-                          addBlocker(
-                            'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
-                          );
-                        }
-                      },
-                    );
-                  }
-                }
-              },
-            );
+            verifyProtectedSiteCertificate(shortenedDomain, siteData.certChain);
           } else {
             console.log('not in session list');
-            // If not in session list, send a message to the background script to fetch the certificate chain
-
-            // Remove "www." from the beginning of the domain
-            const shortenedDomain = grabMainUrl(url); //webDomain.replace(/^www\./, '')
-
-            chrome.runtime.sendMessage(
-              {
-                type: iMsgReqType.fetchCertificateChain,
-                webDomain: shortenedDomain,
-              },
-              function (response) {
-                if (response.certificateChain) {
-                  const savedCertificateChain = siteData.certChain;
-                  if (
-                    compareCertificateChains(
-                      response.certificateChain,
-                      savedCertificateChain,
-                    )
-                  ) {
-                    console.log('Certificate chain matches');
-                    addBlocker(
-                      'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
-                    );
-                  } else {
-                    console.log('Certificate chain does not match');
-                    //DO OTHER STUFF HERE
-                    addBlocker(
-                      'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
-                    );
-                  }
-                } else if (response.error) {
-                  console.error(
-                    'Error fetching certificate chain:',
-                    response.error,
-                  );
-                  // If there's an error fetching the certificate chain, add blocker
-                  addBlocker(
-                    'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
-                  );
-                }
+            verifyProtectedSiteCertificate(
+              shortenedDomain,
+              siteData.certChain,
+              () => {
+                addBlocker(
+                  'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
+                );
               },
             );
           }
