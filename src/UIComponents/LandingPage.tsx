@@ -33,19 +33,126 @@ interface LandingPageProps {
   showchanged: boolean;
   user_id: string;
 }
-interface LandingPageState { }
+interface LandingPageState {
+  showBlockedUnblockConfirm: boolean;
+}
 const localStorage = chrome.storage.local;
 
 class LandingPage extends Component<LandingPageProps, LandingPageState> {
+  private hasAutoCompletedPreviouslyBlockedTask = false;
+
+  constructor(props: LandingPageProps) {
+    super(props);
+    this.state = {
+      showBlockedUnblockConfirm: false,
+    };
+  }
+
+  private completeTaskForPreviouslyBlockedSite = () => {
+    const user_id = this.props.user_id;
+    const currentSite = this.props.webUrl;
+
+    // Keep existing analytics behavior that was previously triggered by the
+    // "cannot complete task" blocked-site button.
+    sendUserActionInfo(user_id, 15);
+
+    chrome.tabs.get(this.props.tabId, tab => {
+      const tabUrl = tab?.url;
+      if (!tabUrl) {
+        console.warn('No tab URL available to parse assignment_id');
+        alert('Thank you! Please go back to your email for the next task.');
+        return;
+      }
+
+      let assignment_id: number | undefined;
+      try {
+        const urlObj = new URL(tabUrl);
+        assignment_id = getAssignmentIdFromPath(urlObj.pathname);
+      } catch (e) {
+        console.warn('Failed to parse assignment_id from tab URL', e);
+      }
+
+      if (!assignment_id) {
+        console.warn('Could not parse assignment_id from tab URL path');
+        alert('Thank you! Please go back to your email for the next task.');
+        return;
+      }
+
+      fetch('https://study-api.com/api/record-complete-assignment-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          assignment_id,
+          completion_type: 'previous_block_extension',
+          // Backend validates `website` against task.site_url if provided.
+          website: currentSite,
+        }),
+      })
+        .then(() => {
+          alert('Thank you! Please go back to your email for the next task.');
+        })
+        .catch(e => {
+          console.warn(
+            'record-complete-assignment-event call failed',
+            e,
+          );
+          // Still show the message even if the call fails
+          alert('Thank you! Please go back to your email for the next task.');
+        });
+    });
+  };
+
+  private maybeAutoCompletePreviouslyBlockedTask = () => {
+    const data = this.props.websiteData[this.props.webUrl];
+    const isBlocked = data?.LogType === WebsiteListEntryLogType.BLOCKED;
+
+    if (!isBlocked || this.hasAutoCompletedPreviouslyBlockedTask) {
+      return;
+    }
+
+    this.hasAutoCompletedPreviouslyBlockedTask = true;
+    this.completeTaskForPreviouslyBlockedSite();
+  };
+
+  private removeSiteFromBlockedList = () => {
+    const currentSite = this.props.webUrl;
+
+    chrome.storage.local.get(
+      { websiteList: {} },
+      (items) => {
+        const websiteList: { [key: string]: WebsiteListEntry } = items.websiteList;
+        delete websiteList[currentSite];
+
+        chrome.storage.local.set({ websiteList }, () => {
+          chrome.runtime.sendMessage({ type: iMsgReqType.siteDataRefresh });
+          chrome.tabs.sendMessage(this.props.tabId, { action: 'removeBlocker' });
+          this.setState({ showBlockedUnblockConfirm: false });
+          alert('This website has been removed from your blocked list');
+        });
+      },
+    );
+  };
+
   componentWillUnmount(): void { }
-  componentDidMount(): void { }
+  componentDidMount(): void {
+    this.maybeAutoCompletePreviouslyBlockedTask();
+  }
   componentDidUpdate(
     prevProps: Readonly<LandingPageProps>,
     prevState: Readonly<LandingPageState>,
   ): void {
     if (this.props.webUrl !== prevProps.webUrl) {
+      this.hasAutoCompletedPreviouslyBlockedTask = false;
+      this.setState({ showBlockedUnblockConfirm: false });
       // console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
       //do something...
+    }
+
+    if (
+      this.props.webUrl !== prevProps.webUrl ||
+      this.props.websiteData !== prevProps.websiteData
+    ) {
+      this.maybeAutoCompletePreviouslyBlockedTask();
     }
   }
   render(): ReactNode {
@@ -505,8 +612,8 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     : 'none',
               }}
             >
-              You had previously marked this website as blocked. Please proceed
-              carefully.
+              You are done with this task. Please proceed to the next task. You had
+              previously blocked this website.
             </h2>
           </>
         ) : undefined}
@@ -544,45 +651,70 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
             </h3>
 
             <button
-              className='button is-rounded is-danger is-fullwidth'
-              id='unblock-once'
+              className='button is-rounded is-light is-fullwidth'
+              id='unblock-website'
               style={{
                 display:
                   data.LogType === WebsiteListEntryLogType.BLOCKED
                     ? ''
                     : 'none',
                 minHeight: '4em',
+                height: 'auto',
+                whiteSpace: 'normal',
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+                textAlign: 'center',
+                lineHeight: '1.3',
+                padding: '0.75em 1em',
               }}
               onClick={() => {
-                //TODO: do we want to make this unblock for the remainder of the session, or perhaps on a tab
-                //basis?
-                // chrome.storage.local.get({ sessionList: {} }, data => {
-                //   const sesh = data.sessionList
-                //   sesh[this.props.webUrl] = true
-                // })
-                //TODO: make this match our sendMessage format
-
-                // chrome.runtime.sendMessage({
-                //   action: 'removeBlocker'
-                // })
-                chrome.tabs.sendMessage(this.props.tabId, {
-                  action: 'removeBlocker',
-                });
-                sendUserActionInfo(user_id, 11); // placeholder userid that will be overridden
+                this.setState({ showBlockedUnblockConfirm: true });
               }}
             >
-              I want to risk my online security <br />
-              and visit this website anyways
+              I accidentally blocked this website. Unblock it.
             </button>
+
+            <div
+              style={{
+                display:
+                  data.LogType === WebsiteListEntryLogType.BLOCKED &&
+                    this.state.showBlockedUnblockConfirm
+                    ? ''
+                    : 'none',
+                marginTop: '10px',
+              }}
+            >
+              <h3 className='subtitle' style={{ textAlign: 'center' }}>
+                This website will be removed from your blocked list. Are you sure
+                you want to continue?
+              </h3>
+              <button
+                className='button is-rounded is-light is-fullwidth'
+                id='cancel-unblock-website'
+                style={{ minHeight: '3em' }}
+                onClick={() => {
+                  this.setState({ showBlockedUnblockConfirm: false });
+                }}
+              >
+                cancel
+              </button>
+              <button
+                className='button is-rounded is-danger is-fullwidth'
+                id='confirm-unblock-website'
+                style={{ minHeight: '3em', marginTop: '10px' }}
+                onClick={() => {
+                  this.removeSiteFromBlockedList();
+                }}
+              >
+                Yes, unblock website.
+              </button>
+            </div>
 
             <button
               className='button is-rounded is-info is-fullwidth'
               id='cannot-complete-task'
               style={{
-                display:
-                  data.LogType === WebsiteListEntryLogType.BLOCKED
-                    ? ''
-                    : 'none',
+                display: 'none',
                 minHeight: '4em',
                 marginTop: '10px',
               }}
@@ -618,7 +750,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       assignment_id,
-                      completion_type: 'report_extension',
+                      completion_type: 'previous_block_extension',
                       // Backend validates `website` against task.site_url if provided.
                       website: currentSite,
                     }),
