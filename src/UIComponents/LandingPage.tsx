@@ -35,6 +35,8 @@ interface LandingPageProps {
 }
 interface LandingPageState {
   showBlockedUnblockConfirm: boolean;
+  showKnownSiteReportStep: boolean;
+  selectedSiteToReport?: string;
 }
 const localStorage = chrome.storage.local;
 
@@ -45,8 +47,107 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
     super(props);
     this.state = {
       showBlockedUnblockConfirm: false,
+      showKnownSiteReportStep: false,
+      selectedSiteToReport: undefined,
     };
   }
+
+  private markCurrentSiteAsBlocked = (siteToReport?: string) => {
+    const user_id = this.props.user_id;
+
+    chrome.tabs.query(
+      { active: true, currentWindow: true },
+      function (tabs) {
+        const url = tabs[0].url;
+        const urlObj = new URL(url as string);
+        const currentSite = grabMainUrl(urlObj);
+        const currentTabId = tabs[0].id;
+        const favicon = tabs[0].favIconUrl;
+        if (currentSite) {
+          chrome.storage.local.get(
+            { websiteList: {} },
+            function (items) {
+              const websiteList: {
+                [key: string]: WebsiteListEntry;
+              } = items.websiteList;
+              const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
+              const localTimeString = new Date(
+                currentTimeInMs,
+              ).toLocaleString(); // Convert to local date and time string
+
+              websiteList[currentSite] = {
+                LogType: WebsiteListEntryLogType.BLOCKED,
+                certChain: undefined,
+                addedAt: localTimeString,
+                lastVisit: localTimeString,
+                faviconUrl: favicon as string,
+              }; // Mark the current site as unsafe
+              chrome.storage.local.set(
+                { websiteList: websiteList },
+                function () {
+                  console.log(
+                    'Current website marked as blocked:',
+                    currentSite,
+                  );
+                  // displayUnsafeSites()
+                },
+              );
+              chrome.tabs.sendMessage(currentTabId as number, {
+                action: 'addBlocker',
+              });
+              sendUserActionInfo(
+                user_id,
+                6,
+                currentSite,
+                currentSite,
+              );
+              if (siteToReport) {
+                // Log phishing report with the impersonated site
+                sendUserActionInfo(
+                  user_id,
+                  10,
+                  siteToReport,
+                  currentSite,
+                );
+              }
+              sendUserActionInfo(user_id, 17); // Log list of unsafe sites
+              // Record task completion for the current /a/<id> page.
+              const assignment_id =
+                getAssignmentIdFromPath(urlObj.pathname);
+              if (!assignment_id) {
+                console.warn(
+                  'Could not parse assignment_id from tab URL path',
+                  urlObj.pathname,
+                );
+                return;
+              }
+
+              fetch(
+                'https://study-api.com/api/record-complete-assignment-event',
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    assignment_id,
+                    completion_type: 'report_extension',
+                    // Backend validates `website` against task.site_url if provided.
+                    website: currentSite,
+                  }),
+                },
+              ).catch(e =>
+                console.warn(
+                  'record-complete-assignment-event call failed',
+                  e,
+                ),
+              );
+            },
+          );
+        } else {
+          console.warn('Error: No current site to report.');
+        }
+      },
+    );
+  };
 
   private completeTaskForPreviouslyBlockedSite = () => {
     const user_id = this.props.user_id;
@@ -143,7 +244,11 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
   ): void {
     if (this.props.webUrl !== prevProps.webUrl) {
       this.hasAutoCompletedPreviouslyBlockedTask = false;
-      this.setState({ showBlockedUnblockConfirm: false });
+      this.setState({
+        showBlockedUnblockConfirm: false,
+        showKnownSiteReportStep: false,
+        selectedSiteToReport: undefined,
+      });
       // console.warn('URL HAS CHANGED, CHECK DATA AND WHATNMOT');
       //do something...
     }
@@ -159,7 +264,6 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
     const user_id = this.props.user_id;
 
     const data = this.props.websiteData[this.props.webUrl];
-    let selectedSiteToReport: string | undefined = undefined;
 
     console.warn(this.props.websiteData, data, this.props.webUrl);
     return (
@@ -188,17 +292,11 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               this is the correct website.
             </p>
             <br />
-            {true ? (<><h2
-              className='subtitle'
-              id='choose-option'
-              style={{ textAlign: 'center' }}
-            >
-              Choose an option below:
-            </h2>
-
-              <div className='block'>
+            {!this.state.showKnownSiteReportStep ? (
+              <>
+                <div className='block landing-action-block'>
                 <button
-                  className='button is-rounded is-info is-fullwidth'
+                  className='button is-rounded is-info landing-action-button'
                   id='sensitive-save-btn'
                   style={{ minHeight: '3em' }}
                   onClick={async () => {
@@ -284,253 +382,75 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     );
                   }}
                 >
-                  Save new known site
+                  Save as a new known site
                 </button>
-              </div></>) : undefined}
-            {
-              //this should be false so it can be hidden since we are using a different reporting layout
-            }
-            <div className='block'>
-              <button
-                className='button is-rounded is-danger is-fullwidth'
-                id='mark-unsafe-btn'
-                style={{ minHeight: '3em', marginTop: '10px' }}
-                onClick={() => {
-                  chrome.tabs.query(
-                    { active: true, currentWindow: true },
-                    function (tabs) {
-                      const url = tabs[0].url;
-                      const urlObj = new URL(url as string);
-                      const currentSite = grabMainUrl(urlObj);
-                      const currentTabId = tabs[0].id;
-                      const favicon = tabs[0].favIconUrl;
-                      if (currentSite) {
-                        chrome.storage.local.get(
-                          { websiteList: {} },
-                          function (items) {
-                            const websiteList: {
-                              [key: string]: WebsiteListEntry;
-                            } = items.websiteList;
-                            const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
-                            const localTimeString = new Date(
-                              currentTimeInMs,
-                            ).toLocaleString(); // Convert to local date and time string
-
-                            websiteList[currentSite] = {
-                              LogType: WebsiteListEntryLogType.BLOCKED,
-                              certChain: undefined,
-                              addedAt: localTimeString,
-                              lastVisit: localTimeString,
-                              faviconUrl: favicon as string,
-                            }; // Mark the current site as unsafe
-                            chrome.storage.local.set(
-                              { websiteList: websiteList },
-                              function () {
-                                console.log(
-                                  'Current website marked as blocked:',
-                                  currentSite,
-                                );
-                                // displayUnsafeSites()
-                              },
-                            );
-                            chrome.tabs.sendMessage(currentTabId as number, {
-                              action: 'addBlocker',
-                            });
-                            sendUserActionInfo(
-                              user_id,
-                              6,
-                              currentSite,
-                              currentSite,
-                            );
-                            sendUserActionInfo(user_id, 17); // Log list of unsafe sites
-                            // Record task completion for the current /a/<id> page.
-                            const assignment_id =
-                              getAssignmentIdFromPath(urlObj.pathname);
-                            if (!assignment_id) {
-                              console.warn(
-                                'Could not parse assignment_id from tab URL path',
-                                urlObj.pathname,
-                              );
-                              return;
-                            }
-
-                            fetch(
-                              'https://study-api.com/api/record-complete-assignment-event',
-                              {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  assignment_id,
-                                  completion_type: 'report_extension',
-                                  // Backend validates `website` against task.site_url if provided.
-                                  website: currentSite,
-                                }),
-                              },
-                            ).catch(e =>
-                              console.warn(
-                                'record-complete-assignment-event call failed',
-                                e,
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        console.warn('Error: No current site to report.');
-                      }
-                    },
-                  );
-                }}
-              >
-                Block this site
-              </button>
-            </div>
-
-            <div className='block' id='report-phish-prompt-text'>
-              <h3 className='subtitle' style={{ textAlign: 'center' }}>
-                If you thought this was one of your saved known sites, choose that
-                site below:{' '}
-              </h3>
-            </div>
-            <div id='sensitive-sites-dropdown-container'>
-              <div
-                className='select is-rounded is-danger'
-                id='sensitive-sites-dropdown-container'
-                style={{ marginLeft: '25px', marginBottom: '10px', width: 'auto', overflowX: 'hidden', wordWrap: 'break-word', maxWidth: '75vw' }}
-              >
-                <select
-                  id='sensitive-sites-dropdown'
-                  defaultValue=''
-                  onChange={event => {
-                    const selectedOption = event.target.value;
-                    if (selectedOption === '') {
-                      selectedSiteToReport = undefined;
-                    } else {
-                      selectedSiteToReport = selectedOption;
-                    }
-                    console.log('Selected option:', selectedOption);
+              </div>
+              <div className='block landing-action-block'>
+                <button
+                  className='button is-rounded is-danger landing-action-button'
+                  id='go-to-known-site-report-step-btn'
+                  style={{ minHeight: '3em' }}
+                  onClick={() => {
+                    this.setState({
+                      showKnownSiteReportStep: true,
+                      selectedSiteToReport: undefined,
+                    });
                   }}
                 >
-                  <option value=''>Select the known site</option>
-                  {Object.keys(this.props.websiteData).map(key =>
-                    this.props.websiteData[key].LogType ===
-                      WebsiteListEntryLogType.PROTECTED ? (
-                      <option value={key} key={key}>{getSiteName(key)}</option>
-                    ) : undefined,
-                  )}
-                </select>
+                  I thought this was one of my known sites
+                </button>
               </div>
-            </div>
+            </>
+            ) : (
+              <>
+                <div className='block' id='report-phish-prompt-text'>
+                  <h3 className='subtitle' style={{ textAlign: 'center' }}>
+                    If this site is impersonating one of your saved sites, you can
+                    select it below (optional).
+                  </h3>
+                </div>
+                <div className='landing-select-wrapper'>
+                  <div
+                    className='select is-rounded is-danger'
+                    id='sensitive-sites-dropdown-container'
+                    style={{ width: '100%', overflowX: 'hidden', wordWrap: 'break-word' }}
+                  >
+                    <select
+                      id='sensitive-sites-dropdown'
+                      value={this.state.selectedSiteToReport ?? ''}
+                      onChange={event => {
+                        const selectedOption = event.target.value;
+                        this.setState({
+                          selectedSiteToReport:
+                            selectedOption === '' ? undefined : selectedOption,
+                        });
+                      }}
+                    >
+                      <option value=''>Select the known site (optional)</option>
+                      {Object.keys(this.props.websiteData).map(key =>
+                        this.props.websiteData[key].LogType ===
+                          WebsiteListEntryLogType.PROTECTED ? (
+                          <option value={key} key={key}>{getSiteName(key)}</option>
+                        ) : undefined,
+                      )}
+                    </select>
+                  </div>
+                </div>
 
-            <div className='block'>
-              <button
-                className='button is-rounded is-danger is-clipped'
-                id='unsafe-save-btn'
-                style={{ marginLeft: '100px' }}
-                onClick={() => {
-                  if (!selectedSiteToReport) {
-                    console.warn(
-                      'Error: Please choose what you want to report before continuing.',
-                    );
-                    return;
-                  }
-                  const siteToReport = selectedSiteToReport;
-                  chrome.tabs.query(
-                    { active: true, currentWindow: true },
-                    function (tabs) {
-                      const url = tabs[0].url;
-                      const urlObj = new URL(url as string);
-                      const currentSite = grabMainUrl(urlObj);
-                      const currentTabId = tabs[0].id;
-                      const favicon = tabs[0].favIconUrl;
-                      if (currentSite) {
-                        chrome.storage.local.get(
-                          { websiteList: {} },
-                          function (items) {
-                            const websiteList: {
-                              [key: string]: WebsiteListEntry;
-                            } = items.websiteList;
-                            const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
-                            const localTimeString = new Date(
-                              currentTimeInMs,
-                            ).toLocaleString(); // Convert to local date and time string
-
-                            websiteList[currentSite] = {
-                              LogType: WebsiteListEntryLogType.BLOCKED,
-                              certChain: undefined,
-                              addedAt: localTimeString,
-                              lastVisit: localTimeString,
-                              faviconUrl: favicon as string,
-                            }; // Mark the current site as unsafe
-                            chrome.storage.local.set(
-                              { websiteList: websiteList },
-                              function () {
-                                console.log(
-                                  'Current website marked as blocked:',
-                                  currentSite,
-                                );
-                                // displayUnsafeSites()
-                              },
-                            );
-                            chrome.tabs.sendMessage(currentTabId as number, {
-                              action: 'addBlocker',
-                            });
-                            // Log the selected site with the current site
-                            sendUserActionInfo(
-                              user_id,
-                              6,
-                              currentSite,
-                              currentSite,
-                            );
-                            // Log phishing report with the impersonated site
-                            sendUserActionInfo(
-                              user_id,
-                              10,
-                              siteToReport,
-                              currentSite,
-                            );
-                            sendUserActionInfo(user_id, 17); // Log list of unsafe sites
-                            console.log('report payload', { currentSite, siteToReport });
-                            // Record task completion for the current /a/<id> page.
-                            const assignment_id =
-                              getAssignmentIdFromPath(urlObj.pathname);
-                            if (!assignment_id) {
-                              console.warn(
-                                'Could not parse assignment_id from tab URL path',
-                                urlObj.pathname,
-                              );
-                              return;
-                            }
-
-                            fetch(
-                              'https://study-api.com/api/record-complete-assignment-event',
-                              {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                  assignment_id,
-                                  completion_type: 'report_extension',
-                                  // Backend validates `website` against task.site_url if provided.
-                                  website: currentSite,
-                                }),
-                              },
-                            ).catch(e =>
-                              console.warn(
-                                'record-complete-assignment-event call failed',
-                                e,
-                              ),
-                            );
-                          },
-                        );
-                      } else {
-                        console.warn('Error: No current site to report.');
-                      }
-                    },
-                  );
-                }}
-              >
-                Report
-              </button>
-            </div>
+                <div className='block landing-action-block'>
+                  <button
+                    className='button is-rounded is-danger landing-action-button'
+                    id='confirm-block-site-btn'
+                    style={{ minHeight: '3em' }}
+                    onClick={() => {
+                      this.markCurrentSiteAsBlocked(this.state.selectedSiteToReport);
+                    }}
+                  >
+                    Confirm and block site
+                  </button>
+                </div>
+              </>
+            )}
 
             {/* Report Info Change button - commented out for now, may be needed in the future
             <div className='block'>
