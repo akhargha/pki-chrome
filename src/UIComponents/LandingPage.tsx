@@ -287,120 +287,118 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                   maxHeight: '20px',
                 }}
               />
-              We do <strong>not</strong> recognize this website. If you were trying to
-              visit a known site, please recheck how you got here and make sure
-              this is the correct website.
+              We do <strong>not</strong> recognize this website. You have not saved this site as a known site.
             </p>
             <br />
             {!this.state.showKnownSiteReportStep ? (
               <>
                 <div className='block landing-action-block'>
-                <button
-                  className='button is-rounded is-info landing-action-button'
-                  id='sensitive-save-btn'
-                  style={{ minHeight: '3em' }}
-                  onClick={async () => {
-                    localStorage.get(
-                      { websiteList: {}, sessionList: {} },
-                      async i => {
-                        const websiteList: { [key: string]: WebsiteListEntry; } =
-                          i.websiteList;
-                        const sessionList: { [key: string]: boolean; } =
-                          i.sessionList;
+                  <button
+                    className='button is-rounded is-info landing-action-button'
+                    id='sensitive-save-btn'
+                    style={{ minHeight: '3em' }}
+                    onClick={async () => {
+                      localStorage.get(
+                        { websiteList: {}, sessionList: {} },
+                        async i => {
+                          const websiteList: { [key: string]: WebsiteListEntry; } =
+                            i.websiteList;
+                          const sessionList: { [key: string]: boolean; } =
+                            i.sessionList;
 
-                        const webDomain = this.props.webUrl;
-                        const tabId = this.props.tabId;
-                        const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
+                          const webDomain = this.props.webUrl;
+                          const tabId = this.props.tabId;
+                          const currentTimeInMs = Date.now(); // Get current time in milliseconds since Unix epoch
 
-                        const currentTime = new Date(
-                          currentTimeInMs,
-                        ).toLocaleString();
-                        const iconurl = (await getTabData()).favIconUrl;
-                        fetchCertificateChain(webDomain)
-                          .then(certificateChain => {
-                            websiteList[webDomain] = {
-                              LogType: WebsiteListEntryLogType.PROTECTED,
-                              certChain: certificateChain,
-                              addedAt: currentTime,
-                              lastVisit: currentTime,
-                              faviconUrl: iconurl as string,
-                            };
-                            sessionList[webDomain] = true;
+                          const currentTime = new Date(
+                            currentTimeInMs,
+                          ).toLocaleString();
+                          const iconurl = (await getTabData()).favIconUrl;
+                          fetchCertificateChain(webDomain)
+                            .then(certificateChain => {
+                              websiteList[webDomain] = {
+                                LogType: WebsiteListEntryLogType.PROTECTED,
+                                certChain: certificateChain,
+                                addedAt: currentTime,
+                                lastVisit: currentTime,
+                                faviconUrl: iconurl as string,
+                              };
+                              sessionList[webDomain] = true;
 
-                            chrome.storage.local.set(
-                              {
-                                websiteList: websiteList,
-                                sessionList: sessionList,
-                              },
-                              function () {
-                                console.log(
-                                  'Website Saved as Sensitive',
-                                  webDomain,
-                                );
-                                console.log(
-                                  'Website added to session list',
-                                  webDomain,
-                                );
-                                chrome.runtime.sendMessage({
-                                  type: iMsgReqType.siteDataRefresh,
-                                });
-                                chrome.tabs.sendMessage(
-                                  tabId,
-                                  {
-                                    action: 'removeBlocker',
-                                  },
-                                  () => {
-                                    console.log('done removed');
-                                  },
-                                ); //send message to unblock
-                              },
-                            );
-                            // removeView()
-                            // document.getElementById('added-to-trusted').style.display =
-                            //   'block'
+                              chrome.storage.local.set(
+                                {
+                                  websiteList: websiteList,
+                                  sessionList: sessionList,
+                                },
+                                function () {
+                                  console.log(
+                                    'Website Saved as Sensitive',
+                                    webDomain,
+                                  );
+                                  console.log(
+                                    'Website added to session list',
+                                    webDomain,
+                                  );
+                                  chrome.runtime.sendMessage({
+                                    type: iMsgReqType.siteDataRefresh,
+                                  });
+                                  chrome.tabs.sendMessage(
+                                    tabId,
+                                    {
+                                      action: 'removeBlocker',
+                                    },
+                                    () => {
+                                      console.log('done removed');
+                                    },
+                                  ); //send message to unblock
+                                },
+                              );
+                              // removeView()
+                              // document.getElementById('added-to-trusted').style.display =
+                              //   'block'
 
-                            sendUserActionInfo(user_id, 4);
-                            sendUserActionInfo(user_id, 7);
-                            return true;
-                          })
-                          .catch(error => {
-                            console.warn(
-                              'Error fetching certificate chain:',
-                              error,
-                            );
-                            // console.log('checking local vers')
-                            // localFetchCertChain(webDomain)
-                            //   .then(data => {
-                            //     console.log(data)
-                            //   })
-                            //   .catch(e => {
-                            //     console.warn('Failed to get local version', e)
-                            //   })
-                            // Handle the error, e.g., display an error message to the user
-                          });
-                      },
-                    );
-                  }}
-                >
-                  Save as a new known site
-                </button>
-              </div>
-              <div className='block landing-action-block'>
-                <button
-                  className='button is-rounded is-danger landing-action-button'
-                  id='go-to-known-site-report-step-btn'
-                  style={{ minHeight: '3em' }}
-                  onClick={() => {
-                    this.setState({
-                      showKnownSiteReportStep: true,
-                      selectedSiteToReport: undefined,
-                    });
-                  }}
-                >
-                  I thought this was one of my known sites
-                </button>
-              </div>
-            </>
+                              sendUserActionInfo(user_id, 4);
+                              sendUserActionInfo(user_id, 7);
+                              return true;
+                            })
+                            .catch(error => {
+                              console.warn(
+                                'Error fetching certificate chain:',
+                                error,
+                              );
+                              // console.log('checking local vers')
+                              // localFetchCertChain(webDomain)
+                              //   .then(data => {
+                              //     console.log(data)
+                              //   })
+                              //   .catch(e => {
+                              //     console.warn('Failed to get local version', e)
+                              //   })
+                              // Handle the error, e.g., display an error message to the user
+                            });
+                        },
+                      );
+                    }}
+                  >
+                    Save as a new known site
+                  </button>
+                </div>
+                <div className='block landing-action-block'>
+                  <button
+                    className='button is-rounded is-danger landing-action-button'
+                    id='go-to-known-site-report-step-btn'
+                    style={{ minHeight: '3em' }}
+                    onClick={() => {
+                      this.setState({
+                        showKnownSiteReportStep: true,
+                        selectedSiteToReport: undefined,
+                      });
+                    }}
+                  >
+                    I thought this was one of my known sites
+                  </button>
+                </div>
+              </>
             ) : (
               <>
                 <div className='block' id='report-phish-prompt-text'>
