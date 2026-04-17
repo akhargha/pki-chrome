@@ -774,50 +774,52 @@ function addBlocker(
     find.remove();
   }
   console.log('made blocker');
-  // if (!document.getElementById('myBlockerDiv')) {
+
   const blockerDiv = document.createElement('div');
   blockerDiv.id = 'myBlockerDiv';
-  blockerDiv.style.position = 'fixed';
-  blockerDiv.style.left = '0';
-  blockerDiv.style.top = '0';
-  blockerDiv.style.width = '100vw'; // Width as 100% of viewport width
-  blockerDiv.style.height = '100vh'; // Height as 100% of viewport height
-  blockerDiv.style.zIndex = '10001';
-
+  blockerDiv.style.cssText = `
+    position: fixed; left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    z-index: 10001;
+    background-color: transparent;
+    cursor: default;
+  `;
   document.body.appendChild(blockerDiv);
 
-  const blockerMessage = document.createElement('h1');
-  blockerMessage.style.color = 'black'; // Changed to yellow background
-  blockerMessage.style.fontFamily = 'Trebuchet MS';
-  blockerMessage.style.fontSize = '50px';
-  blockerMessage.style.textAlign = 'center';
-  blockerMessage.style.position = 'absolute'; // Ensure it's positioned relative to the blockerDiv
-  blockerMessage.style.top = '50%'; // Center vertically in the middle of the viewport
-  blockerMessage.style.left = '50%'; // Center horizontally
-  blockerMessage.style.transform = 'translate(-50%, -50%)'; // Ensure it's centered perfectly
-  blockerMessage.innerHTML = message; // Use the message parameter
-  blockerMessage.style.display = 'none'; // Initially hide the message
+  const card = document.createElement('div');
+  card.style.cssText = `
+    background: #fff; border-radius: 12px;
+    padding: 40px 48px; max-width: 560px; width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+  `;
+  blockerDiv.appendChild(card);
 
-  // Flashing colors for the text
-  const colors = ['red', 'blue', 'green', 'white']; // Define colors to cycle through
-  let currentColorIndex = 0; // Starting index
-  setInterval(function () {
-    blockerMessage.style.backgroundColor = colors[currentColorIndex]; // Update the color
-    currentColorIndex = (currentColorIndex + 1) % colors.length; // Move to the next color
-  }, 500); // Change color every 500 milliseconds
+  const icon = document.createElement('div');
+  icon.textContent = '\u26A0';
+  icon.style.cssText = 'font-size: 48px; margin-bottom: 16px;';
+  card.appendChild(icon);
 
-  blockerDiv.appendChild(blockerMessage);
+  const blockerMessage = document.createElement('p');
+  blockerMessage.style.cssText = `
+    color: #1a1a1a; font-size: 18px; line-height: 1.5;
+    margin: 0;
+  `;
+  blockerMessage.textContent = message;
+  card.appendChild(blockerMessage);
 
-  // Show message/feedback when user clicks without opening extension
   blockerDiv.addEventListener('click', function () {
     blockerClicked = true;
-    blockerMessage.style.display = 'block'; // Show the message on click
+    blockerDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+    card.style.display = 'block';
 
-    //TODO: IMPLEMENT THIS LOGIC!!!
-    chrome.runtime.sendMessage({ type: 'blockerDivClicked' }); // Send msg to popup.js to show feedback
+    chrome.runtime.sendMessage({ type: 'blockerDivClicked' });
 
     const timestamp = Date.now();
-
     const event = '1';
     const comment = 'Interact with Moby-protected website without opening extension';
     chrome.runtime.sendMessage({
@@ -828,7 +830,6 @@ function addBlocker(
       comment: comment,
     });
   });
-  // }
 }
 
 function removeBlocker() {

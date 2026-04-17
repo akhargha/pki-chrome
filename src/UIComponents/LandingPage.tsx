@@ -405,8 +405,26 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               <>
                 <div className='block' id='report-phish-prompt-text'>
                   <h3 className='subtitle' style={{ textAlign: 'center' }}>
-                    If this site is impersonating one of your saved sites, you can
-                    select it below (optional).
+                    Is this site impersonating one of your known sites?
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        marginLeft: '6px',
+                        width: '16px',
+                        height: '16px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ccc',
+                        color: '#555',
+                        fontSize: '11px',
+                        lineHeight: '16px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        verticalAlign: 'middle',
+                      }}
+                      onClick={() => {
+                        alert('If you think this site is impersonating one of your known sites, select it below. Otherwise, choose "None of the above" and continue.');
+                      }}
+                    >?</span>
                   </h3>
                 </div>
                 <div className='landing-select-wrapper'>
@@ -426,13 +444,14 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                         });
                       }}
                     >
-                      <option value=''>Select the known site (optional)</option>
+                      <option value=''>Select a known site</option>
                       {Object.keys(this.props.websiteData).map(key =>
                         this.props.websiteData[key].LogType ===
                           WebsiteListEntryLogType.PROTECTED ? (
                           <option value={key} key={key}>{getSiteName(key)}</option>
                         ) : undefined,
                       )}
+                      <option value='__none__'>None of the above</option>
                     </select>
                   </div>
                 </div>
@@ -443,10 +462,13 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     id='confirm-block-site-btn'
                     style={{ minHeight: '3em' }}
                     onClick={() => {
-                      this.markCurrentSiteAsBlocked(this.state.selectedSiteToReport);
+                      const selected = this.state.selectedSiteToReport;
+                      this.markCurrentSiteAsBlocked(
+                        selected === '__none__' ? undefined : selected,
+                      );
                     }}
                   >
-                    Confirm and block site
+                    Report and block
                   </button>
                 </div>
               </>
