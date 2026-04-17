@@ -15,7 +15,11 @@ if len(os.listdir("./builds")) > 0:
     print("Builds directory is not empty... you should delete this folder before running this script.")
 
 
-result = subprocess.run(f"npm run build_batch -- user_id=some_value",cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE)
+result = subprocess.run(f"npm run build_batch -- user_id=some_value",cwd=os.getcwd(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+if result.returncode != 0:
+    print(f"ERROR: npm run build_batch failed with exit code {result.returncode}")
+    print(result.stderr.decode("utf-8","replace")[-1000:])
+    sys.exit(1)
 amount = len(sys.argv) > 1 and int(sys.argv[1]) or 10
 for i in range(amount):
     user_id ="user_" + str(i)#''.join(random.choices(string.ascii_letters, k=10))

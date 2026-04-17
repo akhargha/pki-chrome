@@ -155,15 +155,18 @@ function verifyProtectedSiteCertificate(
 }
 
 chrome.runtime.sendMessage({ type: iMsgReqType.fetchCookieInfo }, c => {
-  const cookies: ChromeCookie[] = c;
-
-  //this is because we have one cookie which is the crsf token! we need at least 2 cookies
-  //should we check this on every page... idk. but I don't think this
-  //will have an impact on performance either way.
-  if (cookies.length <= 1) {
+  if (chrome.runtime.lastError) {
+    console.warn('Error fetching cookies:', chrome.runtime.lastError.message);
     main();
     return;
-  } // we dont have the required data, do nothing as of right now...
+  }
+
+  const cookies: ChromeCookie[] = c;
+
+  if (!cookies || cookies.length <= 1) {
+    main();
+    return;
+  }
 
   cookies.forEach((cookie: ChromeCookie) => {
     console.log("COOKIE:", cookie.name);
@@ -504,24 +507,19 @@ function main() {
         });
         chrome.runtime.sendMessage({ type: iMsgReqType.siteDataRefresh });
         if (siteData.LogType === WebsiteListEntryLogType.PROTECTED) {
-          // Check if the site is in protected list
           console.log('protected site');
-          // Check if the site is in session list
           if (sessionList[shortenedDomain]) {
             console.log('in session list');
-            // If in session list, remove blocker if it exists
             removeBlocker();
             verifyProtectedSiteCertificate(shortenedDomain, siteData.certChain);
           } else {
             console.log('not in session list');
+            addBlocker(
+              'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
+            );
             verifyProtectedSiteCertificate(
               shortenedDomain,
               siteData.certChain,
-              () => {
-                addBlocker(
-                  'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
-                );
-              },
             );
           }
         } else {
@@ -694,7 +692,15 @@ setInterval(() => {
 // Listener for messages
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === 'removeBlocker') {
-    removeBlocker();
+    chrome.storage.local.get({ websiteList: {} }, function (items) {
+      const websiteList: { [key: string]: WebsiteListEntry } = items.websiteList;
+      const siteData = websiteList[shortenedDomain];
+      if (siteData && siteData.LogType === WebsiteListEntryLogType.BLOCKED) {
+        console.log('Refusing to remove blocker: site is BLOCKED');
+        return;
+      }
+      removeBlocker();
+    });
   }
   if (request.action === 'addBlocker') {
     addBlocker();

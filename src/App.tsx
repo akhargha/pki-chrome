@@ -5,6 +5,7 @@ import SensitiveSiteControls from './UIComponents/SensitiveSiteControls';
 import LandingPage from './UIComponents/LandingPage';
 import {
   WebsiteListEntry,
+  WebsiteListEntryLogType,
   checkList,
   checkListReturn,
 } from './utils/LocalStorage';
@@ -270,9 +271,17 @@ class App extends Component<object, AppState> {
               //TODO: MAKE THIS ASYNC SO WE DONT HAVE ALL THIS NESTED STUFF
               //TODO: ADD METADATA FOR IF THE CERTIFICATE WAS CHANGED!
               if (d.websiteList[shortenedDomain]) {
-                let filter = shortenedDomain;
-                if (filter === 'acct.ilogicalloanssavings.mobyphish.com') {
-                  filter = urlObj.hostname.replace(/^www\./, '');
+                const siteEntry = d.websiteList[shortenedDomain];
+                const isBlockedSite = siteEntry.LogType === WebsiteListEntryLogType.BLOCKED;
+
+                if (isBlockedSite) {
+                  // BLOCKED sites: never send removeBlocker from the popup.
+                  // The blocker stays until the user explicitly removes
+                  // the site from the blocked list.
+                  setter(t);
+                  sendUserActionInfo(user_id, 3);
+                } else if (shortenedDomain === 'acct.ilogicalloanssavings.mobyphish.com') {
+                  const filter = urlObj.hostname.replace(/^www\./, '');
                   console.warn("Filter thing", filter);
                   fetchCertificateChain(filter).then(cert => {
                     if (g.ilogicalloanssavings.realCert === false) {
@@ -288,7 +297,6 @@ class App extends Component<object, AppState> {
                         console.log("COMPARE", cert, cert, d.websiteList[shortenedDomain]);
 
                         if (compareCertificateChains(cert, realCert)) {
-                          // Certificate chains match - remove blocker
                           chrome.tabs.sendMessage(tabs[0].id as number, {
                             action: 'removeBlocker',
                           });
@@ -301,14 +309,13 @@ class App extends Component<object, AppState> {
                         sendUserActionInfo(user_id, 3);
                         return;
                       });
-                      return; // exit out of process
+                      return;
                     } else {
                       const savedCertificateChain = g.ilogicalloanssavings.realCert;
 
                       console.log("COMPARE", cert, savedCertificateChain, d.websiteList[shortenedDomain]);
 
                       if (compareCertificateChains(cert, savedCertificateChain)) {
-                        // Certificate chains match - remove blocker
                         chrome.tabs.sendMessage(tabs[0].id as number, {
                           action: 'removeBlocker',
                         });
@@ -322,23 +329,20 @@ class App extends Component<object, AppState> {
                     }
                   });
                 } else {
-                  // For all other saved sites, fetch and compare certificate chains
-                  const savedCertificateChain = d.websiteList[shortenedDomain].certChain;
+                  // PROTECTED sites: fetch and compare certificate chains
+                  const savedCertificateChain = siteEntry.certChain;
                   fetchCertificateChain(shortenedDomain).then(currentCert => {
                     if (compareCertificateChains(currentCert, savedCertificateChain)) {
-                      // Certificate chains match - remove blocker
                       chrome.tabs.sendMessage(tabs[0].id as number, {
                         action: 'removeBlocker',
                       });
                     } else {
-                      // Certificate chains don't match - keep blocker, show warning
                       t.doShowCertChangedButton = true;
                     }
                     setter(t);
                     sendUserActionInfo(user_id, 3);
                   }).catch(err => {
                     console.error("Error fetching certificate chain:", err);
-                    // On error, treat as potential security issue - keep blocker
                     t.doShowCertChangedButton = true;
                     setter(t);
                     sendUserActionInfo(user_id, 3);
