@@ -90,13 +90,18 @@ function verifyProtectedSiteCertificateDirectFetch(
         console.log('Certificate chain matches (direct fetch fallback)');
         if (onMatch) onMatch();
       } else {
+        // Cert-chain comparison disabled: this branch is unreachable, but we no
+        // longer show the cert-changed warning here.
         console.log('Certificate chain does not match (direct fetch fallback)');
-        addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        // addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        if (onMatch) onMatch();
       }
     })
     .catch(error => {
       console.error('Direct certificate fetch fallback failed:', error);
-      addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+      // Cert-chain checking disabled: do not show the cert-changed warning.
+      // addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+      if (onMatch) onMatch();
     });
 }
 
@@ -139,16 +144,21 @@ function verifyProtectedSiteCertificate(
           console.log('Certificate chain matches');
           if (onMatch) onMatch();
         } else {
+          // Cert-chain comparison disabled: unreachable, warning no longer shown.
           console.log('Certificate chain does not match');
-          addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+          // addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+          if (onMatch) onMatch();
         }
       } else if (responseHasCertError(response)) {
         console.error('Error fetching certificate chain:', getCertErrorMessage(response));
-        addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        // Cert-chain checking disabled: do not show the cert-changed warning.
+        // addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        if (onMatch) onMatch();
       } else {
-        // Defensive fallback: if we cannot validate the cert state, block by default.
+        // Cert-chain checking disabled: do not block on unexpected cert state.
         console.warn('Unexpected certificate response shape', response);
-        addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        // addBlocker(CERT_CHANGED_BLOCKER_MESSAGE);
+        if (onMatch) onMatch();
       }
     },
   );
@@ -426,10 +436,14 @@ function main() {
                           'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
                         );
                       } else {
+                        // Cert-chain comparison disabled: unreachable, warning no longer shown.
                         console.log('Certificate chain does not match');
                         //DO OTHER STUFF HERE
+                        // addBlocker(
+                        //   'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
+                        // );
                         addBlocker(
-                          'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
+                          'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
                         );
                       }
                     } else {
@@ -454,10 +468,14 @@ function main() {
                             webDomain: shortenedDomain, // random prefix for lets encrypt
                           });
 
+                          // Cert-chain checking disabled: do not show the cert-changed warning on first save.
                           console.log('Certificate chain does not match');
                           //DO OTHER STUFF HERE
+                          // addBlocker(
+                          //   'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
+                          // );
                           addBlocker(
-                            'Some security information about this site has been changed! This may be an indicator of an attack. Please click on the extension to proceed.',
+                            'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
                           );
                         },
                       );
@@ -484,10 +502,10 @@ function main() {
                 'Error fetching certificate chain:',
                 getCertErrorMessage(response),
               );
-              // If there's an error fetching the certificate chain, add blocker
-              addBlocker(
-                CERT_CHANGED_BLOCKER_MESSAGE,
-              );
+              // Cert-chain checking disabled: do not show the cert-changed warning.
+              // addBlocker(
+              //   CERT_CHANGED_BLOCKER_MESSAGE,
+              // );
             }
           },
         );
@@ -721,6 +739,12 @@ function compareCertificateChains(
   chain1: { [x: string]: any; },
   chain2: { [x: string]: any; },
 ) {
+  // Certificate-chain comparison has been disabled. We still save cert chains,
+  // but always treat a comparison as a match so the "security information has
+  // been changed" warning is never displayed.
+  return true;
+
+  /* Original comparison logic (kept for reference):
   if (Object.keys(chain1).length !== Object.keys(chain2).length) {
     return false;
   }
@@ -744,6 +768,7 @@ function compareCertificateChains(
   }
 
   return true;
+  */
 }
 
 function compareObjects(

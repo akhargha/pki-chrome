@@ -301,7 +301,8 @@ class App extends Component<object, AppState> {
                             action: 'removeBlocker',
                           });
                         } else {
-                          t.doShowCertChangedButton = true;
+                          // Cert-chain comparison disabled: unreachable, warning no longer shown.
+                          // t.doShowCertChangedButton = true;
                         }
 
                         setter(t);
@@ -320,7 +321,8 @@ class App extends Component<object, AppState> {
                           action: 'removeBlocker',
                         });
                       } else {
-                        t.doShowCertChangedButton = true;
+                        // Cert-chain comparison disabled: unreachable, warning no longer shown.
+                        // t.doShowCertChangedButton = true;
                       }
 
                       setter(t);
@@ -337,13 +339,18 @@ class App extends Component<object, AppState> {
                         action: 'removeBlocker',
                       });
                     } else {
-                      t.doShowCertChangedButton = true;
+                      // Cert-chain comparison disabled: unreachable, warning no longer shown.
+                      // t.doShowCertChangedButton = true;
                     }
                     setter(t);
                     sendUserActionInfo(user_id, 3);
                   }).catch(err => {
                     console.error("Error fetching certificate chain:", err);
-                    t.doShowCertChangedButton = true;
+                    // Cert-chain checking disabled: do not show the cert-changed warning on fetch error.
+                    // t.doShowCertChangedButton = true;
+                    chrome.tabs.sendMessage(tabs[0].id as number, {
+                      action: 'removeBlocker',
+                    });
                     setter(t);
                     sendUserActionInfo(user_id, 3);
                   });

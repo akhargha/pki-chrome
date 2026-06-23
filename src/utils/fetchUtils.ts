@@ -26,6 +26,12 @@ export function compareCertificateChains(
   chain1: { [x: string]: any; },
   chain2: { [x: string]: any; },
 ) {
+  // Certificate-chain comparison has been disabled. We still save cert chains,
+  // but always treat a comparison as a match so the "security information has
+  // been changed" warning is never displayed.
+  return true;
+
+  /* Original comparison logic (kept for reference):
   if (Object.keys(chain1).length !== Object.keys(chain2).length) {
     return false;
   }
@@ -49,6 +55,7 @@ export function compareCertificateChains(
   }
 
   return true;
+  */
 }
 
 export function compareObjects(
