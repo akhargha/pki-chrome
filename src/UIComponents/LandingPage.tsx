@@ -299,12 +299,12 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                     style={{ minHeight: '3em' }}
                     onClick={async () => {
                       localStorage.get(
-                        { websiteList: {}, sessionList: {} },
+                        { websiteList: {}, tabDatabase: {} },
                         async i => {
                           const websiteList: { [key: string]: WebsiteListEntry; } =
                             i.websiteList;
-                          const sessionList: { [key: string]: boolean; } =
-                            i.sessionList;
+                          const tabDatabase: { [key: number]: { unblockedDomain: string; }; } =
+                            i.tabDatabase;
 
                           const webDomain = this.props.webUrl;
                           const tabId = this.props.tabId;
@@ -323,12 +323,12 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                                 lastVisit: currentTime,
                                 faviconUrl: iconurl as string,
                               };
-                              sessionList[webDomain] = true;
+                              tabDatabase[tabId] = { unblockedDomain: webDomain };
 
                               chrome.storage.local.set(
                                 {
                                   websiteList: websiteList,
-                                  sessionList: sessionList,
+                                  tabDatabase: tabDatabase,
                                 },
                                 function () {
                                   console.log(
@@ -336,7 +336,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                                     webDomain,
                                   );
                                   console.log(
-                                    'Website added to session list',
+                                    'Tab unblocked for domain',
                                     webDomain,
                                   );
                                   chrome.runtime.sendMessage({
@@ -403,7 +403,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
               <>
                 <div className='block' id='report-phish-prompt-text'>
                   <h3 className='subtitle' style={{ textAlign: 'center' }}>
-                    Is this site impersonating one of your known sites?
+                    Were you trying to visit one of your saved sites?
                     <span
                       style={{
                         display: 'inline-block',
@@ -420,7 +420,7 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                         verticalAlign: 'middle',
                       }}
                       onClick={() => {
-                        alert('If you think this site is impersonating one of your known sites, select it below. Otherwise, choose "None of the above" and continue.');
+                        alert('Did you expect this to be a different website? If so, select the website you were trying to visit.');
                       }}
                     >?</span>
                   </h3>
@@ -751,19 +751,19 @@ class LandingPage extends Component<LandingPageProps, LandingPageState> {
                 fetchCertificateChain(webDomain)
                   .then(newCertificateChain => {
                     chrome.storage.local.get(
-                      { websiteList: {}, sessionList: {} },
+                      { websiteList: {}, tabDatabase: {} },
                       (items) => {
                         const websiteList: { [key: string]: WebsiteListEntry } = items.websiteList;
-                        const sessionList: { [key: string]: boolean } = items.sessionList;
+                        const tabDatabase: { [key: number]: { unblockedDomain: string; } } = items.tabDatabase;
 
                         if (websiteList[webDomain]) {
                           // Update the certificate chain
                           websiteList[webDomain].certChain = newCertificateChain;
                           websiteList[webDomain].lastVisit = new Date().toLocaleString();
-                          sessionList[webDomain] = true;
+                          tabDatabase[tabId] = { unblockedDomain: webDomain };
 
                           chrome.storage.local.set(
-                            { websiteList, sessionList },
+                            { websiteList, tabDatabase },
                             () => {
                               console.log('Certificate chain updated for', webDomain);
                               // Remove the blocker

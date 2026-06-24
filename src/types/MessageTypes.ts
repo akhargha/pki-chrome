@@ -16,7 +16,8 @@ export enum iMsgReqType {
   //for react ui
   siteDataRefresh,
   openNewTab,
-  fetchCookieInfo
+  fetchCookieInfo,
+  checkTabUnblocked
 }
 
 export type iMsgReq = {

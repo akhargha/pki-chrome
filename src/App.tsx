@@ -181,9 +181,12 @@ class App extends Component<object, AppState> {
 
           sendUserActionInfo(user_id, 2);
 
-          chrome.storage.local.get({ sessionList: {} }, function (items) {
-            const sessionList = items.sessionList;
-            if (!sessionList[shortenedDomain]) {
+          chrome.storage.local.get({ tabDatabase: {} }, function (items) {
+            const tabDatabase: { [key: number]: { unblockedDomain: string; }; } =
+              items.tabDatabase;
+            // "First interaction" for this tab+domain: the tab wasn't already
+            // unblocked for this exact domain.
+            if (tabDatabase[tabId as number]?.unblockedDomain !== shortenedDomain) {
               chrome.tabs.sendMessage(tabId as number, { action: "checkIfClicked" }, (response) => {
                 if (response && !response.clicked) {
                   // document.getElementById(
@@ -198,9 +201,11 @@ class App extends Component<object, AppState> {
                 }
               });
             }
-            sessionList[shortenedDomain] = true;
-            chrome.storage.local.set({ sessionList: sessionList }, function () {
-              console.log('Website added to session list', shortenedDomain);
+            // Unblock this tab for the current domain only. The unblock is
+            // cleared by the service worker as soon as the tab leaves the domain.
+            tabDatabase[tabId as number] = { unblockedDomain: shortenedDomain };
+            chrome.storage.local.set({ tabDatabase: tabDatabase }, function () {
+              console.log('Tab unblocked for domain', shortenedDomain);
               // Note: Blocker removal moved to certificate comparison logic
               // Only remove blocker when certificate chains match
             });

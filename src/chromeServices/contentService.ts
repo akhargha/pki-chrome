@@ -391,13 +391,12 @@ function main() {
     //do something with error
   }
   chrome.storage.local.get(
-    //websiteList is the list of sites we have saved as safe or unsafe
-    //session list is the list of sites that we have visitied in this session, so no reverification is needed.
-    { websiteList: {}, sessionList: {}, ignoreList: [] },
+    //websiteList is the list of sites we have saved as safe or unsafe.
+    //the per-tab unblock state lives in tabDatabase (in the service worker).
+    { websiteList: {}, ignoreList: [] },
     function (items) {
       const websiteList: { [key: string]: WebsiteListEntry; } =
         items.websiteList;
-      const sessionList: { [key: string]: boolean; } = items.sessionList;
       const ignoreList: string[] = items.ignoreList;
       if (shortenedDomain === 'acct.ilogicalloanssavings.mobyphish.com') {
         const domain = webDomain.replace(/^www\./, ''); // only for our site, we want to get the whole thing.
@@ -521,25 +520,38 @@ function main() {
         websiteList[shortenedDomain] = siteData;
         chrome.storage.local.set({
           websiteList,
-          sessionList,
         });
         chrome.runtime.sendMessage({ type: iMsgReqType.siteDataRefresh });
         if (siteData.LogType === WebsiteListEntryLogType.PROTECTED) {
           console.log('protected site');
-          if (sessionList[shortenedDomain]) {
-            console.log('in session list');
-            removeBlocker();
-            verifyProtectedSiteCertificate(shortenedDomain, siteData.certChain);
-          } else {
-            console.log('not in session list');
-            addBlocker(
-              'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
-            );
-            verifyProtectedSiteCertificate(
-              shortenedDomain,
-              siteData.certChain,
-            );
-          }
+          // The unblock decision is per-tab and only valid while this tab stays
+          // on the same domain. The service worker holds that state because the
+          // content script can't read its own tabId.
+          chrome.runtime.sendMessage(
+            {
+              type: iMsgReqType.checkTabUnblocked,
+              webDomain: shortenedDomain,
+            },
+            resp => {
+              if (resp && resp.unblocked) {
+                console.log('tab unblocked for domain');
+                removeBlocker();
+                verifyProtectedSiteCertificate(
+                  shortenedDomain,
+                  siteData.certChain,
+                );
+              } else {
+                console.log('tab not unblocked for domain');
+                addBlocker(
+                  'You\'ve saved this site as a known site. Please click the MobyWeb extension before continuing to stay safe.',
+                );
+                verifyProtectedSiteCertificate(
+                  shortenedDomain,
+                  siteData.certChain,
+                );
+              }
+            },
+          );
         } else {
           console.log('blocked site');
 

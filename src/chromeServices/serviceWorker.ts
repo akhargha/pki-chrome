@@ -1,7 +1,7 @@
 //this file is used for background stuff
 // has no direct access to the DOM
 
-import { fetchCertificateChain } from '../utils/fetchUtils';
+import { fetchCertificateChain, grabMainUrl } from '../utils/fetchUtils';
 import {
   eMsgReq,
   eMsgReqType,
@@ -62,7 +62,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
 
           const localStorageData = await chrome.storage.local.get({
             websiteList: {},
-            sessionList: {},
+            tabDatabase: {},
           });
 
           // Retrieve userId from Chrome storage
@@ -79,8 +79,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
 
           const websiteList: { [key: string]: WebsiteListEntry; } =
             localStorageData.websiteList;
-          const sessionList: { [key: string]: boolean; } =
-            localStorageData.sessionList;
+          const tabDatabase: { [key: number]: { unblockedDomain: string; }; } =
+            localStorageData.tabDatabase;
 
           websiteList[webDomain] = {
             LogType: WebsiteListEntryLogType.PROTECTED,
@@ -90,16 +90,19 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
             faviconUrl: tab.favIconUrl as string,
           };
 
-          // Only add to session list if it's not the test domain
-          if (webDomain !== 'acct.ilogicalloanssavings.mobyphish.com') {
-            sessionList[webDomain] = true;
+          // Only unblock the current tab if it's not the test domain
+          if (
+            webDomain !== 'acct.ilogicalloanssavings.mobyphish.com' &&
+            tab.id !== undefined
+          ) {
+            tabDatabase[tab.id] = { unblockedDomain: webDomain };
           }
 
           console.log('Ok go go');
 
           await chrome.storage.local.set({
             websiteList,
-            sessionList,
+            tabDatabase,
           });
 
           //so our ui can refresh on open
@@ -110,7 +113,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, _) => {
             .then(v => { })
             .catch(e => console.warn(e));
           console.log('Website Saved as Sensitive', webDomain);
-          console.log('Website added to session list', webDomain);
+          console.log('Tab unblocked for domain', webDomain);
 
           if (webDomain !== 'acct.ilogicalloanssavings.mobyphish.com') {
             sendUserActionInfo(userId, 4);
@@ -272,7 +275,63 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse(cookies);
       });
       return true;
+    case iMsgReqType.checkTabUnblocked: {
+      // Content scripts can't read their own tabId, so the decision is made
+      // here using the per-tab tabDatabase record. A tab is "unblocked" only
+      // while it stays on the exact domain it was unblocked for.
+      const tabId = sender.tab?.id;
+      const domain = data.webDomain;
+      if (tabId === undefined || !domain) {
+        sendResponse({ unblocked: false });
+        return true;
+      }
+      chrome.storage.local.get({ tabDatabase: {} }, items => {
+        const tabDatabase: { [key: number]: { unblockedDomain: string; }; } =
+          items.tabDatabase;
+        sendResponse({
+          unblocked: tabDatabase[tabId]?.unblockedDomain === domain,
+        });
+      });
+      return true;
+    }
   }
+});
+
+// Clear a tab's unblock when it navigates to a different domain, so the
+// known-site warning reappears on returning to the domain or in new tabs.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  const urlString = changeInfo.url ?? tab.url;
+  if (!urlString) {
+    return;
+  }
+
+  let newDomain: string;
+  try {
+    newDomain = grabMainUrl(new URL(urlString));
+  } catch (e) {
+    return;
+  }
+
+  chrome.storage.local.get({ tabDatabase: {} }, items => {
+    const tabDatabase: { [key: number]: { unblockedDomain: string; }; } =
+      items.tabDatabase;
+    if (tabDatabase[tabId] && tabDatabase[tabId].unblockedDomain !== newDomain) {
+      delete tabDatabase[tabId];
+      chrome.storage.local.set({ tabDatabase });
+    }
+  });
+});
+
+// Clean up the per-tab record when a tab is closed.
+chrome.tabs.onRemoved.addListener(tabId => {
+  chrome.storage.local.get({ tabDatabase: {} }, items => {
+    const tabDatabase: { [key: number]: { unblockedDomain: string; }; } =
+      items.tabDatabase;
+    if (tabDatabase[tabId]) {
+      delete tabDatabase[tabId];
+      chrome.storage.local.set({ tabDatabase });
+    }
+  });
 });
 
 //handler to detect when the popup opens and closes
